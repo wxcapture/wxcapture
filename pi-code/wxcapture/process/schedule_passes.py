@@ -135,6 +135,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     theta = []
     radius = []
     plot_labels = []
+    VISIBLE_YES = '+'
+    VISIBLE_NO = '_'
     if '+' in stdout.decode('utf-8'):
         visible = ''
         counter = 0
@@ -143,17 +145,17 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
             status = ''
             counter += 1
             try:
-                status = elements[11].replace('*', '_').replace('+', 'Y').replace('0.000000', '_')
+                status = elements[11].replace('*', VISIBLE_NO).replace('+', VISIBLE_YES).replace('0.000000', '_')
             except IndexError:
                 status = '-'
             visible = visible + status
 
             # if visible and not yet started, start
-            if status == 'Y' and visible_start == '':
+            if status == VISIBLE_YES and visible_start == '':
                 visible_start = date_value(row)
 
             # if not visible and has started, has not previously ended, end
-            if status == '_' and visible_start != '' and visible_end == '':
+            if status == VISIBLE_NO and visible_start != '' and visible_end == '':
                 visible_end = date_value(row)
 
             if counter == halfway:

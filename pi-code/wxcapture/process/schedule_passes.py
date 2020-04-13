@@ -135,8 +135,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     theta = []
     radius = []
     plot_labels = []
-    VISIBLE_YES = '+'
-    VISIBLE_NO = '_'
+
     if '+' in stdout.decode('utf-8'):
         visible = ''
         counter = 0
@@ -563,6 +562,9 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
+# globals
+VISIBLE_YES = '+'
+VISIBLE_NO = '_'
 
 # try block to catch any exceptions
 try:
@@ -665,11 +667,15 @@ try:
         html.write('<h2 class=\"section-header\">Today Over ' + CONFIG_INFO['Location'] + '</h2>')
         html.write('<ul>')
         html.write('<li>A satellite name which appears like <del>NOAA 15</del> '
-                   'is not being captured.</li>')
+                   'is not being captured, with the reason why given.</li>')
         html.write('<li>A highlighted row is one where the maximum elevation is high and should'
                    ' give a great image</li>')
         html.write('<li>The polar plot can be clicked on to see more detail of the pass.</li>')
-        html.write('<li>Visible _____^YYYYYY means that the satellite pass, weather permitting, '
+        html.write('<li>Visible ' +
+                   VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + \
+                   '^' + \
+                   VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + \
+                   'means that the satellite pass, weather permitting, '
                    'is not visble for the first half of the pass, with ^ being the pass mid-point '
                    'and Y indicating where it is visible. The total time it may be visible from '
                    'is shown in brackets, e.g. (4:51), being for 4 minutes and 51 seconds. </li>')

@@ -169,3 +169,47 @@ time{
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+.hint {
+    position: relative;
+    display: inline-block;
+    border-bottom: 2px dashed rgb(48, 138, 255);
+}
+
+.hint .hint-popup {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the hint */
+    position: absolute;
+    z-index: 1;
+
+    bottom: 105%;
+    /* width: 100%; */
+    left: 50%;
+    margin-left: -140%;
+    /* right: 105%; */
+
+    width: 120px;
+    /* margin-left: -60px; */
+}
+
+.hint:hover {
+    color: #ffffff;
+    background-color: #cccccc;
+}
+
+.hint:hover .hint-popup {
+    visibility: visible;
+}
+
+b {
+    color: #ffffff;
+    font-size: large;
+    font-weight: bold;
+}

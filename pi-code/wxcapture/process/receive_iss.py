@@ -7,8 +7,10 @@ create images plus pass web page"""
 
 # import libraries
 import os
+import time
 import sys
 import subprocess
+from subprocess import Popen, PIPE
 from rtlsdr import RtlSdr
 import wxcutils
 
@@ -40,11 +42,11 @@ def scp_files():
                     scp_config['remote host'], scp_config['remote directory'],
                     scp_config['remote user'])
 
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '*.html ' +
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.html ' +
                      scp_config['remote user'] +
                      '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] + '/')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '*.txt ' +
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.txt ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] + '/')
@@ -56,6 +58,11 @@ def scp_files():
                      scp_config['remote user'] + '@' +
                      scp_config['remote host']
                      + ':' + scp_config['remote directory'] + '/')
+    MY_LOGGER.debug('SCPing .png image file')
+    wxcutils.run_cmd('scp ' + IMAGE_PATH + FILENAME_BASE + '*.png ' +
+                     scp_config['remote user']
+                     + '@' + scp_config['remote host'] + ':' +
+                     scp_config['remote directory'] + '/images/')
     MY_LOGGER.debug('SCPing .wav audio file')
     wxcutils.run_cmd('scp ' + AUDIO_PATH + FILENAME_BASE + '.wav ' +
                      scp_config['remote user']
@@ -63,6 +70,22 @@ def scp_files():
                      scp_config['remote directory'] + '/audio/')
     MY_LOGGER.debug('SCP complete')
 
+
+def find_files():
+    """find any image files created"""
+    counter = 0
+    for file in os.listdir(WORKING_PATH):
+        if file.endswith('.png'):
+            MY_LOGGER.debug('Found file %s', file)
+            counter += 1
+            # rename file to include the FILENAME_BASE
+            # and to move to the IMAGE_PATH directory
+            wxcutils.move_file(WORKING_PATH, file,
+                               IMAGE_PATH, FILENAME_BASE +  '-sstv-' + str(counter) + '.png')
+            IMAGE_FILES.append(FILENAME_BASE + '-sstv-' + str(counter) + '.png')
+    MY_LOGGER.debug('Found %d files', counter)
+    MY_LOGGER.debug(IMAGE_FILES)
+    return counter
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -122,10 +145,13 @@ IMAGE_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-ISS.json')
 LOCAL_TIME_ZONE = subprocess.check_output("date"). \
     decode('utf-8').split(' ')[-2]
 
+
 # create filename base
 FILENAME_BASE = wxcutils.epoch_to_utc(START_EPOCH, '%Y-%m-%d-%H-%M-%S') + \
     '-' + SATELLITE.replace(' ', '_').replace('(', '').replace(')', '')
 MY_LOGGER.debug('FILENAME_BASE = %s', FILENAME_BASE)
+
+
 
 # load pass information
 PASS_INFO = wxcutils.load_json(OUTPUT_PATH, FILENAME_BASE + '.json')
@@ -157,13 +183,31 @@ if REPROCESS != 'Y':
                      AUDIO_PATH + FILENAME_BASE + '.wav\" rate 48k')
 MY_LOGGER.debug('-' * 30)
 
-# write processing code..
+# need to ensure that the following are running:
+# * pactl load-module module-null-sink sink_name=virtual-cable
+# * qsstv
 
-# currently this is a manual step using Robot36
+# start the playback
+MY_LOGGER.debug('start pactl to play back the recording to QSSTV')
+# paplay -d virtual-cable /home/pi/sstv/audio/2019-08-02-14-16-25-ISS_ZARYA.wav
+CMD = Popen(['/usr/bin/paplay', '-d', 'virtual-cable',
+             AUDIO_PATH + FILENAME_BASE + '.wav']
+            , stdout=PIPE, stderr=PIPE)
+STDOUT, STDERR = CMD.communicate()
+MY_LOGGER.debug('stdout:%s', STDOUT)
+MY_LOGGER.debug('stderr:%s', STDERR)
+
+# with .communicate, will wait for playback to continue
+# sleep 30 seconds to enable any final processing to complete
+MY_LOGGER.debug('sleep 30 seconds for final processing')
+time.sleep(30)
+MY_LOGGER.debug('sleep completed')
+
+# find any images created
+IMAGE_FILES = []
+IMAGE_COUNT = find_files()
 
 MY_LOGGER.debug('-' * 30)
-
-
 
 # build web page for pass
 with open(OUTPUT_PATH + FILENAME_BASE + '.html', 'w') as html:
@@ -192,6 +236,18 @@ with open(OUTPUT_PATH + FILENAME_BASE + '.html', 'w') as html:
     html.write('<li>Modules - ' + PASS_INFO['modules'] + '</li>')
     html.write('</ul>')
     html.write('<img src=\"images/' + FILENAME_BASE + '-plot.png\">')
+    html.write('<h2>Decoded Images</h2>')
+
+    if IMAGE_COUNT == 0:
+        html.write('<p>No images could be automatically decoded.</p>')
+    else:
+        html.write('<table>')
+        for row in IMAGE_FILES:
+            html.write('<tr><td>')
+            html.write('<img src=\"images/' + row + '\">')
+            html.write('</td></tr>')
+        html.write('</table>')
+
     html.write('<a href=\"audio/' + FILENAME_BASE +
                '.wav' + '\"><h2>ISS Audio</h2></a>')
 

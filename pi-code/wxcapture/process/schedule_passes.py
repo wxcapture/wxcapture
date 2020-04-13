@@ -675,7 +675,7 @@ try:
                    VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + \
                    '^' + \
                    VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + \
-                   'means that the satellite pass, weather permitting, '
+                   ' means that the satellite pass, weather permitting, '
                    'is not visble for the first half of the pass, with ^ being the pass mid-point '
                    'and Y indicating where it is visible. The total time it may be visible from '
                    'is shown in brackets, e.g. (4:51), being for 4 minutes and 51 seconds. </li>')

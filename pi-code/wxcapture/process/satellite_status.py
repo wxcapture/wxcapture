@@ -45,18 +45,18 @@ def get_noaa_status(satellite):
         pos_1_end = entry.find('MHz')
         pos_2_st = entry.find('VTX-2')
         pos_2_end = entry.find('MHz')
-        return entry[pos_1_st:pos_1_end + 3].replace(' &nbsp; ', ' = ' ) + \
-            entry[pos_2_st:pos_2_end + 3].replace(' &nbsp; ', ' = ' )
+        return entry[pos_1_st:pos_1_end + 3].replace(' &nbsp; ', ' = ') + \
+            entry[pos_2_st:pos_2_end + 3].replace(' &nbsp; ', ' = ')
     MY_LOGGER.debug('Getting %s status', satellite)
-    lines = NOAA_STATUS_PAGE.splitlines() 
-    
+    lines = NOAA_STATUS_PAGE.splitlines()
+
     line_num = 0
     size_of_lines = len(lines)
-    
+
     result = ''
     match = '<!-- Place Status Includes for ' + satellite + ' here --> '
     MY_LOGGER.debug('Matching to %s', match)
-    
+
     while line_num < size_of_lines:
         if match in lines[line_num].decode('utf-8'):
             # found our satellite
@@ -66,23 +66,23 @@ def get_noaa_status(satellite):
             line_num = size_of_lines
         line_num += 1
     MY_LOGGER.debug('result = %s', result)
-    return(result)
+    return result
 
 
 def get_meteor_status(satellite):
     """get the satellite status for a Meteor satellite"""
     def tidy_up(entry):
-        return entry.decode('utf-8').replace('<td>', '').replace('</td>','')
+        return entry.decode('utf-8').replace('<td>', '').replace('</td>', '')
     MY_LOGGER.debug('Getting %s status', satellite)
-    lines = METEOR_STATUS_PAGE.splitlines() 
-    
+    lines = METEOR_STATUS_PAGE.splitlines()
+
     line_num = 0
     size_of_lines = len(lines)
-    
+
     result = ''
     match = '<h2>' + satellite + ':</h2>'
     MY_LOGGER.debug('Matching to %s', match)
-    
+
     while line_num < size_of_lines:
         if match in lines[line_num].decode('utf-8'):
             # found our satellite
@@ -99,8 +99,8 @@ def get_meteor_status(satellite):
             line_num = size_of_lines
         line_num += 1
     MY_LOGGER.debug('result = %s', result)
-    return(result)
-            
+    return result
+
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -165,11 +165,11 @@ with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
     html.write('</section>')
 
     html.write('<footer class=\"main-footer\">')
-    html.write('<p>Satellite Status last updated at ' +
+    html.write('<p id=\"footer-text\">Satellite Status last updated at <time>' +
                time.strftime('%H:%M (' +
                              subprocess.check_output("date").
                              decode('utf-8').split(' ')[-2] +
-                             ') on the %d/%m/%Y') +
+                             ')</time> on the <time>%d/%m/%Y</time>') +
                '.</p>')
     html.write('</footer>')
     html.write('</body></html>')

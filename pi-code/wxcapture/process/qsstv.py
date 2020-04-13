@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Run pactl and QSSTV
-Runs from crontab on reboot"""
+Needs to be run from VNC and left running
+Otherwise receive_iss.py will not be able
+to decode sstv images"""
 
 import os
 import time

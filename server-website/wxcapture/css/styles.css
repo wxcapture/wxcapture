@@ -25,6 +25,10 @@ html, body {
     text-decoration: none;
 }
 
+a{
+    -webkit-transition: background-color 0.5s;
+}
+
 .nav a:hover {
     background-color: rgba(255, 255, 255, .3);
 }
@@ -40,10 +44,22 @@ html, body {
     padding: 0 5%;
 }
 
+body, html {
+    /* height: 100%; */
+}
+
 .main-header {
     background-blend-mode: multiply;
     background-color: rgba(0, 0, 0, .3);
+    background-size: cover;
+    padding-bottom: 30px;
+    
+    /* Parallax Scrolling */
     background-image: url("images/headerbackground.jpg");
+    height: 40%;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
     padding-bottom: 30px;
 }
@@ -66,6 +82,7 @@ html, body {
 }
 
 .row-highlight {
+    /* background-color: #00E000; */
     background-color: #8595AE;
 }
 
@@ -77,8 +94,12 @@ html, body {
 }
 
 .section-header {
-    color: black;
-    font-family: "Roberto";
+    color: #000000;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    /* color: black;
+    font-family: "Roberto"; */
+    font-style: oblique;
+    text-decoration: underline;
     font-size: 2.5em;
     font-weight: normal;
     text-align: left;
@@ -97,28 +118,39 @@ html, body {
 }
 
 .content-section td {
-    border: 1px solid black;
-    color: black;
-    font-weight: bold;
-    text-align: left;
+      border: 1px solid black;
+      color: black;
+      font-weight: bold;
+      text-align: left;
 }
 
 .content-section a:link {
-    color: green;
-    font-size: 1.2em;
-    font-weight: bold;
+  color: blue;
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
+
 .content-section a:visited {
-    color: black;
-    font-size: 0.8em;
-    font-weight: normal;
+  color: green;
+  /* font-size: 0.8em; */
+  font-weight: normal;
 }
 
 .content-section a:hover {
-    color: red;
-    font-size: 1.5em;
-    font-weight: bolder;
+  color: red;
+  /* font-size: 1.5em; */
+  font-weight: bolder;
+}
+
+time{
+    color: #ffffff;
+    background-color: #888888;
+    font-family: 'Courier New', Courier, monospace
+}
+
+#footer-text{
+    color: #ffffff;
 }
 
 .main-footer {
@@ -129,4 +161,11 @@ html, body {
     font-weight: bold;
     padding-bottom: 30px;
     text-align: center;
+
+    /* Parallax Scrolling */
+    height: 40%;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }

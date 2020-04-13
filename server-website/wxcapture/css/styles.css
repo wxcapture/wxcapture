@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Raleway:wght@100&&family=Roboto');
+
+* {
+    box-sizing: border-box;
+    color: black;
+    font-family: 'Raleway', normal;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.nav ul {
+    margin: 0;
+}
+
+.nav li {
+    display: inline;
+}
+.nav a {
+    color: white;
+    display: inline-block;
+    padding: .5em;
+    text-decoration: none;
+}
+
+.nav a:hover {
+    background-color: rgba(255, 255, 255, .3);
+}
+
+.main-nav {
+    border-bottom: 1px solid rgba(255, 255, 255, .3);
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.main-nav li {
+    padding: 0 5%;
+}
+
+.main-header {
+    background-blend-mode: multiply;
+    background-color: rgba(0, 0, 0, .3);
+    background-image: url("images/headerbackground.jpg");
+    background-size: cover;
+    padding-bottom: 30px;
+}
+
+.page-name {
+    color: white;
+    font-family: "Open Sans";
+    font-size: 4em;
+    font-weight: normal;
+    margin: 0;
+    text-align: center;
+}
+
+.page-name-large {
+    font-size: 4em;
+}
+
+.content-section {
+    margin: 1em;
+}
+
+.row-highlight {
+    background-color: #8595AE;
+}
+
+.container {
+    color: gray;
+    margin: 0 auto;
+    max-width: 1400px;
+    padding: 0 1.5em;
+}
+
+.section-header {
+    color: black;
+    font-family: "Roberto";
+    font-size: 2.5em;
+    font-weight: normal;
+    text-align: left;
+}
+
+.main-header table {
+    border-collapse: collapse;
+}
+
+.content-section th {
+    background-color: #30406C;
+    border: 1px solid black;
+    color: white;
+    font-weight: bolder;
+    text-align: left;
+}
+
+.content-section td {
+    border: 1px solid black;
+    color: black;
+    font-weight: bold;
+    text-align: left;
+}
+
+.content-section a:link {
+    color: green;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.content-section a:visited {
+    color: black;
+    font-size: 0.8em;
+    font-weight: normal;
+}
+
+.content-section a:hover {
+    color: red;
+    font-size: 1.5em;
+    font-weight: bolder;
+}
+
+.main-footer {
+    background-blend-mode: multiply;
+    background-color: rgba(0, 0, 0, .1);
+    background-image: url("images/footerbackground.jpg");
+    background-size: cover;
+    font-weight: bold;
+    padding-bottom: 30px;
+    text-align: center;
+}

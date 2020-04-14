@@ -77,10 +77,6 @@ body, html {
     font-size: 4em;
 }
 
-.content-section {
-    margin: 1em;
-}
-
 .row-highlight {
     /* background-color: #00E000; */
     background-color: #8595AE;
@@ -109,6 +105,10 @@ body, html {
     border-collapse: collapse;
 }
 
+.content-section {
+    margin: 1em;
+}
+
 .content-section th {
     background-color: #30406C;
     border: 1px solid black;
@@ -130,16 +130,13 @@ body, html {
   font-weight: bold;
 }
 
-
 .content-section a:visited {
-  color: green;
-  /* font-size: 0.8em; */
+  color: grey;
   font-weight: normal;
 }
 
 .content-section a:hover {
   color: red;
-  /* font-size: 1.5em; */
   font-weight: bolder;
 }
 

@@ -3,7 +3,8 @@
 * {
     box-sizing: border-box;
     color: black;
-    font-family: 'Raleway', normal;
+    /* font-family: 'Raleway', normal; */
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 html, body {
@@ -44,9 +45,9 @@ a{
     padding: 0 5%;
 }
 
-body, html {
-    /* height: 100%; */
-}
+/* body, html {
+    height: 100%;
+} */
 
 .main-header {
     background-blend-mode: multiply;
@@ -55,7 +56,7 @@ body, html {
     padding-bottom: 30px;
     
     /* Parallax Scrolling */
-    background-image: url("images/headerbackground.jpg");
+    background-image: url("images/header-nz.jpg");
     height: 40%;
     background-attachment: fixed;
     background-position: center;
@@ -66,10 +67,11 @@ body, html {
 
 .page-name {
     color: white;
-    font-family: "Open Sans";
-    font-size: 4em;
-    font-weight: normal;
+    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;;
+    font-size: 10em;
     margin: 0;
+    font-weight: bold;
+    text-decoration: none;
     text-align: center;
 }
 
@@ -167,10 +169,11 @@ time{
     background-size: cover;
 }
 
+/* Hints */
 .hint {
     position: relative;
     display: inline-block;
-    border-bottom: 2px dashed rgb(48, 138, 255);
+    border-bottom: 2px dashed rgb(161, 161, 161);
 }
 
 .hint .hint-popup {

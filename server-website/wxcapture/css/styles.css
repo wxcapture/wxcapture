@@ -26,7 +26,7 @@ html, body {
 }
 
 a{
-    -webkit-transition: background-color 0.5s;
+    transition: background-color 0.5s;
 }
 
 .nav a:hover {
@@ -177,7 +177,9 @@ time{
 }
 
 .hint .hint-popup {
+    transition: opacity 0.5s;
     visibility: hidden;
+    opacity: 0%;
     width: 120px;
     background-color: black;
     color: #fff;
@@ -206,6 +208,11 @@ time{
 
 .hint:hover .hint-popup {
     visibility: visible;
+    opacity: 100%;
+}
+
+.hint-popup{
+    border: 2px dotted #cccccc;
 }
 
 b {

@@ -388,6 +388,11 @@ with open(OUTPUT_PATH + FILENAME_BASE + '.html', 'w') as html:
                            channelB + '</li><li>' + gain + '</li></ul>')
                 html.write('</td></tr>')
 
+            # update the pass json with NOAA data
+            PASS_INFO['NOAA Channel A'] = channelA
+            PASS_INFO['NOAA Channel B'] = channelB
+            PASS_INFO['NOAA Image Gain'] = gain
+
     try:
         NORM_FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-norm.jpg')
         MY_LOGGER.debug('norm_file_size = %s', str(NORM_FILE_SIZE))
@@ -404,6 +409,10 @@ with open(OUTPUT_PATH + FILENAME_BASE + '.html', 'w') as html:
     html.write('</table></body></html>')
 
 html.close()
+
+# save updated pass info json file
+MY_LOGGER.debug('Saving pass info to json file')
+wxcutils.save_json(OUTPUT_PATH, FILENAME_BASE + '.json', PASS_INFO)
 
 # delete audio file?
 if CONFIG_INFO['save .wav files'] == 'no':

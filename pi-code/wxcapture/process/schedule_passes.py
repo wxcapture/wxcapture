@@ -655,7 +655,8 @@ try:
         html.write('<html lang=\"en\"><head><title>Satellite Pass Predictions'
                    '</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
-                   '<link rel=\"stylesheet\" href=\"lightbox/css/lightbox.min.css\">')
+                   '<link rel=\"stylesheet\" href=\"lightbox/css/lightbox.min.css\">'
+                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
         html.write('</head>')
         html.write('<body>')
         html.write(wxcutils.load_file(CONFIG_PATH,

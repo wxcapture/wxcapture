@@ -787,11 +787,11 @@ try:
 
         MY_LOGGER.debug('Footer')
         html.write('<footer class=\"main-footer\">')
-        html.write('<p id=\"footer-text\">Pass Dat last updated at <span class="time">' +
+        html.write('<p id=\"footer-text\">Pass Data last updated at <span class=\"time\">' +
                    time.strftime('%H:%M (' +
                                  subprocess.check_output("date").
                                  decode('utf-8').split(' ')[-2] +
-                                 ')</span> on the <span class="time">%d/%m/%Y</span>') +
+                                 ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
                    '.</p>')
         html.write('</footer>')
         html.write('<script src=\"lightbox/js/lightbox-plus-jquery.min.js\"></script>')

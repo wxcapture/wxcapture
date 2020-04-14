@@ -194,11 +194,11 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                              bpm_month_name + ' ' + bpm_year)
         cp_html.write('</section>')
         cp_html.write('<footer class=\"main-footer\">')
-        cp_html.write('<p id=\"footer-text\">Captures last updated at <span class="time">' +
+        cp_html.write('<p id=\"footer-text\">Captures last updated at <span class=\"time\">' +
                       time.strftime('%H:%M (' +
                                     subprocess.check_output("date").
                                     decode('utf-8').split(' ')[-2] +
-                                    ')</span> on the <span class="time">%d/%m/%Y</span>') +
+                                    ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
                       '.</p>')
         cp_html.write('</footer>')
         cp_html.write('</body></html>')
@@ -388,11 +388,11 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
 
 
     html.write('<footer class=\"main-footer\">')
-    html.write('<p id=\"footer-text\">Captures last updated at <time>' +
+    html.write('<p id=\"footer-text\">Captures last updated at <span class=\"time\">' +
                time.strftime('%H:%M (' +
                              subprocess.check_output("date").
                              decode('utf-8').split(' ')[-2] +
-                             ')</time> on the <time>%d/%m/%Y</time>') +
+                             ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
                '.</p>')
     html.write('</footer>')
     html.write('</body></html>')

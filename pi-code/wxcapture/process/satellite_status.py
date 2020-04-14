@@ -166,11 +166,11 @@ with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
     html.write('</section>')
 
     html.write('<footer class=\"main-footer\">')
-    html.write('<p id=\"footer-text\">Satellite Status last updated at <span class="time">' +
+    html.write('<p id=\"footer-text\">Satellite Status last updated at <span class=\"time\">' +
                time.strftime('%H:%M (' +
                              subprocess.check_output("date").
                              decode('utf-8').split(' ')[-2] +
-                             ')</span> on the <span class="time">%d/%m/%Y</span>') +
+                             ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
                '.</p>')
     html.write('</footer>')
     html.write('</body></html>')

@@ -56,7 +56,7 @@ a{
     padding-bottom: 30px;
     
     /* Parallax Scrolling */
-    background-image: url("images/header-nz.jpg");
+    background-image: url("images/headerbackground.jpg");
     height: 40%;
     background-attachment: fixed;
     background-position: center;

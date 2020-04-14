@@ -175,7 +175,8 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         cp_label = bpm_month_name + ' ' + bpm_year
         cp_html.write('<!DOCTYPE html>')
         cp_html.write('<html lang=\"en\"><head><title>Captures ' + cp_label + '</title>'
-                      '<link rel=\"stylesheet\" href=\"../../css/styles.css\">')
+                      '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
+                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
         cp_html.write('</head>')
         cp_html.write('<body>')
         cp_html.write(wxcutils.load_file(CONFIG_PATH,
@@ -369,7 +370,8 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
     LABEL = MONTH_NAME + ' ' + YEAR
     html.write('<!DOCTYPE html>')
     html.write('<html lang=\"en\"><head><title>Captures</title>'
-               '<link rel=\"stylesheet\" href=\"css/styles.css\">')
+               '<link rel=\"stylesheet\" href=\"css/styles.css\">'
+               '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
     html.write('<meta http-equiv = \"refresh\" content = \"0; url = ' + CURRENT_LINK + '\" />')
     html.write('</head>')
     html.write('<body>')

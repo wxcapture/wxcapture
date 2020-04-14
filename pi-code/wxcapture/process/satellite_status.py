@@ -69,6 +69,21 @@ def get_noaa_status(satellite):
     return result
 
 
+def get_iss_status():
+    """get the ISS SSTV status from ARISS"""
+    page = ISS_STATUS_PAGE.decode('utf-8')
+    # find the marker for the latest update
+    start_pos = page.find('<div class=\'post-body entry-content\'')
+    # find the end of the div
+    start_pos_2 = page.find('>', start_pos) + 1
+    # find the end of the content
+    end_pos = page.find('<div style=', start_pos_2)
+    result = page[start_pos_2: end_pos]
+
+    MY_LOGGER.debug('ISS text = %s', result)
+    return result
+
+
 def get_meteor_status(satellite):
     """get the satellite status for a Meteor satellite"""
     def tidy_up(entry):
@@ -129,7 +144,7 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 # grap the status web pages
 METEOR_STATUS_PAGE = get_page('http://happysat.nl/Meteor/html/Meteor_Status.html')
 NOAA_STATUS_PAGE = get_page('https://www.ospo.noaa.gov/Operations/POES/status.html')
-
+ISS_STATUS_PAGE = get_page('http://ariss-sstv.blogspot.com/')
 
 # output as html
 MY_LOGGER.debug('Build webpage')
@@ -145,6 +160,7 @@ with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
     html.write(wxcutils.load_file(CONFIG_PATH, 'main-header.txt').replace('PAGE-TITLE',
                                                                           'Satellite Status'))
     html.write('<section class=\"content-section container\">')
+
     html.write('<h2 class=\"section-header\">Meteor-M Series Status</h2>')
     html.write('<table>')
     html.write('<tr><th>Meteor-M N2</th><th>Meteor-M N2-2</th></tr>')
@@ -163,6 +179,15 @@ with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
     html.write('<td>' + get_noaa_status('NOAA 19') + '</td></tr>')
     html.write('</table>')
     html.write('<p><a href=\"https://www.ospo.noaa.gov/Operations/POES/status.html\" target=\"_blank\">Data source</a></p>')
+    html.write('</section>')
+
+    html.write('<section class=\"content-section container\">')
+    html.write('<h2 class=\"section-header\">ISS SSTV - ARISS Status</h2>')
+    html.write('<table>')
+    html.write('<tr><th>ISS Zarya</th></tr>')
+    html.write('<tr><td>' + get_iss_status() + '</td></tr>')
+    html.write('</table>')
+    html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\">Data source</a></p>')
     html.write('</section>')
 
     html.write('<footer class=\"main-footer\">')

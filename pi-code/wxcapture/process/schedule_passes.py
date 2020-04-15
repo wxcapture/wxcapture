@@ -658,7 +658,7 @@ try:
                    '<link rel=\"stylesheet\" href=\"lightbox/css/lightbox.min.css\">'
                    '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
         html.write('</head>')
-        html.write('<body>')
+        html.write('<body onload=\"defaulthide()\">')
         html.write(wxcutils.load_file(CONFIG_PATH,
                                       'main-header.txt').replace('PAGE-TITLE',
                                                                  'Satellite Pass Predictions'))
@@ -666,6 +666,8 @@ try:
 
         MY_LOGGER.debug('Table for today')
         html.write('<h2 class=\"section-header\">Today Over ' + CONFIG_INFO['Location'] + '</h2>')
+        html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show instructions</button>')
+        html.write('<div id=\"instructionsDiv\">')
         html.write('<ul>')
         html.write('<li>A satellite name which appears like <del>NOAA 15</del> '
                    'is not being captured, with the reason why given.</li>')
@@ -681,6 +683,7 @@ try:
                    'and Y indicating where it is visible. The total time it may be visible from '
                    'is shown in brackets, e.g. (4:51), being for 4 minutes and 51 seconds. </li>')
         html.write('</ul>')
+        html.write('</div>')
         html.write(CONFIG_INFO['Pass Info'])
         html.write('<table>')
         if CONFIG_INFO['Hide Detail'] == 'Yes':
@@ -794,7 +797,25 @@ try:
                                  ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
                    '.</p>')
         html.write('</footer>')
+
         html.write('<script src=\"lightbox/js/lightbox-plus-jquery.min.js\"></script>')
+        html.write('<script>')
+        html.write('function hideshow() {')
+        html.write('  var x = document.getElementById(\"instructionsDiv\");')
+        html.write('  if (x.style.display === \"none\") {')
+        html.write('    x.style.display = \"block\";')
+        html.write('   showhide.innerHTML = \"Hide instructions\";')
+        html.write(' } else {')
+        html.write('   x.style.display = \"none\";')
+        html.write('   showhide.innerHTML = \"Show instructions\";')
+        html.write(' }')
+        html.write('}')
+        html.write('function defaulthide() {')
+        html.write('  var x = document.getElementById(\"instructionsDiv\");')
+        html.write('  x.style.display = \"none\";')
+        html.write('  showhide.innerHTML = \"Show instructions\";')
+        html.write('}')
+        html.write('</script>')
         html.write('</body></html>')
         html.close()
 

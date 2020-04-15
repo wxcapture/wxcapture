@@ -178,15 +178,20 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                       '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
                       '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
         cp_html.write('</head>')
-        cp_html.write('<body>')
+        cp_html.write('<body onload=\"defaulthide()\">')
         cp_html.write(wxcutils.load_file(CONFIG_PATH,
                                          'main-header-2up.txt').replace('PAGE-TITLE', \
             'Weather Satellite Captures'))
 
         cp_html.write('<section class=\"content-section container\">')
+        cp_html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show previous months / years</button>')
+        cp_html.write('</section>')
+
+        cp_html.write('<div id=\"linksDiv\">')
+        cp_html.write('<section class=\"content-section container\">')
         cp_html.write('<h2 class=\"section-header\">All Captures by Year and Month</h2>')
         cp_html.write(HISTORIC_LINKS)
-        cp_html.write('</section>')
+        cp_html.write('</section></div>')
 
         cp_html.write('<section class=\"content-section container\">')
         cp_html.write('<h2 class=\"section-header\">' + cp_label + '</h2>')
@@ -201,6 +206,25 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                                     ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
                       '.</p>')
         cp_html.write('</footer>')
+
+        cp_html.write('<script>')
+        cp_html.write('function hideshow() {')
+        cp_html.write('  var x = document.getElementById(\"linksDiv\");')
+        cp_html.write('  if (x.style.display === \"none\") {')
+        cp_html.write('    x.style.display = \"block\";')
+        cp_html.write('   showhide.innerHTML = \"Hide previous months / years\";')
+        cp_html.write(' } else {')
+        cp_html.write('   x.style.display = \"none\";')
+        cp_html.write('   showhide.innerHTML = \"Show previous months / years\";')
+        cp_html.write(' }')
+        cp_html.write('}')
+        cp_html.write('function defaulthide() {')
+        cp_html.write('  var x = document.getElementById(\"linksDiv\");')
+        cp_html.write('  x.style.display = \"none\";')
+        cp_html.write('  showhide.innerHTML = \"Show previous months / years\";')
+        cp_html.write('}')
+        cp_html.write('</script>')
+
         cp_html.write('</body></html>')
 
         return result

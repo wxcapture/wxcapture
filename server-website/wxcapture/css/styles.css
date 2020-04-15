@@ -220,3 +220,8 @@ b {
     font-size: large;
     font-weight: bold;
 }
+
+.showhidebutton {
+    background: #30406C;
+    color: white;
+}

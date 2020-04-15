@@ -181,7 +181,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         cp_html.write('<body onload=\"defaulthide()\">')
         cp_html.write(wxcutils.load_file(CONFIG_PATH,
                                          'main-header-2up.txt').replace('PAGE-TITLE', \
-            'Weather Satellite Captures'))
+            'Satellite Captures'))
 
         cp_html.write('<section class=\"content-section container\">')
         cp_html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show previous months / years</button>')
@@ -401,7 +401,7 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
     html.write('<body>')
     html.write(wxcutils.load_file(CONFIG_PATH,
                                   'main-header.txt').replace('PAGE-TITLE',
-                                                             'Weather Satellite Captures'))
+                                                             'Satellite Captures'))
 
     html.write('<section class=\"content-section container\">')
     html.write('<h2 class=\"section-header\">Redirect Page</h2>')

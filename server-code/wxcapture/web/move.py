@@ -62,6 +62,37 @@ def make_directories(target, element0, element1, element2):
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/images')
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/audio')
 
+    # copy redirect page to stop directory display if not already existing
+    MY_LOGGER.debug('Writing redirect pages if required')
+    test_filename = target + element0 + '/index.html'
+    if not os.path.isfile(test_filename):
+        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
+        wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html',
+                           test_filename)
+
+    test_filename = target + element0 + '/' + element1 + '/index.html'
+    if not os.path.isfile(test_filename):
+        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
+        wxcutils.copy_file(CONFIG_PATH + 'redirect-0up.html',
+                          test_filename)
+
+    test_filename = target + element0 + '/' + element1 + '/' + element2 + '/index.html'
+    if not os.path.isfile():
+        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
+        wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html',
+                           test_filename)
+
+    test_filename = target + element0 + '/' + element1 + '/' + element2 + '/images/index.html'
+    if not os.path.isfile(test_filename):
+        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
+        wxcutils.copy_file(CONFIG_PATH + 'redirect-2up.html',
+                           test_filename)
+
+    test_filename = target + element0 + '/' + element1 + '/' + element2 + '/audio/index.html'
+    if not os.path.isfile(test_filename):
+        wxcutils.copy_file(CONFIG_PATH + 'redirect-2up.html',
+                           test_filename)
+
 
 def get_links(tmp_date_start, tmp_date_now):
     """get a list of links to previous capture pages"""
@@ -120,6 +151,8 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                 MY_LOGGER.debug('filename found = %s', filename)
                 if CAPTURES_PAGE in filename:
                     MY_LOGGER.debug('Skipping existing %s file', CAPTURES_PAGE)
+                elif 'index.html'  in filename:
+                    MY_LOGGER.debug('Skipping existing index.html file')
                 else:
                     filename_list.append(filename)
             filename_list.sort(reverse=True)
@@ -169,6 +202,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
             data += '</ul>'
         return data
 
+    MY_LOGGER.debug('build_month_page for %s %s %s %s %s',bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bpm_year)
     # now create captures page
     with open(bpm_file_path + bpm_file_name, 'w') as cp_html:
         # html header
@@ -229,7 +263,14 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
 
         cp_html.write('</body></html>')
 
+        # copy redirect page to stop directory display
+        if not os.path.isfile( bpm_file_path + 'index.html'):
+            MY_LOGGER.debug('Copy redirect page as not exist')
+            wxcutils.copy_file(CONFIG_PATH + 'redirect-0up.html',
+                            bpm_file_path + 'index.html')
+
         return result
+
 
 # setup paths to directories
 HOME = '/home/mike'
@@ -400,7 +441,7 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
                '<title>Captures</title>'
                '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
-    html.write('<meta http-equiv = \"refresh\" content = \"0; url = ' + CURRENT_LINK + '\" />')
+    html.write('<meta http-equiv = \"refresh\" content = \"0\"; url = \"' + CURRENT_LINK + '\" />')
     html.write('</head>')
     html.write('<body>')
     html.write(wxcutils.load_file(CONFIG_PATH,

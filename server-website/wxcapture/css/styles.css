@@ -119,11 +119,30 @@ a{
     text-align: left;
 }
 
-.content-section td {
-      border: 1px solid black;
-      color: black;
-      font-weight: bold;
-      text-align: left;
+table { 
+    border-collapse: collapse;
+    border: 3px solid black;
+
+    /* border-collapse does not work with rounded corners! :'( */
+    /* border-radius: 10px; */
+}
+
+th, td {
+    /* border-radius: 10px; */
+    /* border: 1px solid black; */
+    padding: 10px;
+}
+
+.content-section td {   
+    /* border: 1px solid black; */
+    color: black;
+    font-weight: bold;
+    text-align: left;
+}
+
+tr { 
+    border: solid;
+    border-width: 2px 0;
 }
 
 .content-section a:link {
@@ -222,6 +241,27 @@ b {
 }
 
 .showhidebutton {
+    font-size: large;
+
+    border: 5px solid rgb(65, 87, 146);
+    /* border-radius: 7px; */
     background: #30406C;
     color: white;
+    
+    padding: 5px;
+    margin-bottom: 10px;
+    /* margin: auto; */
+}
+
+.instructions{
+    background-color: rgb(212, 224, 255);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 3px solid rgb(157, 183, 255);
+    /* border-radius: 10px; */
+}
+
+del{
+    color: #cccccc;
+    background-color: #ffffff;
 }

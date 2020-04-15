@@ -74,7 +74,7 @@ def make_directories(target, element0, element1, element2):
     if not os.path.isfile(test_filename):
         MY_LOGGER.debug('Creating index.html page - %s', test_filename)
         wxcutils.copy_file(CONFIG_PATH + 'redirect-0up.html',
-                          test_filename)
+                           test_filename)
 
     test_filename = target + element0 + '/' + element1 + '/' + element2 + '/index.html'
     if not os.path.isfile():
@@ -202,7 +202,8 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
             data += '</ul>'
         return data
 
-    MY_LOGGER.debug('build_month_page for %s %s %s %s %s',bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bpm_year)
+    MY_LOGGER.debug('build_month_page for %s %s %s %s %s', bpm_file_path, bpm_file_name,
+                    bpm_month, bpm_month_name, bpm_year)
     # now create captures page
     with open(bpm_file_path + bpm_file_name, 'w') as cp_html:
         # html header
@@ -262,12 +263,6 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         cp_html.write('</script>')
 
         cp_html.write('</body></html>')
-
-        # copy redirect page to stop directory display
-        if not os.path.isfile( bpm_file_path + 'index.html'):
-            MY_LOGGER.debug('Copy redirect page as not exist')
-            wxcutils.copy_file(CONFIG_PATH + 'redirect-0up.html',
-                            bpm_file_path + 'index.html')
 
         return result
 

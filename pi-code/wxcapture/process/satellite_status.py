@@ -151,7 +151,9 @@ MY_LOGGER.debug('Build webpage')
 with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
     # html header
     html.write('<!DOCTYPE html>')
-    html.write('<html lang=\"en\"><head><title>Satellite Status'
+    html.write('<html lang=\"en\"><head>'
+               '<meta charset=\"UTF-8\">'
+               '<title>Satellite Status'
                '</title>'
                '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')

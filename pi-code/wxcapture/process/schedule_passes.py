@@ -652,7 +652,9 @@ try:
     with open(OUTPUT_PATH + 'satpass.html', 'w') as html:
         # html header
         html.write('<!DOCTYPE html>')
-        html.write('<html lang=\"en\"><head><title>Satellite Pass Predictions'
+        html.write('<html lang=\"en\"><head>'
+                   '<meta charset=\"UTF-8\">'
+                   '<title>Satellite Pass Predictions'
                    '</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                    '<link rel=\"stylesheet\" href=\"lightbox/css/lightbox.min.css\">'

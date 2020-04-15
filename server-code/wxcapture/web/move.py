@@ -174,7 +174,9 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         # html header
         cp_label = bpm_month_name + ' ' + bpm_year
         cp_html.write('<!DOCTYPE html>')
-        cp_html.write('<html lang=\"en\"><head><title>Captures ' + cp_label + '</title>'
+        cp_html.write('<html lang=\"en\"><head>'
+                      '<meta charset=\"UTF-8\">'
+                      '<title>Captures ' + cp_label + '</title>'
                       '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
                       '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
         cp_html.write('</head>')
@@ -393,7 +395,9 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
     # html header
     LABEL = MONTH_NAME + ' ' + YEAR
     html.write('<!DOCTYPE html>')
-    html.write('<html lang=\"en\"><head><title>Captures</title>'
+    html.write('<html lang=\"en\"><head>'
+               '<meta charset=\"UTF-8\">'
+               '<title>Captures</title>'
                '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
     html.write('<meta http-equiv = \"refresh\" content = \"0; url = ' + CURRENT_LINK + '\" />')

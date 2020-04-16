@@ -17,46 +17,109 @@
                 <li><a href="satpass.html">Predictions</a></li>
                 <li><a href="captures.html">Captures</a></li>
                 <li><a href="satellitestatus.html">Status</a></li>
-                <li><a href="satellites.html">Satellites</a></li>
+                <li><a href="resources.html">Resources</a></li>
             </ul>
         </nav>
         <h1 class="page-name page-name-large">Resources</h1>
     </header>
 
     <section class="content-section container">  
-        <!-- NOAA POES Satelites -->
-        <h2 class="section-header">NOAA POES Satellite Resources</h2>
+        <!-- Header -->
+        <h2 class="section-header">About</h2>
+        <p>In putting together this site, we have made use of multiple online resources which have assisted in multiple areas from how to build antennae, decode images and troubleshooting.</p>
         <table>
             <tr>
-                <td>
-                    <a class="example-image-link" href="images/noaa_satellite_a.png" data-lightbox="images/noaa_satellite_a.png"><img class="example-image" src="images/noaa_satellite_a.png" width=400 alt="Image of NOAA 19 satellites" /></a><br>
-                    <a class="example-image-link" href="images/noaa_satellite_b.png" data-lightbox="images/noaa_satellite_b.png"><img class="example-image" src="images/noaa_satellite_b.png" width=400 alt="Image of NOAA 15 satellites" /></a><br>
-                </td>
-                <td><h2>NOAA POES Satellite Resources</h2>
-                    <h2>General Information:</h2>
-                    <ul>
-                        <li>Passes overhead multiple times a day</li>
-                        <li>Easiest satellite to receive</li>
-                        <li>You can get something even if the signal is really weak</li>
-                        <li>Analogue Signal</li>
-                        <li></li>
-                    </ul>
-                    
-                    <h2>Resources:</h2>
-                    <ul>
-                        <li>SDR gain - 37.2dB</li>
-                        <li>SDR type - RTL-SDR v3 (RTL2838UHIDIR)</li>
-                        <li>Antenna - Quadrifilar Helicoidal antenna (137.6 MHz)</li>
-                        <li>Frequency range - 135-140 MHz from bandpass filter</li>
-                        <li>Hardware used - RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)</li>
-                    </ul>
-                </td>
+                <td><a href="#SDR">SDR - Software Defined Radio</a></td>
+                <td><a href="#ANTENNAE">Antennae - design and construction</a></td>
+                <td><a href="#NOAA">NOAA - decoding and processing</a></td>
+            </tr>
+            <tr>
+                <td><a href="#METEOR">Meteor - decoding and processing</a></td>
+                <td><a href="#WEBSITES">Websites</a></td>
+                <td><a href="#TBA">TBA</a></td>
+            </tr>
+            
+        <table>
+
+        <!-- SDR -->
+        <a name="SDR"></a>
+        <h2 class="section-header">SDR - Software Defined Radio</h2>
+        <table>
+            <tr>
+                <th>Link</th><th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://airspy.com/download/">SDR#</a></td><td>Windows software to control an SDR, which included multiple plugins.</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.rtl-sdr.com/rtl-sdr-blog-v-3-dongles-user-guide/">RTL-SDR v3 User Guide</a></td><td>User guide for the SDRs used in this project.</td>
             </tr>
         </table>
+
+        <!-- ANTENNAE -->
+        <a name="ANTENNAE"></a>
+        <h2 class="section-header">Antennae - design and construction</h2>
+        <table>
+            <tr>
+                <th>Link</th><th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="http://jcoppens.com/ant/qfh/index.en.php">QFH antenna design</a></td><td>Design information for building a QFH antenna.</td>
+            </tr>
+            <tr>
+                <td><a href="http://jcoppens.com/ant/qfh/calc.en.php">QFH calculator</a></td><td>Online calculator for designing a QFH antenna optimised for receiving NOAA and Meteor satellites.</td>
+            </tr>
+        </table>
+
+        <!-- NOAA -->
+        <a name="NOAA"></a>
+        <h2 class="section-header">NOAA - decoding and processing</h2>
+        <table>
+            <tr>
+                <th>Link</th><th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://wxtoimgrestored.xyz/">wxtoimg</a></td><td>wxtoimg is the NOAA decoding software used in the project. Ensure you download the beta release for latest version, including the ability to install on Windows 10 (Intel CPU only)</td>
+            </tr>
+            <tr>
+                <td><a href="https://noaasis.noaa.gov/NOAASIS/pubs/Users_Guide-Building_Receive_Stations_March_2009.pdf">NOAA Satellite Guide</a></td><td>National Oceanic and Atmospheric Administration User's Guide for Building and Operating Environmental Satellite Receiving Stations. Slightly dated in places.</td>
+            </tr>
+        </table>
+
+        <!-- METEOR -->
+         <a name="METEOR"></a>
+         <h2 class="section-header">Meteor - decoding and processing</h2>
+         <table>
+             <tr>
+                <th>Link</th><th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/dbdexter-dev/meteor_demod">Meteor-M2 series demodulator</a></td><td>Software used to demodulate the recorded pass .wav file.</td>
+             </tr>
+             <tr>
+                <td><a href="https://github.com/artlav/meteor_decoder">Meteor-M2 series decoder</a></td><td>Software used to decode the demodulated pass data</td>
+             </tr>
+        </table>
+
+        <!-- WEBSITES -->
+        <a name="WEBSITES"></a>
+        <h2 class="section-header">Websites</h2>
+        <table>
+            <tr>
+               <th>Link</th><th>Description</th>
+           </tr>
+           <tr>
+               <td><a href="https://www.reddit.com/r/RTLSDR/">Reddit /r/RTLSDR</a></td><td>Reddit RTLSDR community</td>
+            </tr>
+            <tr>
+               <td><a href="https://www.reddit.com/r/amateursatellites/">Reddit /r/amateursatellites</a></td><td>Reddit amateur satellites community</td>
+            </tr>
+       </table>
+
     </section>
     
     <footer class="main-footer">
-        <p id="footer-text">Page last updated at <span class="time">00:00 (NZST)</span>  on   <span class="time">07/04/2020</span></p>
+        <p id="footer-text">Page last updated at <span class="time">11:30 (NZST)</span> on <span class="time">17/04/2020</span></p>
     </footer>
 
     <script src="lightbox/js/lightbox-plus-jquery.min.js"></script>

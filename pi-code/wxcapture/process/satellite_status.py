@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """build satellite status page"""
 
+
 # import libraries
 import os
 import time

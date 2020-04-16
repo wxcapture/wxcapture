@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """move files to web server directory"""
 
+# import libraries
 import os
 import subprocess
-
-
 import wxcutils
 
 

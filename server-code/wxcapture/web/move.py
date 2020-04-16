@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """move files to web server directory"""
 
+
+# import libraries
 import os
 from os import listdir
 from os.path import isfile, join
@@ -10,7 +12,6 @@ import time
 import fnmatch
 from datetime import datetime
 from dateutil import rrule
-
 import wxcutils
 
 
@@ -62,12 +63,7 @@ def make_directories(target, element0, element1, element2):
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/images')
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/audio')
 
-    # create redirect pages, if required
-    test_filename = target + element0 + '/index.html'
-    if not os.path.isfile(test_filename):
-        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
-        wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html',
-                           test_filename)
+
 
     test_filename = target + element0 + '/' + element1 + '/index.html'
     if not os.path.isfile(test_filename):

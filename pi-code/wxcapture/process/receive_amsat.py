@@ -12,6 +12,7 @@ import subprocess
 from rtlsdr import RtlSdr
 import wxcutils
 
+
 def get_sdr_device(sdr_serial_number):
     """ get SDR device ID from the serial number"""
     return RtlSdr.get_device_index_by_serial(sdr_serial_number)

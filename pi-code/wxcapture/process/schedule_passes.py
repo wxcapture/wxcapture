@@ -16,8 +16,10 @@ import matplotlib
 import matplotlib.pyplot as pyplot
 import wxcutils
 
+
 # required to avoid display errors for pyplotlib
 matplotlib.use('Agg')
+
 
 def is_daylight(time_now):
     """check if it is daylight at the time"""

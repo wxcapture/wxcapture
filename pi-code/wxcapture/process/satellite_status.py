@@ -73,13 +73,18 @@ def get_noaa_status(satellite):
 def get_iss_status():
     """get the ISS SSTV status from ARISS"""
     page = ISS_STATUS_PAGE.decode('utf-8')
+    result = ''
+    start_pos = page.find('<h2 class=\'date-header\'><span>') + 30
+    end_pos = page.find('</span>', start_pos)
+    result += page[start_pos: end_pos] + '<br><br>'
+
     # find the marker for the latest update
     start_pos = page.find('<div class=\'post-body entry-content\'')
     # find the end of the div
     start_pos_2 = page.find('>', start_pos) + 1
     # find the end of the content
     end_pos = page.find('<div style=', start_pos_2)
-    result = page[start_pos_2: end_pos]
+    result += page[start_pos_2: end_pos]
 
     MY_LOGGER.debug('ISS text = %s', result)
     return result

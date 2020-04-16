@@ -62,8 +62,7 @@ def make_directories(target, element0, element1, element2):
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/images')
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/audio')
 
-    # copy redirect page to stop directory display if not already existing
-    MY_LOGGER.debug('Writing redirect pages if required')
+    # create redirect pages, if required
     test_filename = target + element0 + '/index.html'
     if not os.path.isfile(test_filename):
         MY_LOGGER.debug('Creating index.html page - %s', test_filename)
@@ -77,7 +76,7 @@ def make_directories(target, element0, element1, element2):
                            test_filename)
 
     test_filename = target + element0 + '/' + element1 + '/' + element2 + '/index.html'
-    if not os.path.isfile():
+    if not os.path.isfile(test_filename):
         MY_LOGGER.debug('Creating index.html page - %s', test_filename)
         wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html',
                            test_filename)
@@ -276,7 +275,6 @@ CONFIG_PATH = APP_PATH + 'config/'
 # start logging
 MODULE = 'move'
 MY_LOGGER = wxcutils.get_logger(MODULE, LOG_PATH, MODULE + '.log')
-# MY_LOGGER = wxcutils.get_logger(MODULE, FILE_PATH + 'logs/', MODULE + '.log')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
 MY_LOGGER.debug('Execution start')
 
@@ -436,13 +434,9 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
                '<title>Captures</title>'
                '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
-    html.write('<meta http-equiv = \"refresh\" content = \"0\"; url = \"' + CURRENT_LINK + '\" />')
+    html.write('<meta http-equiv = \"refresh\" content=\"0; url=\'' + CURRENT_LINK + '\'\" />')
     html.write('</head>')
     html.write('<body>')
-    html.write(wxcutils.load_file(CONFIG_PATH,
-                                  'main-header.txt').replace('PAGE-TITLE',
-                                                             'Satellite Captures'))
-
     html.write('<section class=\"content-section container\">')
     html.write('<h2 class=\"section-header\">Redirect Page</h2>')
     html.write('<p>Your browser should be redirecting you to the page for the current month - ')
@@ -450,15 +444,6 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
     html.write('<p>Click the link if you have not been redirected.</p>')
     html.write('</section>')
 
-
-    html.write('<footer class=\"main-footer\">')
-    html.write('<p id=\"footer-text\">Captures last updated at <span class=\"time\">' +
-               time.strftime('%H:%M (' +
-                             subprocess.check_output("date").
-                             decode('utf-8').split(' ')[-2] +
-                             ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
-               '.</p>')
-    html.write('</footer>')
     html.write('</body></html>')
 
 MY_LOGGER.debug('Finished capture page building')

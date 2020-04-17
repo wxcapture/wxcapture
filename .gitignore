@@ -4,7 +4,6 @@ server-website/wxcapture/captures.html
 server-website/wxcapture/satellitestatus.html
 
 # server code
-server-code/wxcapture/web/move_modal.py
-server-code/wxcapture/web/fix_pass_pages.py
+
 
 # pi code

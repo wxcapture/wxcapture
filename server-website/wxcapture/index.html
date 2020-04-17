@@ -36,16 +36,17 @@
 
         <!-- NOAA POES Satelites -->
         <a name="NOAA"></a>
-        <h2 class="section-header">NOAA 15 / 18 / 19 Series Weather Satellites</h2>
+        <h2 class="section-header">NOAA POES Series Weather Satellites</h2>
         <table>
             <tr>
                 <td>
-                    <a class="example-image-link" href="images/noaa_sample_a.jpg" data-lightbox="images/noaa_sample_a.jpg"><img class="example-image" src="images/noaa_sample_a_small.jpg" alt="NOAA 18 Image" /></a><br>
+                    <a class="example-image-link" href="images/noaa_sample_a.jpg" data-lightbox="images/noaa_sample_a.jpg"><img class="example-image" src="images/noaa_sample_a_small.jpg" alt="NOAA 18 Image" height=1000/></a><br>
                     Click on image for a larger version
                     <br>or<br>
                     <a href="images/noaa_sample_a.jpg" target="_blank">Full size version - opens in a new window</a>
                 </td>
-                <td><h2>NOAA POES Satellites</h2>
+                <td>
+                    <!-- <h2>NOAA POES Satellites</h2> -->
                     <h2>General Information:</h2>
                     <ul>
                         <li>Passes overhead multiple times around dawn and dusk</li>
@@ -53,6 +54,14 @@
                         <li>You can get something even if the signal is really weak</li>
                         <li>Analogue Signal</li>
                     </ul>
+
+                    <h2>Satellites in operation:</h2>
+                    <ul>
+                        <li>NOAA 15</li>
+                        <li>NOAA 18</li>
+                        <li>NOAA 19</li>
+                    </ul>
+                    More info on <a href="satellitestatus.html">Satellite status page</a>
                     
                     <h2>About this pass:</h2>
                     <ul>
@@ -78,22 +87,35 @@
         <table>
             <tr>
                 <td>
-                    <a class="example-image-link" href="images/meteor_sample_decode.jpg" data-lightbox="images/meteor_sample_decode.jpg"><img class="example-image" src="images/meteor_sample_decode_small.jpg" alt="Meteor-M 2 Image" /><!-- Easter Egg --></a><br>
+                    <a class="example-image-link" href="images/meteor_sample_decode.jpg" data-lightbox="images/meteor_sample_decode.jpg"><img class="example-image" src="images/meteor_sample_decode_small.jpg" alt="Meteor-M 2 Image" height=1000/><!-- Easter Egg --></a><br>
                     Click on image for a larger version
                     <br>or<br>
                     <a href="images/meteor_sample_decode.jpg" target="_blank">Full size version - opens in a new window</a>
                 </td>
-                <td><h2>Meteor-M2 <del>& Meteor-M2-2</del></h2>
+                <td>
+                    <!-- <h2>Meteor-M2 <del>& Meteor-M2-2</del></h2> -->
                     <h2>General Information:</h2>
                     <ul>
-                        <li>The pass on the left from Meteor-M 2 was received perfectly. However, the horizontal black lines you see in the decode are caused by buffer overflows in a code bug on the satellite itself.</li>
-                        <li>These overflows occur when the satellite has received a certain amount of data (so more often over land than sea), and this typically happens around once every 6 minutes.</li>
-                        <li>Meteor M2-2's LRPT was disabled because it was hit by a micrometeorite in 2019.</li>
+                        <li>Launched by Roscosmos, the Russian space agency</li>
+                        <li>Suffers from buffer overflows caused by a bug in the code (more info below)</li>
                         <li>Requires a strong signal to lock on to and decode</li>
                         <li>Digital Signal</li>
                     </ul>
+
+                    <h2>Satellites in operation:</h2>
+                    <ul>
+                        <li>Meteor M2</li>
+                        <hr>
+                        <li>[Sometimes works in sunlight] Meteor M1: Mission ended in 2014</li>
+                        <li>[Disintegrated] Meteor M2-1: Programming error, failed so separate from the Soyuz-2.1b upper stage</li>
+                        <li>[LRPT permanently disabled] Meteor M2-2: Hit by a micrometeorite in 2019.</li>
+                    </ul>
+                    More info on <a href="satellitestatus.html">Satellite status page</a>
+                    
                     <h2>Pass Information:</h2>
                     <ul>
+                        <li>The pass on the left from Meteor-M 2 was received perfectly. However, the horizontal black lines you see in the decode are caused by buffer overflows in a code bug on the satellite itself.</li>
+                        <li>These overflows occur when the satellite has received a certain amount of data (so more often over land than sea), and this typically happens around once every 6 minutes.</li>
                         <li>Max pass elevation - 62&deg;</li>
                         <li>Pass start (NZDT) - Tue 11 Feb 2020 08:43:57</li>
                         <li>Pass end (NZDT) - Tue 11 Feb 2020 08:59:15</li>
@@ -104,11 +126,11 @@
                         <li>Frequency range - 135-140 MHz from bandpass filter</li>
                         <li>Modules - RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)</li>
                     </ul>
-                    <img src="images/meteor_sample_polarplot.png" alt="Polar plot" />
+                    <img src="images/meteor_sample_polarplot.png" alt="Polar plot" height=300px/>
                 </td>
             </tr>
         </table>
-
+        
         <!-- ISS SSTV -->
         <a name="ISS"></a>
         <h2 class="section-header">ISS (Zarya) SSTV</h2>
@@ -129,6 +151,8 @@
                         <li>The ISS is the largest manned object ever assembled in space, requiring multiple launches from Russian and American satellite launchers.</li>
                         <li>It is the single most expensive object ever built. The cost of the ISS has been estimated at over US$120 billion.<br></li>
                     </ul>
+                    <li>More info on <a href="satellitestatus.html">Satellite status page</a></li>
+                    
                     <h2>Pass Information:</h2>
                     <ul>
                         <li>Occasionally broadcasts <span class="hint">SSTV<span class="hint-popup"><b>S</b>low <b>S</b>can <b>T</b>ele<b>V</b>ision</span></span> as part of "events" on frequency 145.8MHz.</li>
@@ -143,7 +167,7 @@
     <footer class="main-footer">
         <p id="footer-text">Page last updated at <span class="time">11:00 (NZST)</span> on <span class="time">17/04/2020</span></p>
     </footer>
-
+    
     <script src="lightbox/js/lightbox-plus-jquery.min.js"></script>
 </body>
 

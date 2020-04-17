@@ -1,23 +1,23 @@
 {
    "sdr": {
-		"QFH": {
-			"antenna":"Quadrifilar Helicoidal antenna",
+        "QFH": {
+            "antenna":"Quadrifilar Helicoidal antenna",
             "chipset":"RTL2838UHIDIR",
             "sdr type":"RTL-SDR v3",
             "centre frequency":"137.6 MHz",
-			"frequency range":"135-140 MHz from bandpass filter",
+            "frequency range":"135-140 MHz from bandpass filter",
             "modules":"RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)",
-			"sdr active":"yes",
+            "sdr active":"yes",
             "serial number":"00000001"
-		},
-		"ground-plane": {
-			"antenna":"Ground Plane antenna",
+        },
+        "ground-plane": {
+            "antenna":"Ground Plane antenna",
             "chipset":"RTL2838UHIDIR",
             "sdr type":"RTL-SDR v3",
             "centre frequency":"148.5 MHz",
-			"frequency range":"TBC",
+            "frequency range":"TBC",
             "modules":"None additional",
-			"sdr active":"yes",
+            "sdr active":"yes",
             "serial number":"00000002"
         }
     }

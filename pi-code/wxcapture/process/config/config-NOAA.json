@@ -9,145 +9,145 @@
    "sample rate":"37000",
    "image minimum":"3000",
    "enhancements": {
-		"008": {
-			"description":"Contrast - channel A image",
-			"options":"-e contrast -a",
-			"active":"yes",
-			"filename":"contrasta",
+        "008": {
+            "description":"Contrast - channel A image",
+            "options":"-e contrast -a",
+            "active":"yes",
+            "filename":"contrasta",
             "scale":"no"
-		},
-		"009": {
-			"description":"Contrast - channel B image",
-			"options":"-e contrast -b",
-			"active":"yes",
-			"filename":"contrastb",
+        },
+        "009": {
+            "description":"Contrast - channel B image",
+            "options":"-e contrast -b",
+            "active":"yes",
+            "filename":"contrastb",
             "scale":"no"
-		},
-		"999": {
-			"description":"Contrast - channels A,B image",
-			"options":"-e contrast",
-			"active":"no",
-			"filename":"contrast",
+        },
+        "999": {
+            "description":"Contrast - channels A,B image",
+            "options":"-e contrast",
+            "active":"no",
+            "filename":"contrast",
             "scale":"no"
-		},
-		"999": {
-			"description":"Histogram equalisation image",
-			"options":"-e histeq",
-			"active":"no",
-			"filename":"histeq",
+        },
+        "999": {
+            "description":"Histogram equalisation image",
+            "options":"-e histeq",
+            "active":"no",
+            "filename":"histeq",
             "scale":"no"
-		},
-		"004": {
-			"description":"Coloured infrared image",
-			"options":"-e MCIR",
-			"active":"yes",
-			"filename":"mcir",
+        },
+        "004": {
+            "description":"Coloured infrared image",
+            "options":"-e MCIR",
+            "active":"yes",
+            "filename":"mcir",
             "scale":"no"
-		},
-		"003": {
-			"description":"Coloured infrared image highlighting precipitation",
-			"options":"-e MCIR-precip",
-			"active":"yes",
-			"filename":"mcir-precip",
+        },
+        "003": {
+            "description":"Coloured infrared image highlighting precipitation",
+            "options":"-e MCIR-precip",
+            "active":"yes",
+            "filename":"mcir-precip",
             "scale":"no"
-		},
-		"005": {
-			"description":"Normal image",
-			"options":"",
-			"active":"yes",
-			"filename":"norm",
+        },
+        "005": {
+            "description":"Normal image",
+            "options":"",
+            "active":"yes",
+            "filename":"norm",
             "scale":"no"
-		},
-		"13": {
-			"description":"Pristine output image",
-			"options":"-e pris",
-			"active":"yes",
-			"filename":"pris",
+        },
+        "13": {
+            "description":"Pristine output image",
+            "options":"-e pris",
+            "active":"yes",
+            "filename":"pris",
             "scale":"no"
-		},
-		"007": {
-			"description":"Sea surface temperature image",
-			"options":"-e sea",
-			"active":"yes",
-			"filename":"sea",
+        },
+        "007": {
+            "description":"Sea surface temperature image",
+            "options":"-e sea",
+            "active":"yes",
+            "filename":"sea",
             "scale":"yes"
-		},
-		"006": {
-			"description":"Air temperature image",
-			"options":"-e therm",
-			"active":"yes",
-			"filename":"therm",
+        },
+        "006": {
+            "description":"Air temperature image",
+            "options":"-e therm",
+            "active":"yes",
+            "filename":"therm",
             "scale":"yes"
-		},
-		"001": {
-			"description":"Enhanced infra red image",
-			"options":"-e ZA",
-			"active":"yes",
-			"filename":"za",
+        },
+        "001": {
+            "description":"Enhanced infra red image",
+            "options":"-e ZA",
+            "active":"yes",
+            "filename":"za",
             "scale":"yes"
-		},
-		"999": {
-			"description":"Hurricane enhanced image",
-			"options":"-e BD",
-			"active":"no",
-			"filename":"bd",
+        },
+        "999": {
+            "description":"Hurricane enhanced image",
+            "options":"-e BD",
+            "active":"no",
+            "filename":"bd",
             "scale":"yes"
-		},
-		"999": {
-			"description":"Warm season enhanced image",
-			"options":"-e MD",
-			"active":"no",
-			"filename":"md",
+        },
+        "999": {
+            "description":"Warm season enhanced image",
+            "options":"-e MD",
+            "active":"no",
+            "filename":"md",
             "scale":"yes"
-		},
-		"999": {
-			"description":"Thunderstorm enhanced image",
-			"options":"-e MB",
-			"active":"no",
-			"filename":"mb",
+        },
+        "999": {
+            "description":"Thunderstorm enhanced image",
+            "options":"-e MB",
+            "active":"no",
+            "filename":"mb",
             "scale":"yes"
-		},
-		"002": {
-			"description":"No colour infrared enhanced image",
-			"options":"-e NO",
-			"active":"yes",
-			"filename":"no",
+        },
+        "002": {
+            "description":"No colour infrared enhanced image",
+            "options":"-e NO",
+            "active":"yes",
+            "filename":"no",
             "scale":"no"
-		},
-		"999": {
-			"description":"Sea surface / cold cloud enhanced image",
-			"options":"-e JF",
-			"active":"no",
-			"filename":"jf",
+        },
+        "999": {
+            "description":"Sea surface / cold cloud enhanced image",
+            "options":"-e JF",
+            "active":"no",
+            "filename":"jf",
             "scale":"no"
-		},	
-		"010": {
-			"description":"Multispecteral analysis enhanced image",
-			"options":"-e MSA",
-			"active":"yes",
-			"filename":"msa",
+        },    
+        "010": {
+            "description":"Multispecteral analysis enhanced image",
+            "options":"-e MSA",
+            "active":"yes",
+            "filename":"msa",
             "scale":"no"
-		},
-		"012": {
-			"description":"HVC enhanced image",
-			"options":"-e HVCT",
-			"active":"yes",
-			"filename":"hvct",
+        },
+        "012": {
+            "description":"HVC enhanced image",
+            "options":"-e HVCT",
+            "active":"yes",
+            "filename":"hvct",
             "scale":"no"
-		},
-		"011": {
-			"description":"HVC enhanced image highlighting precipitation",
-			"options":"-e HVCT-precip",
-			"active":"yes",
-			"filename":"hvct-precip",
+        },
+        "011": {
+            "description":"HVC enhanced image highlighting precipitation",
+            "options":"-e HVCT-precip",
+            "active":"yes",
+            "filename":"hvct-precip",
             "scale":"no"
-		},
-		"999": {
-			"description":"Multispecteral analysis enhanced image highlighting precipitation",
-			"options":"-e MSA-precip",
-			"active":"no",
-			"filename":"msa-precip",
+        },
+        "999": {
+            "description":"Multispecteral analysis enhanced image highlighting precipitation",
+            "options":"-e MSA-precip",
+            "active":"no",
+            "filename":"msa-precip",
             "scale":"no"
-		}
+        }
    }
 }

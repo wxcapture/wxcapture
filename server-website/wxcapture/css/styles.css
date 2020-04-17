@@ -87,7 +87,7 @@ a{
 .container {
     color: gray;
     margin: 0 auto;
-    max-width: 1400px;
+    /* max-width: 1400px; */
     padding: 0 1.5em;
 }
 

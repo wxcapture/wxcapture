@@ -25,15 +25,15 @@
 
     
     <section class="content-section container">  
-        <h2 class="section-header">About</h2>
+        <h2 class="section-header">About WxCapture</h2>
         <p>This site publishes data captured from satellites orbiting the Earth, received with a cheap SDR, with more information about and examples decodes from each type of satellite being captured shown below:</p>
         <ul>
             <li><a href="#NOAA">NOAA POES Series Weather Satellites</a></li>
             <li><a href="#METEOR">Meteor-M Series Weather Satellites</a></li>
             <li><a href="#ISS">ISS (Zarya) SSTV</a></li>
         </ul>
-
-
+        
+        
         <!-- NOAA POES Satelites -->
         <a name="NOAA"></a>
         <h2 class="section-header">NOAA POES Series Weather Satellites</h2>
@@ -54,7 +54,7 @@
                         <li>You can get something even if the signal is really weak</li>
                         <li>Analogue Signal</li>
                     </ul>
-
+                    
                     <h2>Satellites:</h2>
                     <ul>
                         <li>NOAA 15</li>
@@ -66,107 +66,114 @@
                     <h2>About this pass:</h2>
                     <ul>
                         <li><strong>You can see <a href="https://en.wikipedia.org/wiki/Cyclone_Harold">Cyclone Harold</a>, a category 5 cyclone, in the top left of the image.</li>
-                        <li>The eye of the storm is clearly visible.</strong></li>
-                        <li>Max pass elevation - 79&deg;</li>
-                        <li>Pass start (NZST) - Mon 06 Apr 2020 09:03:32/li>
-                        <li>Pass end (NZST) - Mon 06 Apr 2020 09:19:25/li>
-                        <li>Pass start (UTC) - Sun 05 Apr 2020 21:03:32/li>
-                        <li>Pass end (UTC) - Sun 05 Apr 2020 21:19:25/li>
-                        <li>SDR type - RTL-SDR v3 (RTL2838UHIDIR)</li>
-                        <li>Antenna - Quadrifilar Helicoidal antenna (137.6 MHz)</li>
-                        <li>Hardware used - RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)</li>
-                    </ul>
-                    <img src="images/noaa_sample_plot.png" alt="Polar plot" height=300px/>
-                </td>
-            </tr>
-        </table>
-
-        <!-- Meteor Satellites -->
-        <a name="METEOR"></a>
-        <h2 class="section-header">Meteor-M Series Weather Satellites</h2>
-        <table>
-            <tr>
-                <td>
-                    <a class="example-image-link" href="images/meteor_sample_decode.jpg" data-lightbox="images/meteor_sample_decode.jpg"><img class="example-image" src="images/meteor_sample_decode_small.jpg" alt="Meteor-M 2 Image" height=1000/><!-- Easter Egg --></a><br>
-                    Click on image for a larger version
-                    <br>or<br>
-                    <a href="images/meteor_sample_decode.jpg" target="_blank">Full size version - opens in a new window</a>
-                </td>
-                <td>
-                    <!-- <h2>Meteor-M2 <del>& Meteor-M2-2</del></h2> -->
-                    <h2>General Information:</h2>
-                    <ul>
-                        <li>Launched by Roscosmos, the Russian space agency</li>
-                        <li>Suffers from buffer overflows caused by a bug in the code (more info below)</li>
-                        <li>Requires a strong signal to lock on to and decode</li>
-                        <li>Digital Signal</li>
-                    </ul>
-
-                    <h2>Satellites:</h2>
-                    <ul>
-                        <li><del>M1:</del> Mission ended in 2014 (Sometimes works in sunlight)</li>
-                        <li>M2: Functional</li>
-                        <li><del>M2-1:</del> Programming error, failed to separate from the Soyuz-2.1b upper stage (Disintegrated)</li>
-                        <li><del>M2-2:</del> Hit by a micrometeorite in 2019 (LRPT permanently disabled)</li>
-                    </ul>
-                    <p>More info on <a href="satellitestatus.html">Satellite status</a></p>
+                            <li>The eye of the storm is clearly visible.</strong></li>
+                            <li>Max pass elevation - 79&deg;</li>
+                            <li>Pass start (NZST) - Mon 06 Apr 2020 09:03:32/li>
+                                <li>Pass end (NZST) - Mon 06 Apr 2020 09:19:25/li>
+                                    <li>Pass start (UTC) - Sun 05 Apr 2020 21:03:32/li>
+                                        <li>Pass end (UTC) - Sun 05 Apr 2020 21:19:25/li>
+                                            <li>SDR type - RTL-SDR v3 (RTL2838UHIDIR)</li>
+                                            <li>Antenna - Quadrifilar Helicoidal antenna (137.6 MHz)</li>
+                                            <li>Hardware used - RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)</li>
+                                        </ul>
+                                        <img src="images/noaa_sample_plot.png" alt="Polar plot" height=300px/>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Meteor Satellites -->
+                            <a name="METEOR"></a>
+                            <h2 class="section-header">Meteor-M Series Weather Satellites</h2>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <a class="example-image-link" href="images/meteor_sample_decode.jpg" data-lightbox="images/meteor_sample_decode.jpg"><img class="example-image" src="images/meteor_sample_decode_small.jpg" alt="Meteor-M 2 Image" height=1000/><!-- Easter Egg --></a><br>
+                                        Click on image for a larger version
+                                        <br>or<br>
+                                        <a href="images/meteor_sample_decode.jpg" target="_blank">Full size version - opens in a new window</a>
+                                    </td>
+                                    <td>
+                                        <!-- <h2>Meteor-M2 <del>& Meteor-M2-2</del></h2> -->
+                                        <h2>General Information:</h2>
+                                        <ul>
+                                            <li>Launched by Roscosmos, the Russian space agency</li>
+                                            <li>Suffers from buffer overflows caused by a bug in the code (more info below)</li>
+                                            <li>Requires a strong signal to lock on to and decode</li>
+                                            <li>Digital Signal</li>
+                                        </ul>
+                                        
+                                        <h2>Satellites:</h2>
+                                        <ul>
+                                            <li><del>M1:</del> Mission ended in 2014 (Sometimes works in sunlight)</li>
+                                            <li>M2: Functional</li>
+                                            <li><del>M2-1:</del> Programming error, failed to separate from the Soyuz-2.1b upper stage (Disintegrated)</li>
+                                            <li><del>M2-2:</del> Hit by a micrometeorite in 2019 (LRPT permanently disabled)</li>
+                                        </ul>
+                                        <p>More info on <a href="satellitestatus.html">Satellite status</a></p>
+                                        
+                                        <h2>Pass Information:</h2>
+                                        <ul>
+                                            <li>The pass on the left from Meteor-M 2 was received perfectly. However, the horizontal black lines you see in the decode are caused by buffer overflows in a code bug on the satellite itself.</li>
+                                            <li>These overflows occur when the satellite has received a certain amount of data (so more often over land than sea), and this typically happens around once every 6 minutes.</li>
+                                            <li>Max pass elevation - 62&deg;</li>
+                                            <li>Pass start (NZDT) - Tue 11 Feb 2020 08:43:57</li>
+                                            <li>Pass end (NZDT) - Tue 11 Feb 2020 08:59:15</li>
+                                            <li>Pass start (UTC) - Mon 10 Feb 2020 19:43:57</li>
+                                            <li>Pass end (UTC) - Mon 10 Feb 2020 19:59:15</li>
+                                            <li>SDR type - RTL-SDR v3 (RTL2838UHIDIR)</li>
+                                            <li>Antenna - Quadrifilar Helicoidal antenna (137.6 MHz)</li>
+                                            <li>Frequency range - 135-140 MHz from bandpass filter</li>
+                                            <li>Modules - RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)</li>
+                                        </ul>
+                                        <img src="images/meteor_sample_polarplot.png" alt="Polar plot" height=300px/>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- ISS SSTV -->
+                            <a name="ISS"></a>
+                            <h2 class="section-header">ISS (Zarya) SSTV</h2>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <a class="example-image-link" href="images/iss_sstv_sample.png" data-lightbox="images/iss_sstv_sample.png"><img class="example-image" src="images/iss_sstv_sample.png" width=400 alt="ISS SSTV Image" /></a><br>
+                                        <a class="example-image-link" href="images/iss_sstv_sample_b.png" data-lightbox="images/iss_sstv_sample_b.png"><img class="example-image" src="images/iss_sstv_sample_b.png" width=400 alt="ISS SSTV Image" /></a><br>
+                                        Click on an image for a larger version
+                                    </td>
+                                    <td><h2>International Space Station - Zarya Module</h2>
+                                        <h2>General Information:</h2>
+                                        <ul>
+                                            <li>The <span class="hint">ISS<span class="hint-popup"><b>I</b>nternational <b>S</b>pace <b>S</b>tation</span></span> is a joint project between between five participating space agencies: NASA (United States), Roscosmos (Russia), JAXA (Japan), ESA (Europe), and CSA (Canada).</li>
+                                            <li>There have been crew living aboard continuously since 2nd November 2000.</li>
+                                            <li>There is a ham radio onboard in the Russian Zarya module, which is often used by astronauts plus used for SSTV broadcasts.</li>
+                                            <li>The ISS travels at an orbital speed of 8km per second. That means it circles the entire planet once every 90 minutes.</li>
+                                            <li>The ISS is the largest manned object ever assembled in space, requiring multiple launches from Russian and American satellite launchers.</li>
+                                            <li>It is the single most expensive object ever built. The cost of the ISS has been estimated at over US$120 billion.<br></li>
+                                        </ul>
+                                        
+                                        <h2>Pass Information:</h2>
+                                        <ul>
+                                            <li>Occasionally broadcasts <span class="hint">SSTV<span class="hint-popup"><b>S</b>low <b>S</b>can <b>T</b>ele<b>V</b>ision</span></span> as part of "events" on frequency 145.8MHz.</li>
+                                            <li>Although it can be captured from around the world, events may cover just a handful of orbits and these are often prioritised for those passing over Russia.</li>
+                                            <li>More info about upcoming events can be found on the <a href="satellitestatus.html">satellite status</a> page.</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                            <h2 class="section-header">About the site</h2>
+                            <p>This site is a joint project between Mike (KiwiinNZ) and Albert (Technobird22).
+                                We are looking to turn this into an open source solution so that anyone can set
+                                up their own automatic decoding station.<br> This site is currently under very
+                                active development, so you will often notice changes to it.<br>
+                                Everything you see here is available on our Github: <a href="https://github.com/wxcapture/wxcapture">https://github.com/wxcapture/wxcapture</a> <br>
+                                Please report any bugs to <a href="mailto:wxcapture@gmail.com">wxcapture@gmail.com</a> or <a href="https://github.com/wxcapture/wxcapture/issues/new">submit an issue on Github</a></p>
+                            </section>
+                                
+                        <footer class="main-footer">
+                            <p id="footer-text">Page last updated at <span class="time">11:00 (NZST)</span> on <span class="time">17/04/2020</span></p>
+                        </footer>
+                        
+                        <script src="lightbox/js/lightbox-plus-jquery.min.js"></script>
+                    </body>
                     
-                    <h2>Pass Information:</h2>
-                    <ul>
-                        <li>The pass on the left from Meteor-M 2 was received perfectly. However, the horizontal black lines you see in the decode are caused by buffer overflows in a code bug on the satellite itself.</li>
-                        <li>These overflows occur when the satellite has received a certain amount of data (so more often over land than sea), and this typically happens around once every 6 minutes.</li>
-                        <li>Max pass elevation - 62&deg;</li>
-                        <li>Pass start (NZDT) - Tue 11 Feb 2020 08:43:57</li>
-                        <li>Pass end (NZDT) - Tue 11 Feb 2020 08:59:15</li>
-                        <li>Pass start (UTC) - Mon 10 Feb 2020 19:43:57</li>
-                        <li>Pass end (UTC) - Mon 10 Feb 2020 19:59:15</li>
-                        <li>SDR type - RTL-SDR v3 (RTL2838UHIDIR)</li>
-                        <li>Antenna - Quadrifilar Helicoidal antenna (137.6 MHz)</li>
-                        <li>Frequency range - 135-140 MHz from bandpass filter</li>
-                        <li>Modules - RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)</li>
-                    </ul>
-                    <img src="images/meteor_sample_polarplot.png" alt="Polar plot" height=300px/>
-                </td>
-            </tr>
-        </table>
-        
-        <!-- ISS SSTV -->
-        <a name="ISS"></a>
-        <h2 class="section-header">ISS (Zarya) SSTV</h2>
-        <table>
-            <tr>
-                <td>
-                    <a class="example-image-link" href="images/iss_sstv_sample.png" data-lightbox="images/iss_sstv_sample.png"><img class="example-image" src="images/iss_sstv_sample.png" width=400 alt="ISS SSTV Image" /></a><br>
-                    <a class="example-image-link" href="images/iss_sstv_sample_b.png" data-lightbox="images/iss_sstv_sample_b.png"><img class="example-image" src="images/iss_sstv_sample_b.png" width=400 alt="ISS SSTV Image" /></a><br>
-                    Click on an image for a larger version
-                </td>
-                <td><h2>International Space Station - Zarya Module</h2>
-                    <h2>General Information:</h2>
-                    <ul>
-                        <li>The <span class="hint">ISS<span class="hint-popup"><b>I</b>nternational <b>S</b>pace <b>S</b>tation</span></span> is a joint project between between five participating space agencies: NASA (United States), Roscosmos (Russia), JAXA (Japan), ESA (Europe), and CSA (Canada).</li>
-                        <li>There have been crew living aboard continuously since 2nd November 2000.</li>
-                        <li>There is a ham radio onboard in the Russian Zarya module, which is often used by astronauts plus used for SSTV broadcasts.</li>
-                        <li>The ISS travels at an orbital speed of 8km per second. That means it circles the entire planet once every 90 minutes.</li>
-                        <li>The ISS is the largest manned object ever assembled in space, requiring multiple launches from Russian and American satellite launchers.</li>
-                        <li>It is the single most expensive object ever built. The cost of the ISS has been estimated at over US$120 billion.<br></li>
-                    </ul>
-                    
-                    <h2>Pass Information:</h2>
-                    <ul>
-                        <li>Occasionally broadcasts <span class="hint">SSTV<span class="hint-popup"><b>S</b>low <b>S</b>can <b>T</b>ele<b>V</b>ision</span></span> as part of "events" on frequency 145.8MHz.</li>
-                        <li>Although it can be captured from around the world, events may cover just a handful of orbits and these are often prioritised for those passing over Russia.</li>
-                        <li>More info about upcoming events can be found on the <a href="satellitestatus.html">satellite status</a> page.</li>
-                    </ul>
-                </td>
-            </tr>
-        </table>
-    </section>
-    
-    <footer class="main-footer">
-        <p id="footer-text">Page last updated at <span class="time">11:00 (NZST)</span> on <span class="time">17/04/2020</span></p>
-    </footer>
-    
-    <script src="lightbox/js/lightbox-plus-jquery.min.js"></script>
-</body>
-
-</html>
+                    </html>

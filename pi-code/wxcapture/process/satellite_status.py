@@ -46,8 +46,8 @@ def get_noaa_status(satellite):
         pos_1_end = entry.find('MHz')
         pos_2_st = entry.find('VTX-2')
         pos_2_end = entry.find('MHz')
-        return entry[pos_1_st:pos_1_end + 3].replace(' &nbsp; ', ' = ') + \
-            entry[pos_2_st:pos_2_end + 3].replace(' &nbsp; ', ' = ')
+        return entry[pos_1_st:pos_1_end + 3].replace(' &nbsp; ', ' - ') + \
+            entry[pos_2_st:pos_2_end + 3].replace(' &nbsp; ', ' - ')
     MY_LOGGER.debug('Getting %s status', satellite)
     lines = NOAA_STATUS_PAGE.splitlines()
 

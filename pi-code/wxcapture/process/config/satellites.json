@@ -1,87 +1,76 @@
 {  
    "satellites":[  
       {  
-        "name":"NOAA 15",
-        "NORAD catalog number":"25338",
-        "frequency":137.6200,
-        "type":"NOAA",
-        "active":"yes",
-        "capture":"yes",
-        "priority":"10",
-        "sdr":"QFH"
+         "name":"NOAA 15",
+         "NORAD catalog number":"25338",
+         "frequency":137.6200,
+         "type":"NOAA",
+		 "active":"yes",
+		 "capture":"yes",
+         "priority":"10",
+         "sdr":"QFH"
       },
       {  
-        "name":"NOAA 18",
-        "NORAD catalog number":"28654",
-        "frequency":137.9125,
-        "type":"NOAA",
-        "active":"yes",
-        "capture":"yes",
-        "priority":"10",
-        "sdr":"QFH"
+         "name":"NOAA 18",
+         "NORAD catalog number":"28654",
+         "frequency":137.9125,
+         "type":"NOAA",
+		 "active":"yes",
+		 "capture":"yes",
+         "priority":"10",
+         "sdr":"QFH"
       },
       {
-        "name":"NOAA 19",
-        "NORAD catalog number":"33591",
-        "frequency":137.1000,
-        "type":"NOAA",
-        "active":"yes",
-        "capture":"yes",
-        "priority":"10",
-        "sdr":"QFH"
+         "name":"NOAA 19",
+         "NORAD catalog number":"33591",
+         "frequency":137.1000,
+         "type":"NOAA",
+		 "active":"yes",
+		 "capture":"yes",
+         "priority":"10",
+         "sdr":"QFH"
       },
       {  
-        "name":"METEOR-M 1",
-        "NORAD catalog number":"35865",
-        "frequency":137.1000,
-        "type":"METEOR",
-        "active":"yes",
-        "capture":"yes",
-        "night":"no",
-        "priority":"20",
-        "sdr":"QFH"
+         "name":"METEOR-M 2",
+         "NORAD catalog number":"40069",
+         "frequency":137.1000,
+         "type":"METEOR",
+		 "active":"yes",
+		 "capture":"yes",
+         "night":"no",
+         "priority":"20",
+         "sdr":"QFH"
       },
       {  
-        "name":"METEOR-M 2",
-        "NORAD catalog number":"40069",
-        "frequency":137.1000,
-        "type":"METEOR",
-        "active":"yes",
-        "capture":"yes",
-        "night":"no",
-        "priority":"20",
-        "sdr":"QFH"
+         "name":"METEOR-M2 2",
+         "NORAD catalog number":"44387",
+         "frequency":137.9000,
+         "type":"METEOR",
+		 "active":"no",
+		 "capture":"no",
+         "night":"no",
+         "priority":"0",
+         "sdr":"QFH"
       },
       {  
-        "name":"METEOR-M2 2",
-        "NORAD catalog number":"44387",
-        "frequency":137.9000,
-        "type":"METEOR",
-        "active":"no",
-        "capture":"no",
-        "night":"no",
-        "priority":"0",
-        "sdr":"QFH"
+         "name":"SAUDISAT 1C (SO-50)",
+         "NORAD catalog number":"27607",
+         "frequency":436.795,
+         "type":"AMSAT",
+         "active":"yes",
+		 "capture":"no",
+         "priority":"40",
+         "sdr":"ground-plane"
       },
       {  
-        "name":"SAUDISAT 1C (SO-50)",
-        "NORAD catalog number":"27607",
-        "frequency":436.795,
-        "type":"AMSAT",
-        "active":"yes",
-        "capture":"no",
-        "priority":"40",
-        "sdr":"ground-plane"
-      },
-      {  
-        "name":"ISS (ZARYA)",
-        "NORAD catalog number":"25544",
-        "frequency":145.800,
-        "type":"ISS",
-        "active":"yes",
-        "capture":"no",
-        "priority":"30",
-        "sdr":"ground-plane"
+         "name":"ISS (ZARYA)",
+         "NORAD catalog number":"25544",
+         "frequency":145.800,
+         "type":"ISS",
+		 "active":"yes",
+		 "capture":"no",
+         "priority":"30",
+         "sdr":"ground-plane"
       }
    ]
 }

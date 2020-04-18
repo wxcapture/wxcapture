@@ -672,6 +672,7 @@ try:
         html.write('<h2 class=\"section-header\">Today Over ' + CONFIG_INFO['Location'] + '</h2>')
         html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show instructions</button>')
         html.write('<div id=\"instructionsDiv\">')
+        html.write('<h2 class=\"section-header\">Instructions</h2>')
         html.write('<ul>')
         html.write('<li>A satellite name which appears like <del>NOAA 15</del> '
                    'is not being captured, with the reason why given.</li>')

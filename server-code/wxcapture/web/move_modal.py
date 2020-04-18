@@ -228,7 +228,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         cp_html.write('<ul>')
         cp_html.write('<li>Click on any pass to see the full pass information including the images</li>')
         cp_html.write('<li>If you click outside the pop up or on the X and you\'ll return to the pass list</li>')
-        cp_html.write('<li>Or click on an image and you\'ll see the image in full detail<li>')
+        cp_html.write('<li>Or click on an image and you\'ll see the image in full detail</li>')
         cp_html.write('<li>If you click outside the pop up window or on the X and you\'ll return to the pass information</li>')
         cp_html.write('</ul>')
         cp_html.write('</div>')
@@ -244,7 +244,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         cp_html.write('<h2 class=\"section-header\">' + cp_label + '</h2>')
         result = write_month(OUTPUT_PATH, '/wxcapture/' + bpm_year + '/' + bpm_month + '/',
                              bpm_month_name + ' ' + bpm_year)
-        cp_html.write('</section>')
+        cp_html.write('</ul></section>')
         cp_html.write('<footer class=\"main-footer\">')
         cp_html.write('<p id=\"footer-text\">Captures last updated at <span class=\"time\">' +
                       time.strftime('%H:%M (' +

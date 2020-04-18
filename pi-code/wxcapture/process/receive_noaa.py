@@ -8,13 +8,8 @@ import os
 import sys
 import subprocess
 from subprocess import Popen, PIPE
-from rtlsdr import RtlSdr
 import wxcutils
-
-
-def get_sdr_device(sdr_serial_number):
-    """ get SDR device ID from the serial number"""
-    return RtlSdr.get_device_index_by_serial(sdr_serial_number)
+import wxcutils_pi
 
 
 def get_gain():
@@ -157,7 +152,7 @@ MY_LOGGER.debug('Duration = %s', DURATION)
 
 # determine the device index based on the serial number
 MY_LOGGER.debug('SDR serial number = %s', PASS_INFO['serial number'])
-WX_SDR = get_sdr_device(PASS_INFO['serial number'])
+WX_SDR = wxcutils_pi.get_sdr_device(PASS_INFO['serial number'])
 MY_LOGGER.debug('SDR device ID = %d', WX_SDR)
 
 if REPROCESS != 'Y':
@@ -419,6 +414,22 @@ wxcutils.save_json(OUTPUT_PATH, FILENAME_BASE + '.json', PASS_INFO)
 if CONFIG_INFO['save .wav files'] == 'no':
     MY_LOGGER.debug('Deleting .wav audio file')
     wxcutils.run_cmd('rm ' + AUDIO_PATH + FILENAME_BASE + '.wav')
+
+if IMAGE_OPTIONS['tweet'] == 'yes':
+    MY_LOGGER.debug('Tweeting pass - enhancement type = %s', IMAGE_OPTIONS['tweet enhancement'])
+    LOCATION_HASHTAGS = '#' + CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
+    TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \
+        ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
+
+    TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + IMAGE_OPTIONS['tweet enhancement'] + '-tn.jpg'
+    try:
+        wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
+    except:
+        MY_LOGGER.critical('Tweet exception handler: %s %s %s',
+                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+    MY_LOGGER.debug('Tweeted!')
+else:
+    MY_LOGGER.debug('Tweeting not configured')
 
 if KEEP_PAGE:
     # move files to destinations

@@ -8,6 +8,8 @@
    "lastgain":"43.2",
    "sample rate":"37000",
    "image minimum":"3000",
+   "tweet": "yes",
+   "tweet enhancement": "mcir-precip",
    "enhancements": {
         "008": {
             "description":"Contrast - channel A image",

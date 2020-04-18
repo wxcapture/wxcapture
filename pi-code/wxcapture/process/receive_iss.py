@@ -11,13 +11,8 @@ import time
 import sys
 import subprocess
 from subprocess import Popen, PIPE
-from rtlsdr import RtlSdr
 import wxcutils
-
-
-def get_sdr_device(sdr_serial_number):
-    """ get SDR device ID from the serial number"""
-    return RtlSdr.get_device_index_by_serial(sdr_serial_number)
+import wxcutils_pi
 
 
 def get_gain():
@@ -170,7 +165,7 @@ txt.close()
 
 # determine the device index based on the serial number
 MY_LOGGER.debug('SDR serial number = %s', PASS_INFO['serial number'])
-WX_SDR = get_sdr_device(PASS_INFO['serial number'])
+WX_SDR = wxcutils_pi.get_sdr_device(PASS_INFO['serial number'])
 MY_LOGGER.debug('SDR device ID = %d', WX_SDR)
 
 # capture pass to wav file

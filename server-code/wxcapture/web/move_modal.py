@@ -13,7 +13,7 @@ import fnmatch
 from datetime import datetime
 from dateutil import rrule
 import wxcutils
-import fix_pass_pages
+import fix_pass_pages_lib
 
 
 def mk_dir(directory):
@@ -315,6 +315,10 @@ for x in ONLY_FILES:
                        TARGET + elements[0] + '/' +
                        elements[1] + '/' + elements[2] + '/images/', x)
 
+# get a list of the pass html files for fixing
+PASS_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f))]
+MY_LOGGER.debug('________________%s', PASS_FILES)
+
 # move remaining files, non-plot files, to right subdirectories
 ONLY_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f))]
 ONLY_FILES.extend([f for f in listdir(MY_PATH + 'images/') if isfile(join(MY_PATH + 'images/', f))])
@@ -417,7 +421,13 @@ MY_LOGGER.debug('Building captures page = %s for %s %s (current month)',
                 FILE_PATH, MONTH_NAME, YEAR)
 PAGE_DATA = build_month_page(FILE_PATH, CAPTURES_PAGE, MONTH, MONTH_NAME, YEAR)
 
-
+# apply the modal windows fix for all new pass html files
+for file_name in PASS_FILES:
+    MY_LOGGER.debug('Applying modal fixes to pass files just copied')
+    MY_LOGGER.debug('file_name = %s', file_name)
+    file_bits = file_name.split('-')
+    location = TARGET + file_bits[0] + '/' + file_bits[1] + '/' + file_bits[2] + '/'
+    fix_pass_pages_lib.fix_file(location, file_name)
 
 # build current page which redirects to current month page
 

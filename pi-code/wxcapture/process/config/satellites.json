@@ -31,6 +31,17 @@
          "sdr":"QFH"
       },
       {  
+         "name":"METEOR-M 1",
+         "NORAD catalog number":"35865",
+         "frequency":137.1000,
+         "type":"METEOR",
+         "active":"yes",
+         "capture":"yes",
+         "night":"no",
+         "priority":"20",
+         "sdr":"QFH"
+      },
+      {  
          "name":"METEOR-M 2",
          "NORAD catalog number":"40069",
          "frequency":137.1000,

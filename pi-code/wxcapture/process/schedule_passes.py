@@ -181,12 +181,14 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
         MY_LOGGER.debug('visible_duration = %s', str(visible_duration))
         if visible_at_start and visible_at_end:
             visible = 'Yes - for all of pass'
-        elif visible_at_start and not visible_at_end:
+        elif visible_at_start and not visible_at_end and visible_duration > 0:
             visible = 'Yes - for ' + str(visible_duration // 60) + ':' + \
             str(visible_duration % 60).zfill(2) + ' from start'
-        elif not visible_at_start and visible_at_end:
+        elif not visible_at_start and visible_at_end and visible_duration > 0:
             visible = 'Yes - for ' + str(visible_duration // 60) + ':' + \
             str(visible_duration % 60).zfill(2) + ' from end'
+        else:
+            visible = 'No'
         MY_LOGGER.debug('visible = %s', visible)
         MY_LOGGER.debug('visible_start = %s', visible_start)
         MY_LOGGER.debug('visible_end = %s', visible_end)
@@ -699,8 +701,6 @@ try:
         html.write('<li>A highlighted row is one where the maximum elevation is high and should'
                    ' give a great image</li>')
         html.write('<li>The polar plot can be clicked on to see more detail of the pass.</li>')
-        html.write('<li>The visible number for a pass shows the number of minutes and seconds that the '
-                   'pass is visible for, weather permitting.</li>')
         html.write('</ul>')
         html.write('</div>')
         html.write(CONFIG_INFO['Pass Info'])
@@ -709,16 +709,16 @@ try:
             html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
                        '<th>Polar Plot</th><th>Pass'
                        'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
-                       LOCAL_TIME_ZONE + ')</th><th>Duration (min:sec)</th>'
-                       '<th>Visible</th><th>Capturing?</th></tr>\n')
+                       LOCAL_TIME_ZONE + ')</th><th>Pass Duration (min:sec)</th>'
+                       '<th>Visible to the Eye? (min:sec)?</th><th>Capturing?</th></tr>\n')
         else:
             html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
                        '<th>Polar Plot</th><th>Pass'
                        'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
                        LOCAL_TIME_ZONE + ')</th><th>Pass Start (UTC)</th><th>'
-                       'Pass End (UTC)</th><th>Duration (min:sec)</th><th>'
+                       'Pass End (UTC)</th><th>Pass Duration (min:sec)</th><th>'
                        'Frequency (MHz)</th><th>Antenna</th><th>Direction</th>'
-                       '<th>Visible</th><th>Capturing?</th></tr>\n')
+                       '<th>Visible to the Eye? (min:sec)?</th><th>Capturing?</th></tr>\n')
         # iterate through list
         MY_LOGGER.debug('Iterating through satellites')
         for elem in SAT_DATA:
@@ -770,16 +770,16 @@ try:
             html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
                        '<th>Pass Start (' + LOCAL_TIME_ZONE +
                        ')</th><th>Pass End (' + LOCAL_TIME_ZONE +
-                       ')</th><th>Duration (min:sec)</th>'
-                       '<th>Visible</th></tr>\n')
+                       ')</th><th>Pass Duration (min:sec)</th>'
+                       '<th>Visible to the Eye? (min:sec)?</th></tr>\n')
         else:
             html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
                        '<th>Pass Start (' + LOCAL_TIME_ZONE +
                        ')</th><th>Pass End (' + LOCAL_TIME_ZONE +
                        ')</th><th>Pass Start (UTC)</th><th>Pass '
-                       'End (UTC)</th><th>Duration (min:sec)</th>'
+                       'End (UTC)</th><th>Pass Duration (min:sec)</th>'
                        '<th>Frequency (MHz)</th><th>Antenna</th>'
-                       '<th>Direction</th><th>Visible</th></tr>\n')
+                       '<th>Direction</th><th>Visible to the Eye? (min:sec)?</th></tr>\n')
         # iterate through list
         for elem in SAT_DATA_NEXT:
             rowColour = ''

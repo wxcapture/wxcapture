@@ -421,7 +421,7 @@ if IMAGE_OPTIONS['tweet'] == 'yes':
     TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \
         ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
 
-    TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + IMAGE_OPTIONS['tweet enhancement'] + '-tn.jpg'
+    TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + IMAGE_OPTIONS['tweet enhancement'] + '.jpg'
     try:
         wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
     except:

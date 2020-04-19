@@ -339,10 +339,31 @@ if CREATE_PAGE:
 
     html.close()
 
+
+
 if CREATE_PAGE:
     # move files to destinations
     MY_LOGGER.debug('using scp')
     scp_files()
+    # tweet?
+    if IMAGE_OPTIONS['tweet'] == 'yes':
+        MY_LOGGER.debug('Tweeting pass - format option = %s', IMAGE_OPTIONS['tweet image'])
+        LOCATION_HASHTAGS = '#' + CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
+        TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \
+            ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
+
+        if IMAGE_OPTIONS['tweet enhancement'] == 'large':
+            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + 'cc-rectified.jpg'
+        else:
+            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + 'cc-rectified-tn.jpg'
+        try:
+            wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
+        except:
+            MY_LOGGER.critical('Tweet exception handler: %s %s %s',
+                               sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+        MY_LOGGER.debug('Tweeted!')
+    else:
+        MY_LOGGER.debug('Tweeting not configured')
 else:
     MY_LOGGER.debug('Page not created due to image size')
     MY_LOGGER.debug('Deleting any objects created')

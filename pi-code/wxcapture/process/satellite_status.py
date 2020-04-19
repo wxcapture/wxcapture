@@ -198,6 +198,20 @@ with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
     html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\">Data source</a></p>')
     html.write('</section>')
 
+    # load NOAA options
+    NOAA_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
+    METEOR_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-METEOR.json')
+    if NOAA_OPTIONS['tweet'] == 'yes' or METEOR_OPTIONS['tweet'] == 'yes':
+        TWITTER_CONFIG = wxcutils.load_json(CONFIG_PATH, 'config-twitter.json')
+        html.write('<section class=\"content-section container\">')
+        html.write('<h2 class=\"section-header\">Twitter Feed</h2>')
+        html.write('<p>Tweeting images to <a href=\"https://twitter.com/' + TWITTER_CONFIG['tweet to'].replace('@', '') + '\">' + TWITTER_CONFIG['tweet to'] + '</a> for:</p><ul>')
+        if NOAA_OPTIONS['tweet'] == 'yes':
+            html.write('<li>NOAA - enhancement option = ' + NOAA_OPTIONS['tweet enhancement'] + '</li>')
+        if METEOR_OPTIONS['tweet'] == 'yes':
+            html.write('<li>METEOR - format option = ' + METEOR_OPTIONS['tweet image'] + '</li>')
+        html.write('</ul></section>')
+
     html.write('<footer class=\"main-footer\">')
     html.write('<p id=\"footer-text\">Satellite Status last updated at <span class=\"time\">' +
                time.strftime('%H:%M (' +

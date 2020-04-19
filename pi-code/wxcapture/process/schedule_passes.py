@@ -151,8 +151,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                 status = elements[11].replace('*', VISIBLE_NO).replace('+', VISIBLE_YES).replace('0.000000', '_')
             except IndexError:
                 status = '-'
-            visible = visible + status
 
+            # capture if visible at the start of the pass
             if counter == 1 and status == VISIBLE_YES:
                 visible_at_start = True
 
@@ -163,9 +163,6 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
             # if not visible and has started, has not previously ended, end
             if status == VISIBLE_NO and visible_start != '' and visible_end == '':
                 visible_end = date_value(row)
-
-            if counter == halfway:
-                visible = visible + '^'
 
             # end of loop, so if started and not ended, end
             if visible_start != '' \
@@ -179,14 +176,9 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     else:
         visible = 'No'
     if visible != 'No':
-        # MY_LOGGER.debug('Visible = ' + visible)
-        # MY_LOGGER.debug('visible_start = ' + visible_start)
-        # MY_LOGGER.debug('visible_end = ' + visible_end)
         visible_duration = int(float(wxcutils.utc_to_epoch(visible_end, '%d %b %Y %H:%M:%S')) \
                                - float(wxcutils.utc_to_epoch(visible_start, '%d %b %Y %H:%M:%S')))
-        # MY_LOGGER.debug('visible_duration = ' + str(visible_duration))
-        visible = visible + ' (' + str(visible_duration // 60) + ':' + \
-            str(visible_duration % 60).zfill(2) + ')'
+        MY_LOGGER.debug('visible_duration = %s', str(visible_duration))
         if visible_at_start and visible_at_end:
             visible = 'Yes - for all of pass'
         elif visible_at_start and not visible_at_end:
@@ -196,6 +188,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
             visible = 'Yes - for ' + str(visible_duration // 60) + ':' + \
             str(visible_duration % 60).zfill(2) + ' from end'
         MY_LOGGER.debug('visible = %s', visible)
+        MY_LOGGER.debug('visible_start = %s', visible_start)
+        MY_LOGGER.debug('visible_end = %s', visible_end)
     pass_start = lines[0].split()[1] + ' ' + lines[0].split()[2][:2] + \
         ' ' + lines[0].split()[2][2:5] + ' 20' + lines[0].split()[2][5:] + \
         ' ' + lines[0].split()[3]
@@ -707,14 +701,6 @@ try:
         html.write('<li>The polar plot can be clicked on to see more detail of the pass.</li>')
         html.write('<li>The visible number for a pass shows the number of minutes and seconds that the '
                    'pass is visible for, weather permitting.</li>')
-        # html.write('<li>Visible ' +
-        #            VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + \
-        #            '^' + \
-        #            VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + \
-        #            ' means that the satellite pass, weather permitting, '
-        #            'is not visble for the first half of the pass, with ^ being the pass mid-point '
-        #            'and Y indicating where it is visible. The total time it may be visible from '
-        #            'is shown in brackets, e.g. (4:51), being for 4 minutes and 51 seconds. </li>')
         html.write('</ul>')
         html.write('</div>')
         html.write(CONFIG_INFO['Pass Info'])

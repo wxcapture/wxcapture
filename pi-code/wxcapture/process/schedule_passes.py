@@ -134,6 +134,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     # start to parse the predict output
     visible_start = ''
     visible_end = ''
+    visible_at_start = False
+    visible_at_end = False
     theta = []
     radius = []
     plot_labels = []
@@ -151,6 +153,9 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                 status = '-'
             visible = visible + status
 
+            if counter == 1 and status == VISIBLE_YES:
+                visible_at_start = True
+
             # if visible and not yet started, start
             if status == VISIBLE_YES and visible_start == '':
                 visible_start = date_value(row)
@@ -167,6 +172,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                 and visible_end == '' \
                 and counter == len(lines):
                 visible_end = date_value(row)
+                if  status == VISIBLE_YES:
+                    visible_at_end = True
 
             # MY_LOGGER.debug(counter, len(lines), visible, visible_start, visible_end)
     else:
@@ -180,7 +187,15 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
         # MY_LOGGER.debug('visible_duration = ' + str(visible_duration))
         visible = visible + ' (' + str(visible_duration // 60) + ':' + \
             str(visible_duration % 60).zfill(2) + ')'
-        # MY_LOGGER.debug('visible = ' + visible)
+        if visible_at_start and visible_at_end:
+            visible = 'Yes - for all of pass'
+        elif visible_at_start and not visible_at_end:
+            visible = 'Yes - for ' + str(visible_duration // 60) + ':' + \
+            str(visible_duration % 60).zfill(2) + ' from start'
+        elif not visible_at_start and visible_at_end:
+            visible = 'Yes - for ' + str(visible_duration // 60) + ':' + \
+            str(visible_duration % 60).zfill(2) + ' from end'
+        MY_LOGGER.debug('visible = %s', visible)
     pass_start = lines[0].split()[1] + ' ' + lines[0].split()[2][:2] + \
         ' ' + lines[0].split()[2][2:5] + ' 20' + lines[0].split()[2][5:] + \
         ' ' + lines[0].split()[3]
@@ -541,6 +556,11 @@ def reboot_handler(sleep_time):
         MY_LOGGER.debug('Normal scheduled run')
 
 
+def get_time_element(gte_datetime):
+    """strip out non-time element"""
+    return gte_datetime.split(' ')[4]
+
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -669,7 +689,13 @@ try:
         html.write('<section class=\"content-section container\">')
 
         MY_LOGGER.debug('Table for today')
-        html.write('<h2 class=\"section-header\">Today Over ' + CONFIG_INFO['Location'] + '</h2>')
+        NOW_DAY = str(datetime.now().strftime('%A'))
+        NOW_DAY_NUM = str(datetime.now().strftime(datetime.now().strftime('%d')))
+        NOW_DAY_ORD = wxcutils.ordinal(int(NOW_DAY_NUM))
+        NOW_MONTH = datetime.now().strftime(datetime.now().strftime('%B'))
+        NOW_YEAR = str(datetime.now().strftime(datetime.now().strftime('%Y')))
+        NOW = NOW_DAY + ' ' + NOW_DAY_ORD + ' ' + NOW_MONTH + ' ' + NOW_YEAR
+        html.write('<h2 class=\"section-header\">Today Over ' + CONFIG_INFO['Location'] + ' - ' + NOW + '</h2>')
         html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show instructions</button>')
         html.write('<div id=\"instructionsDiv\">')
         html.write('<h2 class=\"section-header\">Instructions</h2>')
@@ -679,14 +705,16 @@ try:
         html.write('<li>A highlighted row is one where the maximum elevation is high and should'
                    ' give a great image</li>')
         html.write('<li>The polar plot can be clicked on to see more detail of the pass.</li>')
-        html.write('<li>Visible ' +
-                   VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + \
-                   '^' + \
-                   VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + \
-                   ' means that the satellite pass, weather permitting, '
-                   'is not visble for the first half of the pass, with ^ being the pass mid-point '
-                   'and Y indicating where it is visible. The total time it may be visible from '
-                   'is shown in brackets, e.g. (4:51), being for 4 minutes and 51 seconds. </li>')
+        html.write('<li>The visible number for a pass shows the number of minutes and seconds that the '
+                   'pass is visible for, weather permitting.</li>')
+        # html.write('<li>Visible ' +
+        #            VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + VISIBLE_NO + \
+        #            '^' + \
+        #            VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + VISIBLE_YES + \
+        #            ' means that the satellite pass, weather permitting, '
+        #            'is not visble for the first half of the pass, with ^ being the pass mid-point '
+        #            'and Y indicating where it is visible. The total time it may be visible from '
+        #            'is shown in brackets, e.g. (4:51), being for 4 minutes and 51 seconds. </li>')
         html.write('</ul>')
         html.write('</div>')
         html.write(CONFIG_INFO['Pass Info'])
@@ -728,8 +756,8 @@ try:
             html.write('<td>' + str(elem['max_elevation']) + \
                 elem['max_elevation_direction'] + '</td>')
             html.write('<td>' + plot_link + '</td>')
-            html.write('<td>' + elem['start_date_local'] + '</td>')
-            html.write('<td>' + elem['end_date_local'] + '</td>')
+            html.write('<td>' + get_time_element(elem['start_date_local']) + '</td>')
+            html.write('<td>' + get_time_element(elem['end_date_local']) + '</td>')
             if CONFIG_INFO['Hide Detail'] != 'Yes':
                 html.write('<td>' + elem['startDate'] + '</td>')
                 html.write('<td>' + elem['endDate'] + '</td>')

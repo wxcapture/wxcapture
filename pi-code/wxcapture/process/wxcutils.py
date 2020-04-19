@@ -152,3 +152,8 @@ def utc_to_local(utc, mask):
 def local_to_utc(local, mask):
     """ convert local to UTC"""
     return epoch_to_utc(local_to_epoch(local, mask), mask)
+
+def ordinal(num):
+    """get the ordinalinal date description"""
+    return str(num) + ("th" if 4 <= num % 100 <= 20 else
+                       {1: "st", 2: "nd", 3: "rd"}.get(num % 10, "th"))

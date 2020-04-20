@@ -42,12 +42,12 @@ def get_noaa_status(satellite):
         return entry[pos + 10:pos + 13]
     def tidy_up_apt2(entry):
         entry = entry.decode('utf-8')
-        pos_1_st = entry.find('VTX-1')
+        pos_1_st = entry.find('VTX-1') + 85
         pos_1_end = entry.find('MHz')
-        pos_2_st = entry.find('VTX-2')
+        pos_2_st = entry.find('VTX-2') + 85
         pos_2_end = entry.find('MHz')
-        return entry[pos_1_st:pos_1_end + 3].replace(' &nbsp; ', ' - ') + \
-            entry[pos_2_st:pos_2_end + 3].replace(' &nbsp; ', ' - ')
+        return entry[pos_1_st:pos_1_end + 3] + \
+            entry[pos_2_st:pos_2_end + 3]
     MY_LOGGER.debug('Getting %s status', satellite)
     lines = NOAA_STATUS_PAGE.splitlines()
 
@@ -93,7 +93,7 @@ def get_iss_status():
 def get_meteor_status(satellite):
     """get the satellite status for a Meteor satellite"""
     def tidy_up(entry):
-        return entry.decode('utf-8').replace('<td>', '').replace('</td>', '')
+        return entry.decode('utf-8').replace('<td>', '').replace('</td>', '').replace('                        ', '')
     MY_LOGGER.debug('Getting %s status', satellite)
     lines = METEOR_STATUS_PAGE.splitlines()
 
@@ -111,12 +111,12 @@ def get_meteor_status(satellite):
             result += 'Status = ' + tidy_up(lines[line_num + 11]) + '<br>' + \
                 'Frequency = ' + tidy_up(lines[line_num + 9]) + '<br>' + \
                 'Symbol = ' + tidy_up(lines[line_num + 10]) + '<br>' + \
-                'Blue visible APID64 = ' + tidy_up(lines[line_num + 19]) + '<br>' + \
-                'Green visible APID65 = ' + tidy_up(lines[line_num + 20]) + '<br>' + \
-                'Red visible APID66 = ' + tidy_up(lines[line_num + 21]) + '<br>' + \
-                'Infrared APID67 = ' + tidy_up(lines[line_num + 29]) + '<br>' + \
-                'Infrared APID68 = ' + tidy_up(lines[line_num + 30]) + '<br>' + \
-                'Infrared APID69 = ' + tidy_up(lines[line_num + 31])
+                'Blue visible (64) = ' + tidy_up(lines[line_num + 19]) + '<br>' + \
+                'Green visible (65) = ' + tidy_up(lines[line_num + 20]) + '<br>' + \
+                'Red visible (66) = ' + tidy_up(lines[line_num + 21]) + '<br>' + \
+                'Infrared #1 (67) = ' + tidy_up(lines[line_num + 29]) + '<br>' + \
+                'Infrared #2 (68) = ' + tidy_up(lines[line_num + 30]) + '<br>' + \
+                'Infrared #3 (69) = ' + tidy_up(lines[line_num + 31])
             line_num = size_of_lines
         line_num += 1
     MY_LOGGER.debug('result = %s', result)

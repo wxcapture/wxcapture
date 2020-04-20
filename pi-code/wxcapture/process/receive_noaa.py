@@ -171,6 +171,7 @@ if REPROCESS != 'Y':
 # location at the time specified
 # hence the additional time to ensure it is
 START_TIME = int(START_EPOCH) + (int(DURATION) * 0.5)
+MY_LOGGER.debug('wxmap start time = %d (seconds since unix epoch) duration = %d (seconds)', START_TIME, str(DURATION))
 wxcutils.run_cmd('/usr/local/bin/wxmap -T \"' + SATELLITE + '\" -H \"'
                  + WORKING_PATH + 'weather.tle\" -p ' +
                  str(IMAGE_OPTIONS['Population']) + ' -l 0 -o \"' +

@@ -230,16 +230,16 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
         plot_labels.append(wxcutils.epoch_to_local(elements[0], '%H:%M:%S'))
 
 
-    # MY_LOGGER.debug('max_elevation = ' + str(max_elevation))
-    # MY_LOGGER.debug('azimuthmax_elevation = ' + str(azimuthmax_elevation))
+    MY_LOGGER.debug('max_elevation = %s', str(max_elevation))
+    MY_LOGGER.debug('azimuthmax_elevation = %s', str(azimuthmax_elevation))
     if azimuthmax_elevation > 180:
         max_elevation_direction = 'W'
     else:
         max_elevation_direction = 'E'
-    # MY_LOGGER.debug('max_elevation_direction = ' + max_elevation_direction)
+    MY_LOGGER.debug('max_elevation_direction = %s', max_elevation_direction)
 
-    # MY_LOGGER.debug(lines[0])
-    # MY_LOGGER.debug(lines[lines_len])
+    MY_LOGGER.debug('predict first line = %s', lines[0])
+    MY_LOGGER.debug('predict last line = %s', lines[lines_len])
 
     pass_radius_start = 1.0 - (float(lines[0].split()[4]) / 90.0)
     pass_radius_end = 1.0 - (float(lines[lines_len].split()[4]) / 90.0)

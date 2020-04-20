@@ -39,29 +39,27 @@ def build_pass_json():
     json_data = []
     for filename in find_files(TARGET, '*.html'):
         if not ('index.html' in filename or 'captures.html' in filename or 'resources.html' in filename or 'satellitestatus.html' in filename or 'satpass.html' in filename):
-            MY_LOGGER.debug('found pass page - filename = %s', filename)
-            filename_root = filename[:len(filename)-5]
+            # MY_LOGGER.debug('found pass page - filename = %s', filename)
+            file_path, html_file = os.path.split(filename)
+            base_filename, base_extension = os.path.splitext(html_file)
+            filename_root = filename[:len(filename) - len(base_extension)]
             json_filename = filename_root + '.json'
             if os.path.isfile(json_filename):
                 json_exists = 'yes'
             else:
                 json_exists = 'no'
                 json_filename = ''
-            if 'NOAA' in filename:
-                pass_type = 'NOAA'
-            elif 'METEOR' in filename:
-                pass_type = 'METEOR'
-            elif 'ISS' in filename:
-                pass_type = 'ISS'
-            elif 'SAUDISAT' in filename:
-                pass_type = 'AMSAT'
-            else:
-                pass_type = 'unknown'
-            json_data.append({'pass page': filename.replace(OUTPUT_PATH, ''),
-                              'filename root': filename_root.replace(OUTPUT_PATH, ''),
-                              'json exists': json_exists,
-                              'json filename': json_filename.replace(OUTPUT_PATH, ''),
-                              'pass type': pass_type
+            # look for all the image files and add to the list
+            # to avoid the json file getting too large, extract the enhancement part only
+            image_files = glob.glob(file_path + '/images/' + base_filename + '*.jpg')
+            image_enhancements = []
+            for entry in image_files:
+                if entry[len(entry) - 7:] != '-tn.jpg':
+                    result = entry.replace('.jpg', '').replace(file_path + '/images/', '').replace(base_filename, '')
+                    image_enhancements.append(result[1:])
+
+            json_data.append({'path': filename_root.replace(OUTPUT_PATH, ''),
+                              'enhancement': image_enhancements
                             })
     MY_LOGGER.debug('saving passses.json')
     wxcutils.save_json(TARGET, 'passes.json', json_data)

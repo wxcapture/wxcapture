@@ -7,7 +7,8 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
 }
@@ -19,6 +20,7 @@ html, body {
 .nav li {
     display: inline;
 }
+
 .nav a {
     color: white;
     display: inline-block;
@@ -26,7 +28,7 @@ html, body {
     text-decoration: none;
 }
 
-a{
+a {
     transition: background-color 0.5s;
 }
 
@@ -54,7 +56,7 @@ a{
     background-color: rgba(0, 0, 0, .3);
     background-size: cover;
     padding-bottom: 30px;
-    
+
     /* Parallax Scrolling */
     background-image: url("images/headerbackground.jpg");
     height: 40%;
@@ -67,7 +69,8 @@ a{
 
 .page-name {
     color: white;
-    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;;
+    font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    ;
     font-size: 10em;
     margin: 0;
     font-weight: bold;
@@ -119,7 +122,7 @@ a{
     text-align: left;
 }
 
-table { 
+table {
     border-collapse: collapse;
     border: 3px solid black;
 
@@ -127,47 +130,48 @@ table {
     /* border-radius: 10px; */
 }
 
-th, td {
+th,
+td {
     /* border-radius: 10px; */
     /* border: 1px solid black; */
     padding: 10px;
 }
 
-.content-section td {   
+.content-section td {
     /* border: 1px solid black; */
     color: black;
     font-weight: bold;
     text-align: left;
 }
 
-tr { 
+tr {
     border: solid;
     border-width: 2px 0;
 }
 
 .content-section a:link {
-  color: blue;
-  font-size: 1.2em;
-  font-weight: bold;
+    color: blue;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .content-section a:visited {
-  color: grey;
-  font-weight: normal;
+    color: grey;
+    font-weight: normal;
 }
 
 .content-section a:hover {
-  color: red;
-  font-weight: bolder;
+    color: red;
+    font-weight: bolder;
 }
 
-.time{
+.time {
     color: #ffffff;
     background-color: #888888;
     font-family: 'Courier New', Courier, monospace
 }
 
-#footer-text{
+#footer-text {
     color: #ffffff;
 }
 
@@ -230,7 +234,7 @@ tr {
     opacity: 100%;
 }
 
-.hint-popup{
+.hint-popup {
     border: 3px dashed #cccccc;
 }
 
@@ -247,13 +251,13 @@ b {
     /* border-radius: 7px; */
     background: #30406C;
     color: white;
-    
+
     padding: 5px;
     margin-bottom: 10px;
     /* margin: auto; */
 }
 
-.instructions{
+.instructions {
     background-color: rgb(212, 224, 255);
     padding: 10px;
     margin-bottom: 10px;
@@ -261,11 +265,11 @@ b {
     /* border-radius: 10px; */
 }
 
-del{
+del {
     color: #cccccc;
     background-color: #ffffff;
 }
 
-.example-image{
+.example-image {
     border: 4px solid rgb(157, 183, 255);
 }

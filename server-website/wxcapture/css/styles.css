@@ -273,3 +273,8 @@ del {
 .example-image {
     border: 4px solid rgb(157, 183, 255);
 }
+
+.good {
+    font-weight: bold;
+    color: rgb(147, 216, 44);
+}

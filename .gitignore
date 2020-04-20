@@ -3,9 +3,12 @@ server-website/wxcapture/satpass.html
 server-website/wxcapture/captures.html
 server-website/wxcapture/satellitestatus.html
 
-# one-page-for-all passes page
+# one-page-for-all passes page experiment files
 server-website/wxcapture/passes.html
 server-website/wxcapture/passes.json
+server-website/wxcapture/passes_example.json
+server-website/wxcapture/passpage_example.json
+server-website/wxcapture/temp_json_test.json
 
 # server code
 

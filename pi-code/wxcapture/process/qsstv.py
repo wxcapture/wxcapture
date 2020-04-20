@@ -5,8 +5,8 @@ Otherwise receive_iss.py will not be able
 to decode sstv images"""
 
 import os
+import sys
 import time
-import subprocess
 from subprocess import Popen, PIPE
 import wxcutils
 
@@ -30,22 +30,25 @@ MY_LOGGER = wxcutils.get_logger(MODULE, LOG_PATH, MODULE + '.log')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
 MY_LOGGER.debug('Execution start')
 
-MY_LOGGER.debug('wait 10 seconds to allow background processes to start')
-time.sleep(10)
+try:
+    MY_LOGGER.debug('wait 10 seconds to allow background processes to start')
+    time.sleep(10)
 
-MY_LOGGER.debug('start pactl')
-cmd = Popen(['/usr/bin/pactl', 'load-module', 'module-null-sink', 'sink_name=virtual-cable']
-            , stdout=PIPE, stderr=PIPE)
-stdout, stderr = cmd.communicate()
-MY_LOGGER.debug('stdout:%s', stdout)
-MY_LOGGER.debug('stderr:%s', stderr)
+    MY_LOGGER.debug('start pactl')
+    CMD = Popen(['/usr/bin/pactl', 'load-module', 'module-null-sink', 'sink_name=virtual-cable']
+                , stdout=PIPE, stderr=PIPE)
+    STDOUT, STDERR = CMD.communicate()
+    MY_LOGGER.debug('stdout:%s', STDOUT)
+    MY_LOGGER.debug('stderr:%s', STDERR)
 
-MY_LOGGER.debug('wait 5 seconds to allow pactl to start')
-time.sleep(5)
+    MY_LOGGER.debug('wait 5 seconds to allow pactl to start')
+    time.sleep(5)
 
-MY_LOGGER.debug('start qsstv')
-cmd = Popen(['qsstv'], stdout=PIPE, stderr=PIPE)
-
+    MY_LOGGER.debug('start qsstv')
+    CMD = Popen(['qsstv'], stdout=PIPE, stderr=PIPE)
+except:
+    MY_LOGGER.critical('Global exception handler: %s %s %s',
+                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

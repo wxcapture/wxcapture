@@ -606,6 +606,13 @@ try:
     # Remove all AT jobs for scheduler
     remove_jobs('receive_')
 
+    # validate tle file exists
+    wxcutils.validate_tle(WORKING_PATH, 'weather.tle')
+    wxcutils.validate_tle(WORKING_PATH, 'de421.bsp')
+    wxcutils.validate_tle(WORKING_PATH, 'deltat.data')
+    wxcutils.validate_tle(WORKING_PATH, 'deltat.preds')
+    wxcutils.validate_tle(WORKING_PATH, 'Leap_Second.dat')
+
     # check if we email at job output or not
     EMAIL_OUTPUT = ''
     if CONFIG_INFO['email receive output'] == 'N':

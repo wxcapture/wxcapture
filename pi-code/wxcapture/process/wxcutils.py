@@ -157,3 +157,10 @@ def ordinal(num):
     """get the ordinalinal date description"""
     return str(num) + ("th" if 4 <= num % 100 <= 20 else
                        {1: "st", 2: "nd", 3: "rd"}.get(num % 10, "th"))
+
+def validate_tle(vt_path, vt_file):
+    """validate tle file exists, if not replace with backup file"""
+    if not os.path.isfile(vt_path + '/' + vt_file):
+        MY_UTIL_LOGGER.debug('tle file does not exist - %s %s - replacing with backup',
+                             vt_path, vt_file)
+        copy_file(vt_path + '/' + vt_file + '.old', vt_path + '/' + vt_file)

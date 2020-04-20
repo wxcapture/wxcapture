@@ -4,6 +4,7 @@
 
 # import libraries
 import os
+import sys
 from skyfield.api import Loader
 import wxcutils
 
@@ -59,28 +60,32 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 
 
+try:
+    # backup old tle files
+    MY_LOGGER.debug('Backing up old files')
+    backup_tle('de421.bsp')
+    backup_tle('deltat.data')
+    backup_tle('deltat.preds')
+    backup_tle('Leap_Second.dat')
 
-# backup old tle files
-MY_LOGGER.debug('Backing up old files')
-backup_tle('de421.bsp')
-backup_tle('deltat.data')
-backup_tle('deltat.preds')
-backup_tle('Leap_Second.dat')
+    # update planets info
+    MY_LOGGER.debug('Loading new files')
+    LOAD = Loader(WORKING_PATH)
+    TS = LOAD.timescale()
+    PLANETS = LOAD('de421.bsp')
 
-# update planets info
-MY_LOGGER.debug('Loading new files')
-LOAD = Loader(WORKING_PATH)
-TS = LOAD.timescale()
-PLANETS = LOAD('de421.bsp')
+    # validate planets files
+    MY_LOGGER.debug('Validating new files')
+    validate_tle('de421.bsp')
+    validate_tle('deltat.data')
+    validate_tle('deltat.preds')
 
-# validate planets files
-MY_LOGGER.debug('Validating new files')
-validate_tle('de421.bsp')
-validate_tle('deltat.data')
-validate_tle('deltat.preds')
+    MY_LOGGER.debug('Finished')
+    validate_tle('Leap_Second.dat')
 
-MY_LOGGER.debug('Finished')
-validate_tle('Leap_Second.dat')
+except:
+    MY_LOGGER.critical('Global exception handler: %s %s %s',
+                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

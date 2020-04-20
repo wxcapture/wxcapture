@@ -4,6 +4,7 @@
 
 # import libraries
 import os
+import sys
 import time
 import subprocess
 from urllib.request import urlopen
@@ -147,84 +148,88 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
-# grap the status web pages
-METEOR_STATUS_PAGE = get_page('http://happysat.nl/Meteor/html/Meteor_Status.html')
-NOAA_STATUS_PAGE = get_page('https://www.ospo.noaa.gov/Operations/POES/status.html')
-ISS_STATUS_PAGE = get_page('http://ariss-sstv.blogspot.com/')
+try:
+    # grap the status web pages
+    METEOR_STATUS_PAGE = get_page('http://happysat.nl/Meteor/html/Meteor_Status.html')
+    NOAA_STATUS_PAGE = get_page('https://www.ospo.noaa.gov/Operations/POES/status.html')
+    ISS_STATUS_PAGE = get_page('http://ariss-sstv.blogspot.com/')
 
-# output as html
-MY_LOGGER.debug('Build webpage')
-with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
-    # html header
-    html.write('<!DOCTYPE html>')
-    html.write('<html lang=\"en\"><head>'
-               '<meta charset=\"UTF-8\">'
-               '<title>Satellite Status'
-               '</title>'
-               '<link rel=\"stylesheet\" href=\"css/styles.css\">'
-               '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
-    html.write('</head>')
-    html.write('<body>')
-    html.write(wxcutils.load_file(CONFIG_PATH, 'main-header.txt').replace('PAGE-TITLE',
-                                                                          'Satellite Status'))
-    html.write('<section class=\"content-section container\">')
-
-    html.write('<h2 class=\"section-header\">Meteor-M Series Status</h2>')
-    html.write('<table>')
-    html.write('<tr><th>Meteor-M N2</th><th>Meteor-M N2-2</th></tr>')
-    html.write('<tr><td>' + get_meteor_status('Meteor-M N2') + '</td>')
-    html.write('<td>' + get_meteor_status('Meteor-M N2-2') + '</td></tr>')
-    html.write('</table>')
-    html.write('<p><a href=\"http://happysat.nl/Meteor/html/Meteor_Status.html\" target=\"_blank\">Data source</a></p>')
-    html.write('</section>')
-
-    html.write('<section class=\"content-section container\">')
-    html.write('<h2 class=\"section-header\">NOAA Series Status</h2>')
-    html.write('<table>')
-    html.write('<tr><th>NOAA 15</th><th>NOAA 18</th><th>NOAA 19</th></tr>')
-    html.write('<tr><td>' + get_noaa_status('NOAA 15') + '</td>')
-    html.write('<td>' + get_noaa_status('NOAA 18') + '</td>')
-    html.write('<td>' + get_noaa_status('NOAA 19') + '</td></tr>')
-    html.write('</table>')
-    html.write('<p><a href=\"https://www.ospo.noaa.gov/Operations/POES/status.html\" target=\"_blank\">Data source</a></p>')
-    html.write('</section>')
-
-    html.write('<section class=\"content-section container\">')
-    html.write('<h2 class=\"section-header\">ISS SSTV - ARISS Status</h2>')
-    html.write('<table>')
-    html.write('<tr><th>ISS Zarya</th></tr>')
-    html.write('<tr><td>' + get_iss_status() + '</td></tr>')
-    html.write('</table>')
-    html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\">Data source</a></p>')
-    html.write('</section>')
-
-    # load NOAA options
-    NOAA_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
-    METEOR_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-METEOR.json')
-    if NOAA_OPTIONS['tweet'] == 'yes' or METEOR_OPTIONS['tweet'] == 'yes':
-        TWITTER_CONFIG = wxcutils.load_json(CONFIG_PATH, 'config-twitter.json')
+    # output as html
+    MY_LOGGER.debug('Build webpage')
+    with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
+        # html header
+        html.write('<!DOCTYPE html>')
+        html.write('<html lang=\"en\"><head>'
+                   '<meta charset=\"UTF-8\">'
+                   '<title>Satellite Status'
+                   '</title>'
+                   '<link rel=\"stylesheet\" href=\"css/styles.css\">'
+                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
+        html.write('</head>')
+        html.write('<body>')
+        html.write(wxcutils.load_file(CONFIG_PATH, 'main-header.txt').replace('PAGE-TITLE',
+                                                                            'Satellite Status'))
         html.write('<section class=\"content-section container\">')
-        html.write('<h2 class=\"section-header\">Twitter Feed</h2>')
-        html.write('<p>Tweeting images to <a href=\"https://twitter.com/' + TWITTER_CONFIG['tweet to'].replace('@', '') + '\">' + TWITTER_CONFIG['tweet to'] + '</a> for:</p><ul>')
-        if NOAA_OPTIONS['tweet'] == 'yes':
-            html.write('<li>NOAA - enhancement option = ' + NOAA_OPTIONS['tweet enhancement'] + '</li>')
-        if METEOR_OPTIONS['tweet'] == 'yes':
-            html.write('<li>METEOR - format option = ' + METEOR_OPTIONS['tweet image'] + '</li>')
-        html.write('</ul></section>')
 
-    html.write('<footer class=\"main-footer\">')
-    html.write('<p id=\"footer-text\">Satellite Status last updated at <span class=\"time\">' +
-               time.strftime('%H:%M (' +
-                             subprocess.check_output("date").
-                             decode('utf-8').split(' ')[-2] +
-                             ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
-               '.</p>')
-    html.write('</footer>')
-    html.write('</body></html>')
+        html.write('<h2 class=\"section-header\">Meteor-M Series Status</h2>')
+        html.write('<table>')
+        html.write('<tr><th>Meteor-M N2</th><th>Meteor-M N2-2</th></tr>')
+        html.write('<tr><td>' + get_meteor_status('Meteor-M N2') + '</td>')
+        html.write('<td>' + get_meteor_status('Meteor-M N2-2') + '</td></tr>')
+        html.write('</table>')
+        html.write('<p><a href=\"http://happysat.nl/Meteor/html/Meteor_Status.html\" target=\"_blank\">Data source</a></p>')
+        html.write('</section>')
 
-# acp file to destination
-MY_LOGGER.debug('SCP files')
-scp_files()
+        html.write('<section class=\"content-section container\">')
+        html.write('<h2 class=\"section-header\">NOAA Series Status</h2>')
+        html.write('<table>')
+        html.write('<tr><th>NOAA 15</th><th>NOAA 18</th><th>NOAA 19</th></tr>')
+        html.write('<tr><td>' + get_noaa_status('NOAA 15') + '</td>')
+        html.write('<td>' + get_noaa_status('NOAA 18') + '</td>')
+        html.write('<td>' + get_noaa_status('NOAA 19') + '</td></tr>')
+        html.write('</table>')
+        html.write('<p><a href=\"https://www.ospo.noaa.gov/Operations/POES/status.html\" target=\"_blank\">Data source</a></p>')
+        html.write('</section>')
+
+        html.write('<section class=\"content-section container\">')
+        html.write('<h2 class=\"section-header\">ISS SSTV - ARISS Status</h2>')
+        html.write('<table>')
+        html.write('<tr><th>ISS Zarya</th></tr>')
+        html.write('<tr><td>' + get_iss_status() + '</td></tr>')
+        html.write('</table>')
+        html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\">Data source</a></p>')
+        html.write('</section>')
+
+        # load NOAA options
+        NOAA_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
+        METEOR_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-METEOR.json')
+        if NOAA_OPTIONS['tweet'] == 'yes' or METEOR_OPTIONS['tweet'] == 'yes':
+            TWITTER_CONFIG = wxcutils.load_json(CONFIG_PATH, 'config-twitter.json')
+            html.write('<section class=\"content-section container\">')
+            html.write('<h2 class=\"section-header\">Twitter Feed</h2>')
+            html.write('<p>Tweeting images to <a href=\"https://twitter.com/' + TWITTER_CONFIG['tweet to'].replace('@', '') + '\">' + TWITTER_CONFIG['tweet to'] + '</a> for:</p><ul>')
+            if NOAA_OPTIONS['tweet'] == 'yes':
+                html.write('<li>NOAA - enhancement option = ' + NOAA_OPTIONS['tweet enhancement'] + '</li>')
+            if METEOR_OPTIONS['tweet'] == 'yes':
+                html.write('<li>METEOR - format option = ' + METEOR_OPTIONS['tweet image'] + '</li>')
+            html.write('</ul></section>')
+
+        html.write('<footer class=\"main-footer\">')
+        html.write('<p id=\"footer-text\">Satellite Status last updated at <span class=\"time\">' +
+                   time.strftime('%H:%M (' +
+                                 subprocess.check_output("date").
+                                 decode('utf-8').split(' ')[-2] +
+                                 ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
+                   '.</p>')
+        html.write('</footer>')
+        html.write('</body></html>')
+
+    # acp file to destination
+    MY_LOGGER.debug('SCP files')
+    scp_files()
+except:
+    MY_LOGGER.critical('Global exception handler: %s %s %s',
+                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

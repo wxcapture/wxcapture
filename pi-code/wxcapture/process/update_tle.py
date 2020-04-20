@@ -4,6 +4,7 @@
 
 # import libraries
 import os
+import sys
 from urllib.request import urlopen
 import wxcutils
 
@@ -86,23 +87,28 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
-# filenames
-TLE_FILENAME = 'weather.tle'
+try:
+    # filenames
+    TLE_FILENAME = 'weather.tle'
 
-# load satellites
-SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')
+    # load satellites
+    SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')
 
-# backup old tle file
-backup_tle()
+    # backup old tle file
+    backup_tle()
 
-# refresh TLE file
-TLE_INFO = []
-refresh_tle('weather')
-# refresh_tle('stations')
-refresh_tle('amateur')
+    # refresh TLE file
+    TLE_INFO = []
+    refresh_tle('weather')
+    # refresh_tle('stations')
+    refresh_tle('amateur')
 
-# write out TLE file
-write_file()
+    # write out TLE file
+    write_file()
+
+except:
+    MY_LOGGER.critical('Global exception handler: %s %s %s',
+                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

@@ -3,6 +3,10 @@ server-website/wxcapture/satpass.html
 server-website/wxcapture/captures.html
 server-website/wxcapture/satellitestatus.html
 
+# one-page-for-all passes page
+server-website/wxcapture/passes.html
+server-website/wxcapture/passes.json
+
 # server code
 
 

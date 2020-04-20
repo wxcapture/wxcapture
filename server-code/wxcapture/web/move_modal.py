@@ -33,6 +33,40 @@ def find_files(directory, pattern):
                 yield filename
 
 
+def build_pass_json():
+    """build json file for all passes"""
+    MY_LOGGER.debug('building pass json')
+    json_data = []
+    for filename in find_files(TARGET, '*.html'):
+        if not ('index.html' in filename or 'captures.html' in filename or 'resources.html' in filename or 'satellitestatus.html' in filename or 'satpass.html' in filename):
+            MY_LOGGER.debug('found pass page - filename = %s', filename)
+            filename_root = filename[:len(filename)-5]
+            json_filename = filename_root + '.json'
+            if os.path.isfile(json_filename):
+                json_exists = 'yes'
+            else:
+                json_exists = 'no'
+                json_filename = ''
+            if 'NOAA' in filename:
+                pass_type = 'NOAA'
+            elif 'METEOR' in filename:
+                pass_type = 'METEOR'
+            elif 'ISS' in filename:
+                pass_type = 'ISS'
+            elif 'SAUDISAT' in filename:
+                pass_type = 'AMSAT'
+            else:
+                pass_type = 'unknown'
+            json_data.append({'pass page': filename.replace(OUTPUT_PATH, ''),
+                              'filename root': filename_root.replace(OUTPUT_PATH, ''),
+                              'json exists': json_exists,
+                              'json filename': json_filename.replace(OUTPUT_PATH, ''),
+                              'pass type': pass_type
+                            })
+    MY_LOGGER.debug('saving passses.json')
+    wxcutils.save_json(TARGET, 'passes.json', json_data)
+
+
 def ordinal(num):
     """get the ordinalinal date description"""
     return str(num) + ("th" if 4 <= num % 100 <= 20 else
@@ -481,6 +515,11 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
     html.write('</body></html>')
 
 MY_LOGGER.debug('Finished capture page building')
+
+MY_LOGGER.debug('Build json passes file')
+build_pass_json()
+MY_LOGGER.debug('Finished json passes file')
+
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

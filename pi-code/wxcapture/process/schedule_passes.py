@@ -121,8 +121,6 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     else:
         MY_LOGGER.critical('No prediction data - validate satellites.json and predict code'
                            ' - for satellite = %s', sat['name'])
-
-    halfway = round(lines_len / 2)
     orbit = lines[0].split()[10]
     MY_LOGGER.debug('orbit = %s', orbit)
 

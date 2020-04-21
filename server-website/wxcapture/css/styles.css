@@ -278,3 +278,8 @@ del {
     font-weight: bold;
     color: rgb(147, 216, 44);
 }
+
+/* Image display for captures.html */
+#display {
+    width: 200px;
+}

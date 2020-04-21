@@ -158,99 +158,120 @@ try:
                      WORKING_PATH + FILENAME_BASE + '.qpsk ' + AUDIO_PATH + FILENAME_BASE + '.wav')
     MY_LOGGER.debug('-' * 30)
 
-    # Keep original file timestamp
-    MY_LOGGER.debug('Keep original file timestamp')
-    wxcutils.run_cmd('touch -r ' + AUDIO_PATH + FILENAME_BASE + '.wav ' + WORKING_PATH +
-                     FILENAME_BASE + '.qpsk')
-    MY_LOGGER.debug('-' * 30)
+    if not os.path.isfile(WORKING_PATH + FILENAME_BASE + '.qpsk'):
+        MY_LOGGER.debug('No .qpsk file created, unable to continue to decode pass')
+    else:
+        MY_LOGGER.debug('A .qpsk file was created, continuing decoding')
 
-    # Decode QPSK to .dec and .bmp (non-colour corrected)
-    MY_LOGGER.debug('Decode QPSK to .dec and .bmp (non-colour corrected)')
-    wxcutils.run_cmd('/usr/local/bin/medet_arm ' + WORKING_PATH + FILENAME_BASE + '.qpsk '
-                     + WORKING_PATH + FILENAME_BASE + ' -S -cd')
-    MY_LOGGER.debug('-' * 30)
+        # Keep original file timestamp
+        MY_LOGGER.debug('Keep original file timestamp')
+        wxcutils.run_cmd('touch -r ' + AUDIO_PATH + FILENAME_BASE + '.wav ' + WORKING_PATH +
+                         FILENAME_BASE + '.qpsk')
+        MY_LOGGER.debug('-' * 30)
 
-    # Generate colour corrected .bmp
-    # active APIDs are at:
-    # http://happysat.nl/Meteor/html/Meteor_Status.html
-    MY_LOGGER.debug('Generate colour corrected .bmp')
-    wxcutils.run_cmd('/usr/local/bin/medet_arm ' + WORKING_PATH + FILENAME_BASE + '.dec ' +
-                     WORKING_PATH + FILENAME_BASE + '-cc.bmp -r 66 -g 65 -b 64 -d')
-    MY_LOGGER.debug('-' * 30)
+        # Decode QPSK to .dec and .bmp (non-colour corrected)
+        MY_LOGGER.debug('Decode QPSK to .dec and .bmp (non-colour corrected)')
+        wxcutils.run_cmd('/usr/local/bin/medet_arm ' + WORKING_PATH + FILENAME_BASE + '.qpsk '
+                         + WORKING_PATH + FILENAME_BASE + ' -S -cd')
+        MY_LOGGER.debug('-' * 30)
 
-    # create full size .jpg of each .bmp
-    MY_LOGGER.debug('create full size .jpg of each .bmp')
-    # main
-    wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                     ' ' + WORKING_PATH + FILENAME_BASE + '.bmp > ' + WORKING_PATH +
-                     FILENAME_BASE + '.jpg')
-    wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                     ' ' + WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp > ' + WORKING_PATH +
-                     FILENAME_BASE + '-cc.jpg')
-    # channels
-    wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                     ' ' + WORKING_PATH + FILENAME_BASE + '_0.bmp > ' + WORKING_PATH +
-                     FILENAME_BASE + '_0.jpg')
-    wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                     ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
-                     FILENAME_BASE + '_1.jpg')
-    wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                     ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
-                     FILENAME_BASE + '_2.jpg')
+        if not os.path.isfile(WORKING_PATH + FILENAME_BASE + '.dec'):
+            MY_LOGGER.debug('No .dec file created, unable to continue to decode pass')
+        else:
+            MY_LOGGER.debug('A .dec file was created, continuing decoding')
 
-    # Generate stretched version of the colour corrected .jpg
-    MY_LOGGER.debug('Generate stretched version of the colour corrected .jpg')
-    # main
-    wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
-    # channels
-    wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
-    wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
-    wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
+            # Generate colour corrected .bmp
+            # active APIDs are at:
+            # http://happysat.nl/Meteor/html/Meteor_Status.html
+            MY_LOGGER.debug('Generate colour corrected .bmp')
+            wxcutils.run_cmd('/usr/local/bin/medet_arm ' + WORKING_PATH + FILENAME_BASE + '.dec ' +
+                             WORKING_PATH + FILENAME_BASE + '-cc.bmp -r 66 -g 65 -b 64 -d')
+            MY_LOGGER.debug('-' * 30)
 
-    # move to image directory
-    MY_LOGGER.debug('move to image directory')
-    wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '-cc-rectified.jpg',
-                       IMAGE_PATH, FILENAME_BASE + '-cc-rectified.jpg')
-    wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_0-rectified.jpg',
-                       IMAGE_PATH, FILENAME_BASE + '_0-rectified.jpg')
-    wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_1-rectified.jpg',
-                       IMAGE_PATH, FILENAME_BASE + '_1-rectified.jpg')
-    wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_2-rectified.jpg',
-                       IMAGE_PATH, FILENAME_BASE + '_2-rectified.jpg')
+            if not os.path.isfile(WORKING_PATH + FILENAME_BASE + '-cc.bmp'):
+                MY_LOGGER.debug('No -cc.bmp file created, unable to continue to generate images')
+            else:
+                MY_LOGGER.debug('A -cc.bmp file was created, continuing generating images')
 
-    MY_LOGGER.debug('-' * 30)
+                # create full size .jpg of each .bmp
+                MY_LOGGER.debug('create full size .jpg of each .bmp')
+                # main
+                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                                 ' ' + WORKING_PATH + FILENAME_BASE + '.bmp > ' + WORKING_PATH +
+                                 FILENAME_BASE + '.jpg')
+                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                                 ' ' + WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp > ' +
+                                 WORKING_PATH + FILENAME_BASE + '-cc.jpg')
+                # channels
+                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                                 ' ' + WORKING_PATH + FILENAME_BASE + '_0.bmp > ' + WORKING_PATH +
+                                 FILENAME_BASE + '_0.jpg')
+                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                                 ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
+                                 FILENAME_BASE + '_1.jpg')
+                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                                 ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
+                                 FILENAME_BASE + '_2.jpg')
 
-    # create thumbnails
-    # main
-    MY_LOGGER.debug('create thumbnails')
-    wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                     '-cc-rectified.jpg\" | pnmscale -xysize ' +
-                     IMAGE_OPTIONS['thumbnail size'] +
-                     ' | cjpeg -opti -progr -qual ' +
-                     IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                     IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg\"')
-    # channels
-    wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                     '_0-rectified.jpg\" | pnmscale -xysize ' +
-                     IMAGE_OPTIONS['thumbnail size'] +
-                     ' | cjpeg -opti -progr -qual ' +
-                     IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                     IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg\"')
-    wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                     '_1-rectified.jpg\" | pnmscale -xysize ' +
-                     IMAGE_OPTIONS['thumbnail size'] +
-                     ' | cjpeg -opti -progr -qual ' +
-                     IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                     IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg\"')
-    wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                     '_2-rectified.jpg\" | pnmscale -xysize ' +
-                     IMAGE_OPTIONS['thumbnail size'] +
-                     ' | cjpeg -opti -progr -qual ' +
-                     IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                     IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
+                # Generate stretched version of the colour corrected .jpg
+                MY_LOGGER.debug('Generate stretched version of the colour corrected .jpg')
+                # main
+                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
+                # channels
+                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
+                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
+                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
+
+                # move to image directory
+                MY_LOGGER.debug('move to image directory')
+                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '-cc-rectified.jpg',
+                                   IMAGE_PATH, FILENAME_BASE + '-cc-rectified.jpg')
+                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_0-rectified.jpg',
+                                   IMAGE_PATH, FILENAME_BASE + '_0-rectified.jpg')
+                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_1-rectified.jpg',
+                                   IMAGE_PATH, FILENAME_BASE + '_1-rectified.jpg')
+                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_2-rectified.jpg',
+                                   IMAGE_PATH, FILENAME_BASE + '_2-rectified.jpg')
+
+                MY_LOGGER.debug('-' * 30)
+
+                # create thumbnails
+                # main
+                MY_LOGGER.debug('create thumbnails')
+                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                                 '-cc-rectified.jpg\" | pnmscale -xysize ' +
+                                 IMAGE_OPTIONS['thumbnail size'] +
+                                 ' | cjpeg -opti -progr -qual ' +
+                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                                 IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg\"')
+                # channels
+                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                                 '_0-rectified.jpg\" | pnmscale -xysize ' +
+                                 IMAGE_OPTIONS['thumbnail size'] +
+                                 ' | cjpeg -opti -progr -qual ' +
+                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                                 IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg\"')
+                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                                 '_1-rectified.jpg\" | pnmscale -xysize ' +
+                                 IMAGE_OPTIONS['thumbnail size'] +
+                                 ' | cjpeg -opti -progr -qual ' +
+                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                                 IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg\"')
+                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                                 '_2-rectified.jpg\" | pnmscale -xysize ' +
+                                 IMAGE_OPTIONS['thumbnail size'] +
+                                 ' | cjpeg -opti -progr -qual ' +
+                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                                 IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
+
+                # move .dec file to output directory
+                MY_LOGGER.debug('move .dec file to output directory')
+                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '.dec',
+                                   OUTPUT_PATH, FILENAME_BASE  + '.dec')
 
     # delete bmp and qpsk files
     # also intermediate jpg files
+    # these will not error if the files do not exist
     MY_LOGGER.debug('delete intermediate files')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '*.bmp')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.qpsk')
@@ -259,11 +280,6 @@ try:
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
-
-    # move .dec file to output directory
-    MY_LOGGER.debug('move .dec file to output directory')
-    wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '.dec',
-                       OUTPUT_PATH, FILENAME_BASE  + '.dec')
 
     # delete audio file?
     if CONFIG_INFO['save .wav files'] == 'no':

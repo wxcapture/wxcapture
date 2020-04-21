@@ -115,6 +115,9 @@ try:
     PASS_INFO = wxcutils.load_json(OUTPUT_PATH, FILENAME_BASE + '.json')
     MY_LOGGER.debug(PASS_INFO)
 
+    # validate tle files exist
+    wxcutils.validate_tle(WORKING_PATH)
+
     # to enable REPROCESSing using the original tle file, rename it to match the FILENAME_BASE
     wxcutils.copy_file(WORKING_PATH + 'weather.tle', OUTPUT_PATH +
                        FILENAME_BASE + 'weather.tle')

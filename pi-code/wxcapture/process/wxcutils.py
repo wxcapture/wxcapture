@@ -158,9 +158,17 @@ def ordinal(num):
     return str(num) + ("th" if 4 <= num % 100 <= 20 else
                        {1: "st", 2: "nd", 3: "rd"}.get(num % 10, "th"))
 
-def validate_tle(vt_path, vt_file):
-    """validate tle file exists, if not replace with backup file"""
+def validate_single_tle(vt_path, vt_file):
+    """validate a tle file exists, if not replace with backup file"""
     if not os.path.isfile(vt_path + '/' + vt_file):
         MY_UTIL_LOGGER.debug('tle file does not exist - %s %s - replacing with backup',
                              vt_path, vt_file)
         copy_file(vt_path + '/' + vt_file + '.old', vt_path + '/' + vt_file)
+
+def validate_tle(vt_path):
+    """validate all tle files and if not existing, replace with backup"""
+    validate_single_tle(vt_path, 'weather.tle')
+    validate_single_tle(vt_path, 'de421.bsp')
+    validate_single_tle(vt_path, 'deltat.data')
+    validate_single_tle(vt_path, 'deltat.preds')
+    validate_single_tle(vt_path, 'Leap_Second.dat')

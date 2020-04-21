@@ -48,9 +48,10 @@ def refresh_tle(filename):
 def write_file():
     """write TLE"""
     # update TLE
-    MY_LOGGER.debug('write new TLE')
+    MY_LOGGER.debug('write new TLE to %s', WORKING_PATH + TLE_FILENAME)
     file_out = open(WORKING_PATH + TLE_FILENAME, 'w+')
     for satellite in TLE_INFO:
+        MY_LOGGER.debug('%s %s %s', satellite['line_1'], satellite['line_2'], satellite['line_3'])
         file_out.write(satellite['line_1'])
         file_out.write(satellite['line_2'])
         file_out.write(satellite['line_3'])
@@ -62,6 +63,8 @@ def write_file():
         MY_LOGGER.debug('re-using old one')
         wxcutils.run_cmd('rm ' + WORKING_PATH + TLE_FILENAME)
         wxcutils.move_file(WORKING_PATH, TLE_FILENAME + '.old', WORKING_PATH, TLE_FILENAME)
+    else:
+        MY_LOGGER.debug('weather.tle created with non-zero size')
 
 
 # setup paths to directories

@@ -135,17 +135,17 @@ try:
     LOCAL_TIME_ZONE = subprocess.check_output("date"). \
         decode('utf-8').split(' ')[-2]
 
-
     # create filename base
     FILENAME_BASE = wxcutils.epoch_to_utc(START_EPOCH, '%Y-%m-%d-%H-%M-%S') + \
         '-' + SATELLITE.replace(' ', '_').replace('(', '').replace(')', '')
     MY_LOGGER.debug('FILENAME_BASE = %s', FILENAME_BASE)
 
-
-
     # load pass information
     PASS_INFO = wxcutils.load_json(OUTPUT_PATH, FILENAME_BASE + '.json')
     MY_LOGGER.debug(PASS_INFO)
+
+    # validate tle files exist
+    wxcutils.validate_tle(WORKING_PATH)
 
     # to enable REPROCESSing using the original tle file, rename it to match the FILENAME_BASE
     wxcutils.copy_file(WORKING_PATH + 'weather.tle', OUTPUT_PATH +

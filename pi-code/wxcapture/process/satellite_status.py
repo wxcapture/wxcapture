@@ -16,6 +16,7 @@ def parse(line):
     result = line
     return result.decode('utf-8').replace(' ', '').replace('<td>', '').replace('</td>', '').rstrip()
 
+
 def scp_files():
     """scp files"""
     MY_LOGGER.debug('using scp')
@@ -34,6 +35,7 @@ def get_page(page_url):
         page_content = file_in.read()
     # MY_LOGGER.debug('content = %s', page_content)
     return page_content
+
 
 def get_noaa_status(satellite):
     """get the satellite status for a NOAA satellite"""
@@ -168,7 +170,7 @@ try:
         html.write('</head>')
         html.write('<body>')
         html.write(wxcutils.load_file(CONFIG_PATH, 'main-header.txt').replace('PAGE-TITLE',
-                                                                            'Satellite Status'))
+                                                                              'Satellite Status'))
         html.write('<section class=\"content-section container\">')
 
         html.write('<h2 class=\"section-header\">Meteor-M Series Status</h2>')

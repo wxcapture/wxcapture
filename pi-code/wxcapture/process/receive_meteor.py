@@ -152,6 +152,9 @@ try:
 
     MY_LOGGER.debug('-' * 30)
 
+    # assume we don't get a valid page, but confirm if we do
+    CREATE_PAGE = False
+
     # Demodulate .wav to QPSK
     MY_LOGGER.debug('Demodulate .wav to QPSK')
     wxcutils.run_cmd('echo yes | /usr/bin/meteor_demod -B -o ' +
@@ -188,7 +191,8 @@ try:
                              WORKING_PATH + FILENAME_BASE + '-cc.bmp -r 66 -g 65 -b 64 -d')
             MY_LOGGER.debug('-' * 30)
 
-            if not os.path.isfile(WORKING_PATH + FILENAME_BASE + '-cc.bmp'):
+            # note that the bmp file created has the extension .bmp.bmp!
+            if not os.path.isfile(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp'):
                 MY_LOGGER.debug('No -cc.bmp file created, unable to continue to generate images')
             else:
                 MY_LOGGER.debug('A -cc.bmp file was created, continuing generating images')

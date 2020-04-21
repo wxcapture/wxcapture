@@ -1,5 +1,7 @@
 # WXcapture
-Weather Satellite Capture Project
+## Weather Satellite Capture Project
+To see a preview of the site here, check out https://wxcapture.github.io/wxcapture/server-website/wxcapture/index.html
+<!-- You can see our website (with all the data) at [INTRANET] -->
 
 # What is WxCapture?
 There are thousands of satellites currently in orbit, with many satellites passing in the sky overhead at any given moment.
@@ -13,7 +15,5 @@ You can receive some of them yourself with a cheap SDR and antenna, and with wea
 
 # About this project 
 This repository is a joint project between Mike (KiwiinNZ) and Albert (Technobird22). We are looking to turn this into an open source solution so that anyone can set up their own automatic decoding station. This site is currently under very active development, so you will often notice changes to it.
-
-<!-- You can see our website at [INTRANET] -->
 
 Please report any bugs to wxcapture@gmail.com or submit an issue on Github.

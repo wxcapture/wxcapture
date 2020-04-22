@@ -43,12 +43,6 @@ def build_pass_json():
             file_path, html_file = os.path.split(filename)
             base_filename, base_extension = os.path.splitext(html_file)
             filename_root = filename[:len(filename) - len(base_extension)]
-            json_filename = filename_root + '.json'
-            if os.path.isfile(json_filename):
-                json_exists = 'yes'
-            else:
-                json_exists = 'no'
-                json_filename = ''
             # look for all the image files and add to the list
             # to avoid the json file getting too large, extract the enhancement part only
             image_files = glob.glob(file_path + '/images/' + base_filename + '*.jpg')
@@ -485,7 +479,8 @@ for file_name in PASS_FILES:
     MY_LOGGER.debug('file_name = %s', file_name)
     file_bits = file_name.split('-')
     location = TARGET + file_bits[0] + '/' + file_bits[1] + '/' + file_bits[2] + '/'
-    fix_pass_pages_lib.fix_file(location, file_name)
+    if '.html' in file_name:
+        fix_pass_pages_lib.fix_file(location, file_name)
 
 # build current page which redirects to current month page
 

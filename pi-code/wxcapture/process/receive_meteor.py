@@ -50,6 +50,11 @@ def scp_files():
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'])
+    wxcutils.run_cmd('scp ' + AUDIO_PATH + FILENAME_BASE + '.wav ' +
+                     scp_config['remote user']
+                     + '@' + scp_config['remote host'] + ':' +
+                     scp_config['remote directory'] + '/audio/')
+    
     MY_LOGGER.debug('SCP complete')
 
 
@@ -268,6 +273,20 @@ try:
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
                                  IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
 
+                # create a tidied up image for tweeting
+                wxcutils_pi.fix_image(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp',
+                                      WORKING_PATH + FILENAME_BASE + '-tweet.bmp', 'Y')
+                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                                 ' ' + WORKING_PATH + FILENAME_BASE +  '-tweet.bmp > ' + IMAGE_PATH +
+                                 FILENAME_BASE + '-tweet.jpg')
+                wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-tweet.jpg')
+                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                                 '-tweet.jpg\" | pnmscale -xysize ' +
+                                 IMAGE_OPTIONS['thumbnail size'] +
+                                 ' | cjpeg -opti -progr -qual ' +
+                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                                 IMAGE_PATH + FILENAME_BASE + '-tweet-rectified-tn.jpg\"')
+
                 # move .dec file to output directory
                 MY_LOGGER.debug('move .dec file to output directory')
                 wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '.dec',
@@ -379,7 +398,7 @@ try:
             TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \
                 ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
-            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + 'cc-rectified-tn.jpg'
+            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-tweet-rectified-tn.jpg'
             try:
                 wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
             except:

@@ -281,7 +281,7 @@ try:
                                  FILENAME_BASE + '-tweet.jpg')
                 wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-tweet.jpg')
                 wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                                 '-tweet.jpg\" | pnmscale -xysize ' +
+                                 '-tweet-rectified.jpg\" | pnmscale -xysize ' +
                                  IMAGE_OPTIONS['thumbnail size'] +
                                  ' | cjpeg -opti -progr -qual ' +
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +

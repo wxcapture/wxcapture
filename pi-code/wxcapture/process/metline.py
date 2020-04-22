@@ -67,7 +67,7 @@ try:
 
     MY_LOGGER.debug('Image line removal start')
     y_iterator = 1
-    while y_iterator < IMAGE_HEIGHT
+    while y_iterator < IMAGE_HEIGHT:
         x_iterator = 0
         while x_iterator < IMAGE_WIDTH:
             red, green, blue = IMAGE.getpixel((x_iterator, y_iterator))

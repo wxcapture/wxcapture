@@ -29,6 +29,8 @@ def save_image(si_filename):
 def fix_thick_line(ftl_start, ftl_end):
     """fix thick black lines"""
     MY_LOGGER.debug('Thick black line to fix between lines %d and %d of thickness %d', ftl_start, ftl_end, ftl_end - ftl_start)
+    MY_LOGGER.debug('Needs some code adding once I figure how best to handle this!')
+        
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -85,18 +87,16 @@ try:
         else:
             if BLACK_RUN_LENGTH > 1 and BLACK_RUN_LENGTH >= MIN_PIXEL_THICK_LENGTH:
                 # MY_LOGGER.debug('Thick black run total length = %d between lines %d and %d', BLACK_RUN_LENGTH, BLACK_RUN_START, BLACK_RUN_START + BLACK_RUN_LENGTH)
-                fix_thick_line(BLACK_RUN_START, BLACK_RUN_START + BLACK_RUN_LENGTH)
+                fix_thick_line(BLACK_RUN_START - BLACK_RUN_LENGTH, BLACK_RUN_START)
             BLACK_RUN_LENGTH = 0
 
         Y_ITERATOR += 1
-        
-
     MY_LOGGER.debug('Find thick lines end')
 
 
     MY_LOGGER.debug('Image line removal start')
     Y_ITERATOR = 1
-    while Y_ITERATOR < IMAGE_HEIGHT / 1000:
+    while Y_ITERATOR < IMAGE_HEIGHT:
         X_ITERATOR = 0
         while X_ITERATOR < IMAGE_WIDTH:
             RED, GREEN, BLUE = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR))
@@ -106,7 +106,7 @@ try:
                 # MY_LOGGER.debug('bad cyan')
                 RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing cyan')
-                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED_BELOW, green, BLUE))
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED_BELOW, GREEN, BLUE))
                 FIXED_CYAN += 1
             # see if magenta is faulty
             if RED != 0 and GREEN == 0 and BLUE != 0:

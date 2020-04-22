@@ -26,6 +26,10 @@ def save_image(si_filename):
     MY_LOGGER.debug('Saved %s', si_filename)
 
 
+def fix_thick_line(ftl_start, ftl_end):
+    """fix thick black lines"""
+    MY_LOGGER.debug('Thick black line to fix between lines %d and %d of thickness %d', ftl_start, ftl_end, ftl_end - ftl_start)
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -52,7 +56,7 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 IMAGE_HEIGHT = 0
 IMAGE_WIDTH = 0
 IMAGE = Image.new('RGB', (1, 1), (0, 0, 0))
-MIN_PIXEL_LINE_LENGTH = 50
+MIN_PIXEL_THICK_LENGTH = 30
 FIXED_CYAN = 0
 FIXED_MAGENTA = 0
 FIXED_YELLOW = 0
@@ -62,65 +66,90 @@ FIXED_GREEN = 0
 FIXED_BLUE = 0
 
 try:
-    
+    MY_LOGGER.debug('Load image start')
     load_image(WORKING_PATH + 'meteor.bmp')
+    MY_LOGGER.debug('Load image end')
+
+    MY_LOGGER.debug('Find thick lines start')
+    IMAGE_MID_WIDTH = int(IMAGE_WIDTH / 2)
+    Y_ITERATOR = 0
+    BLACK_RUN_LENGTH = 0
+    BLACK_RUN_START = 0
+    while Y_ITERATOR < IMAGE_HEIGHT:
+        # MY_LOGGER.debug('Y_ITERATOR = %d', Y_ITERATOR)
+        RED, GREEN, BLUE = IMAGE.getpixel((IMAGE_MID_WIDTH, Y_ITERATOR))
+        if RED == 0 and GREEN == 0 and BLUE == 0:
+            BLACK_RUN_START = Y_ITERATOR
+            BLACK_RUN_LENGTH += 1
+            # MY_LOGGER.debug('BLACK Y_ITERATOR = %d, run = %d', Y_ITERATOR, BLACK_RUN_LENGTH)
+        else:
+            if BLACK_RUN_LENGTH > 1 and BLACK_RUN_LENGTH >= MIN_PIXEL_THICK_LENGTH:
+                # MY_LOGGER.debug('Thick black run total length = %d between lines %d and %d', BLACK_RUN_LENGTH, BLACK_RUN_START, BLACK_RUN_START + BLACK_RUN_LENGTH)
+                fix_thick_line(BLACK_RUN_START, BLACK_RUN_START + BLACK_RUN_LENGTH)
+            BLACK_RUN_LENGTH = 0
+
+        Y_ITERATOR += 1
+        
+
+    MY_LOGGER.debug('Find thick lines end')
+
 
     MY_LOGGER.debug('Image line removal start')
-    y_iterator = 1
-    while y_iterator < IMAGE_HEIGHT:
-        x_iterator = 0
-        while x_iterator < IMAGE_WIDTH:
-            red, green, blue = IMAGE.getpixel((x_iterator, y_iterator))
-            # MY_LOGGER.debug('Pixel %d,%d = R%d G%d B%d', x_iterator, y_iterator, red, green, blue)
+    Y_ITERATOR = 1
+    while Y_ITERATOR < IMAGE_HEIGHT / 1000:
+        X_ITERATOR = 0
+        while X_ITERATOR < IMAGE_WIDTH:
+            RED, GREEN, BLUE = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR))
+            # MY_LOGGER.debug('Pixel %d,%d = R%d G%d B%d', X_ITERATOR, Y_ITERATOR, RED, green, blue)
             # see if cyan is faulty
-            if red == 0 and green != 0 and blue != 0:
+            if RED == 0 and GREEN != 0 and BLUE != 0:
                 # MY_LOGGER.debug('bad cyan')
-                red_below, green_below, blue_below = IMAGE.getpixel((x_iterator, y_iterator - 1))
+                RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing cyan')
-                IMAGE.putpixel((x_iterator, y_iterator) ,(red_below, green, blue))
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED_BELOW, green, BLUE))
                 FIXED_CYAN += 1
             # see if magenta is faulty
-            if red != 0 and green == 0 and blue != 0:
+            if RED != 0 and GREEN == 0 and BLUE != 0:
                 # MY_LOGGER.debug('bad magenta')
-                red_below, green_below, blue_below = IMAGE.getpixel((x_iterator, y_iterator - 1))
+                RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing magenta')
-                IMAGE.putpixel((x_iterator, y_iterator) ,(red, green_below, blue))
-                FIXED_MAGENTA +- 1
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED, GREEN_BELOW, BLUE))
+                FIXED_MAGENTA += 1
             # see if yellow is faulty
-            if red != 0 and green != 0 and blue == 0:
+            if RED != 0 and GREEN != 0 and BLUE == 0:
                  # MY_LOGGER.debug('bad yellow')
-                red_below, green_below, blue_below = IMAGE.getpixel((x_iterator, y_iterator - 1))
+                RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing yellow')
-                IMAGE.putpixel((x_iterator, y_iterator) ,(red, green, blue_below))
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED, GREEN, BLUE_BELOW))
                 FIXED_YELLOW += 1
             # see if black is faulty
-            if red == 0 and green == 0 and blue == 0:
+            if RED == 0 and GREEN == 0 and BLUE == 0:
                  # MY_LOGGER.debug('bad black')
-                red_below, green_below, blue_below = IMAGE.getpixel((x_iterator, y_iterator - 1))
+                RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing black')
-                IMAGE.putpixel((x_iterator, y_iterator) ,(red_below, green_below, blue_below))
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED_BELOW, GREEN_BELOW, BLUE_BELOW))
                 FIXED_BLACK += 1
-            if red != 0 and green == 0 and blue == 0:
+            if RED != 0 and GREEN == 0 and BLUE == 0:
                 # MY_LOGGER.debug('bad red')
-                red_below, green_below, blue_below = IMAGE.getpixel((x_iterator, y_iterator - 1))
+                RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing red')
-                IMAGE.putpixel((x_iterator, y_iterator) ,(red, green_below, blue_below))
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED, GREEN_BELOW, BLUE_BELOW))
                 FIXED_RED += 1
-            if red == 0 and green != 0 and blue == 0:
+            if RED == 0 and GREEN != 0 and BLUE == 0:
                 # MY_LOGGER.debug('bad green')
-                red_below, green_below, blue_below = IMAGE.getpixel((x_iterator, y_iterator - 1))
+                RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing green')
-                IMAGE.putpixel((x_iterator, y_iterator) ,(red_below, green, blue_below))
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED_BELOW, GREEN, BLUE_BELOW))
                 FIXED_GREEN += 1
-            if red == 0 and green == 0 and blue != 0:
+            if RED == 0 and GREEN == 0 and BLUE != 0:
                 # MY_LOGGER.debug('bad blue')
-                red_below, green_below, blue_below = IMAGE.getpixel((x_iterator, y_iterator - 1))
+                RED_BELOW, GREEN_BELOW, BLUE_BELOW = IMAGE.getpixel((X_ITERATOR, Y_ITERATOR - 1))
                 # MY_LOGGER.debug('fixing blue')
-                IMAGE.putpixel((x_iterator, y_iterator) ,(red_below, green_below, blue))
+                IMAGE.putpixel((X_ITERATOR, Y_ITERATOR), (RED_BELOW, GREEN_BELOW, BLUE))
                 FIXED_GREEN += 1
 
-            x_iterator += 1
-        y_iterator += 1
+            X_ITERATOR += 1
+        Y_ITERATOR += 1
 
     MY_LOGGER.debug('Fixed cyan = %d', FIXED_CYAN)
     MY_LOGGER.debug('Fixed magenta = %d', FIXED_MAGENTA)
@@ -131,8 +160,9 @@ try:
     MY_LOGGER.debug('Fixed blue = %d', FIXED_BLUE)
     MY_LOGGER.debug('Image line removal finished')
 
-    # IMAGE.show()
+    MY_LOGGER.debug('Save image start')
     save_image(WORKING_PATH + 'meteorFIX.bmp')
+    MY_LOGGER.debug('Save image end')
 
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',

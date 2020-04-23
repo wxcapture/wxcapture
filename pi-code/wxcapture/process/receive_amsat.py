@@ -155,6 +155,8 @@ try:
     with open(OUTPUT_PATH + FILENAME_BASE + '.html', 'w') as html:
         html.write('<!DOCTYPE html>')
         html.write('<html lang=\"en\"><head>')
+        html.write('<meta charset=\"UTF-8\">'
+                   '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">')
         html.write('<title>Satellite Pass Audio</title></head>')
         html.write('<body><h2>' + SATELLITE + '</h2>')
         html.write('<ul>')

@@ -4,10 +4,7 @@
 
 # import libraries
 import os
-from os import listdir
-from os.path import isfile, join
 import sys
-import fnmatch
 import wxcutils
 import fix_pass_pages_lib
 
@@ -50,9 +47,11 @@ if DIRECTORY != '':
 else:
     MY_LOGGER.debug('Fixing ALL')
     for filename in fix_pass_pages_lib.find_files(TARGET, '*.html'):
-        if 'NOAA' in filename or '.backup' in filename or 'METEOR' in filename or 'ISS' in filename or 'SAUDISAT' in filename:
+        if 'NOAA' in filename or '.backup' in filename or 'METEOR' in filename \
+            or 'ISS' in filename or 'SAUDISAT' in filename:
             path_part, file_part = os.path.split(filename)
-            MY_LOGGER.debug('Fixing - filename = %s, path = %s, file = %s', filename, path_part, file_part)
+            MY_LOGGER.debug('Fixing - filename = %s, path = %s, file = %s',
+                            filename, path_part, file_part)
             fix_pass_pages_lib.fix_file(path_part + '/', file_part)
         else:
             MY_LOGGER.debug('SKIPing            = %s', filename)

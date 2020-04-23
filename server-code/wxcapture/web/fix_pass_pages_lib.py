@@ -4,11 +4,8 @@
 
 # import libraries
 import os
-from os import listdir
-from os.path import isfile, join
 import fnmatch
 import logging
-from logging.handlers import TimedRotatingFileHandler
 import wxcutils
 
 
@@ -57,7 +54,7 @@ def fix_file(ff_path, ff_filename):
         img_pos = fi_path.find('/wxcapture/')
         img_path = fi_path[img_pos:] + 'images/'
         MY_LOGGER.debug('img_path = %s', img_path)
-        
+
         while parse_pos >= 0:
             if fi_page.find(start_tag, parse_pos) > 0:
 
@@ -69,7 +66,7 @@ def fix_file(ff_path, ff_filename):
                 main_img = fi_page[first_pos_left:first_pos_right]
                 thumb_img = fi_page[second_pos_left:(second_pos_right)]
                 bits = main_img[:10].split('-')
-                
+
                 img_path = '/wxcapture/' + bits[0] + '/' + bits[1] + '/' + bits[2] + '/images/'
 
                 MY_LOGGER.debug('%d %s %s %s', parse_pos, main_img, thumb_img, img_path)
@@ -111,9 +108,9 @@ def fix_file(ff_path, ff_filename):
         MY_LOGGER.debug('no existing backup, so creating page backup file')
         wxcutils.copy_file(ff_path + ff_filename, ff_path + ff_filename + '.backup')
     else:
-         MY_LOGGER.debug('File backup exists, so retaining original backup')
-         # restore the backup and re-fix it
-         wxcutils.copy_file(ff_path + ff_filename + '.backup', ff_path + ff_filename)
+        MY_LOGGER.debug('File backup exists, so retaining original backup')
+        # restore the backup and re-fix it
+        wxcutils.copy_file(ff_path + ff_filename + '.backup', ff_path + ff_filename)
 
      # load file
     MY_LOGGER.debug('load file')
@@ -121,7 +118,7 @@ def fix_file(ff_path, ff_filename):
 
     # add stylesheets
     MY_LOGGER.debug('add stylesheets')
-    ff_page = update_page(ff_page, '</head>', '<link rel=\"stylesheet\" href=\"/wxcapture/css/styles.css\"><link rel=\"stylesheet\" href=\"/wxcapture/lightbox/css/lightbox.min.css\"></head>')
+    ff_page = update_page(ff_page, '</head>', '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link rel=\"stylesheet\" href=\"/wxcapture/css/styles.css\"><link rel=\"stylesheet\" href=\"/wxcapture/lightbox/css/lightbox.min.css\"></head>')
 
     # add script code
     MY_LOGGER.debug('add script code')
@@ -140,7 +137,7 @@ def fix_file(ff_path, ff_filename):
     ff_page = update_page(ff_page, '<table border = 1>', '<table>')
 
     # fix audio link - amsat and ISS only
-    if 'ISS' in ff_filename or 'SAUDISAT' in ff_filename:   
+    if 'ISS' in ff_filename or 'SAUDISAT' in ff_filename:
         audio_pos = ff_path.find('/wxcapture/')
         audio_path = ff_path[audio_pos:] + 'audio/'
         MY_LOGGER.debug('audio_path = %s', audio_path)
@@ -148,7 +145,7 @@ def fix_file(ff_path, ff_filename):
 
     # update img tags to use lightbox
     ff_page = fix_img(ff_page, ff_path, ff_filename)
-    
+
     # MY_LOGGER.debug('%s', ff_page)
 
     # save file

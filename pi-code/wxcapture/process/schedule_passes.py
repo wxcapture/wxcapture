@@ -682,6 +682,7 @@ try:
         html.write('<!DOCTYPE html>')
         html.write('<html lang=\"en\"><head>'
                    '<meta charset=\"UTF-8\">'
+                   '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                    '<title>Satellite Pass Predictions'
                    '</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'

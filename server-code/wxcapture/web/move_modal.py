@@ -40,21 +40,21 @@ def build_pass_json():
     for filename in find_files(TARGET, '*.html'):
         if not ('index.html' in filename or 'captures.html' in filename or 'resources.html' in filename or 'satellitestatus.html' in filename or 'satpass.html' in filename):
             # MY_LOGGER.debug('found pass page - filename = %s', filename)
-            file_path, html_file = os.path.split(filename)
+            bpj_file_path, html_file = os.path.split(filename)
             base_filename, base_extension = os.path.splitext(html_file)
             filename_root = filename[:len(filename) - len(base_extension)]
             # look for all the image files and add to the list
             # to avoid the json file getting too large, extract the enhancement part only
-            image_files = glob.glob(file_path + '/images/' + base_filename + '*.jpg')
+            image_files = glob.glob(bpj_file_path + '/images/' + base_filename + '*.jpg')
             image_enhancements = []
             for entry in image_files:
                 if entry[len(entry) - 7:] != '-tn.jpg':
-                    result = entry.replace('.jpg', '').replace(file_path + '/images/', '').replace(base_filename, '')
+                    result = entry.replace('.jpg', '').replace(bpj_file_path + '/images/', '').replace(base_filename, '')
                     image_enhancements.append(result[1:])
 
             json_data.append({'path': filename_root.replace(OUTPUT_PATH, ''),
                               'enhancement': image_enhancements
-                            })
+                             })
     MY_LOGGER.debug('saving passses.json')
     wxcutils.save_json(TARGET, 'passes.json', json_data)
 
@@ -231,6 +231,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         cp_html.write('<!DOCTYPE html>')
         cp_html.write('<html lang=\"en\"><head>'
                       '<meta charset=\"UTF-8\">'
+                      '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                       '<title>Captures ' + cp_label + '</title>'
                       '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
                       '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>'
@@ -265,7 +266,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         cp_html.write('</div>')
 
         cp_html.write('</section>')
-        
+
         cp_html.write('<section class=\"content-section container\">')
         cp_html.write('<h2 class=\"section-header\">' + cp_label + '</h2>')
         result = write_month(OUTPUT_PATH, '/wxcapture/' + bpm_year + '/' + bpm_month + '/',
@@ -492,6 +493,7 @@ with open(TARGET + CAPTURES_PAGE, 'w') as html:
     html.write('<!DOCTYPE html>')
     html.write('<html lang=\"en\"><head>'
                '<meta charset=\"UTF-8\">'
+               '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                '<title>Captures</title>'
                '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')

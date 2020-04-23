@@ -205,6 +205,10 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                     satellite = 'ISS'
                 elif 'SAUDISAT_1C_SO-50' in filename:
                     satellite = 'SAUDISAT-1C (SO-50)'
+                elif 'RADFXSAT' in filename:
+                    satellite = 'FOX-1B'
+                elif 'FOX-1D' in filename:
+                    satellite = 'FOX-1D'
 
                 utc_time = filename[52:60].replace('-', ':')
                 utc_date = filename[30:40]

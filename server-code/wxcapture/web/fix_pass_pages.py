@@ -48,7 +48,7 @@ else:
     MY_LOGGER.debug('Fixing ALL')
     for filename in fix_pass_pages_lib.find_files(TARGET, '*.html'):
         if 'NOAA' in filename or '.backup' in filename or 'METEOR' in filename \
-            or 'ISS' in filename or 'SAUDISAT' in filename:
+            or 'ISS' in filename or 'SAUDISAT' in filename or 'FOX' in filename:
             path_part, file_part = os.path.split(filename)
             MY_LOGGER.debug('Fixing - filename = %s, path = %s, file = %s',
                             filename, path_part, file_part)

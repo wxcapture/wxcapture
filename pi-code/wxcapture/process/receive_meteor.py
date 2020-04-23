@@ -365,19 +365,32 @@ try:
             html.write('<a href=\"images/' + FILENAME_BASE +
                        '-cc-rectified.jpg' + '\"><img src=\"images/' +
                        FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
+
+            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified.jpg'):
+                MY_LOGGER.debug('Adding tweet image')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified'))
+                html.write('<h3>Tweeted Image</h3>')
+                html.write('<p>Tweet uses thumbnail of the full size image</p>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-tweet-rectified.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-tweet-rectified-tn.jpg' + '\"></a>')
+
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'):
+                MY_LOGGER.debug('Adding channel 0 image')
                 MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'))
                 html.write('<h3>Channel 0 Image</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +
                            '_0-rectified.jpg' + '\"><img src=\"images/' +
                            FILENAME_BASE + '_0-rectified-tn.jpg' + '\"></a>')
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'):
+                MY_LOGGER.debug('Adding channel 1 image')
                 MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'))
                 html.write('<h3>Channel 1 Image</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +
                            '_1-rectified.jpg' + '\"><img src=\"images/' +
                            FILENAME_BASE + '_1-rectified-tn.jpg' + '\"></a>')
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'):
+                MY_LOGGER.debug('Adding channel 2 image')
                 MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'))
                 html.write('<h3>Channel 2 Image</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +

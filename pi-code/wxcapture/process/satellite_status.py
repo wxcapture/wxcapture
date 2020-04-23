@@ -164,8 +164,10 @@ try:
         html.write('<html lang=\"en\"><head>'
                    '<meta charset=\"UTF-8\">'
                    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                   '<title>Satellite Status'
-                   '</title>'
+                   '<meta name=\"description\" content=\"Satellite transmission status for Meteor-M and NOAA weather satellites, International Space Station (ISS) SSTV and WxCapture Twitter Feed\">'
+                   '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
+                   '<meta name=\"author\" content=\"WxCapture\">'
+                   '<title>Satellite Status</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                    '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
         html.write('</head>')
@@ -214,7 +216,7 @@ try:
             if NOAA_OPTIONS['tweet'] == 'yes':
                 html.write('<li>NOAA - enhancement option = ' + NOAA_OPTIONS['tweet enhancement'] + '</li>')
             if METEOR_OPTIONS['tweet'] == 'yes':
-                html.write('<li>METEOR - format option = ' + METEOR_OPTIONS['tweet image'] + '</li>')
+                html.write('<li>METEOR - format option = thumbnail</li>')
             html.write('</ul></section>')
 
         html.write('<footer class=\"main-footer\">')

@@ -309,6 +309,13 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
             else:
                 MY_LOGGER.debug('No processsing code for %s of type %s', sat['name'], sat['type'])
 
+        if 'METEOR' in sat['name']:
+            symbol_rate = sat['symbol rate']
+            mode = sat['mode']
+        else:
+            symbol_rate = 'n/a'
+            mode = 'n/a'
+
         filename_base = wxcutils.epoch_to_utc(start_epoch, '%Y-%m-%d-%H-%M-%S') + \
             '-' + sat['name'].replace(' ', '_').replace('(', '').replace(')', '')
 
@@ -329,6 +336,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                          'plot_title': plot_title,
                          'filename_base': filename_base,
                          'priority': sat['priority'],
+                         'symbol rate': symbol_rate,
+                         'mode': mode,
                          'antenna': antenna,
                          'chipset': chipset,
                          'sdr': sat['sdr'],

@@ -26,11 +26,11 @@ def scp_files():
                     scp_config['remote host'], scp_config['remote directory'],
                     scp_config['remote user'])
 
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '*.html ' +
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.html ' +
                      scp_config['remote user'] +
                      '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] + '/')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '*.txt ' +
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.txt ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] + '/')
@@ -54,7 +54,7 @@ def scp_files():
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] + '/audio/')
-    
+
     MY_LOGGER.debug('SCP complete')
 
 
@@ -162,7 +162,9 @@ try:
 
     # Demodulate .wav to QPSK
     MY_LOGGER.debug('Demodulate .wav to QPSK')
-    wxcutils.run_cmd('echo yes | /usr/bin/meteor_demod -B -o ' +
+    SYMBOL_RATE = ' -r ' + str(PASS_INFO['symbol rate'])
+    MODE = ' -m ' + PASS_INFO['mode']
+    wxcutils.run_cmd('echo yes | /usr/bin/meteor_demod -B ' + SYMBOL_RATE + ' ' + MODE + ' -o ' +
                      WORKING_PATH + FILENAME_BASE + '.qpsk ' + AUDIO_PATH + FILENAME_BASE + '.wav')
     MY_LOGGER.debug('-' * 30)
 
@@ -309,19 +311,36 @@ try:
         MY_LOGGER.debug('Deleting .wav audio file')
         wxcutils.run_cmd('rm ' + AUDIO_PATH + FILENAME_BASE + '.wav')
 
-    # check file size of main image
+    # ensure that we have at least one image created over the minimum size
+    # no need to check for tweet image since this is only created off the
+    # main image, so it must exist for the tweet image to be created
     MY_LOGGER.debug('check file size of main image')
+    CREATE_PAGE = False
     try:
-        MAIN_FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '-cc-rectified.jpg')
-        MY_LOGGER.debug('main_file_size = %s', str(MAIN_FILE_SIZE))
-        if MAIN_FILE_SIZE < int(IMAGE_OPTIONS['image minimum']):
-            MY_LOGGER.debug('Low file size for main image -> bad quality')
-            CREATE_PAGE = False
-            # 'Low file size for main image = bad quality ' +
-                    # '[file size = ' + str(MAIN_FILE_SIZE)
-        else:
-            MY_LOGGER.debug('Good file size for norm image -> non-bad quality')
+        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '-cc-rectified.jpg')
+        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+            MY_LOGGER.debug('Good file size for main image -> non-bad quality')
             CREATE_PAGE = True
+
+        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_0-rectified.jpg')
+        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+            MY_LOGGER.debug('Good file size for channel 0 image -> non-bad quality')
+            CREATE_PAGE = True
+
+        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_1-rectified.jpg')
+        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+            MY_LOGGER.debug('Good file size for channel 1 image -> non-bad quality')
+            CREATE_PAGE = True
+
+        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_2-rectified.jpg')
+        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+            MY_LOGGER.debug('Good file size for channel 2 image -> non-bad quality')
+            CREATE_PAGE = True
+
     except Exception as err:
         MY_LOGGER.debug('Unexpected error validating norm image file size: %s %s %s',
                         sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
@@ -361,14 +380,18 @@ try:
             html.write('<h2>Colour Corrected Image</h2>')
 
             html.write('<p>Click on the image to get the full size image.</p>')
-            html.write('<h3>Colour Image</h3>')
-            html.write('<a href=\"images/' + FILENAME_BASE +
-                       '-cc-rectified.jpg' + '\"><img src=\"images/' +
-                       FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
+
+            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'):
+                MY_LOGGER.debug('Adding combined colour image')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified.jpg'))
+                html.write('<h3>Colour Image</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-cc-rectified.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
 
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified.jpg'):
                 MY_LOGGER.debug('Adding tweet image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified'))
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified.jpg'))
                 html.write('<h3>Tweeted Image</h3>')
                 html.write('<p>Tweet uses thumbnail of the full size image</p>')
                 html.write('<a href=\"images/' + FILENAME_BASE +

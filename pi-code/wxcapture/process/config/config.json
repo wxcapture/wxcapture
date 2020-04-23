@@ -11,7 +11,7 @@
     "Pass Info":"",
     "Hide Detail":"Yes",
     "Link Base":"/wxcapture/",
-    "save .wav files":"yes",
+    "save .wav files":"no",
     "email receive output":"N",
     "plot thumbnail size":"64x64",
     "logging level":"debug"   

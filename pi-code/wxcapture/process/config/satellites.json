@@ -10,7 +10,7 @@
          "priority":"10",
          "sdr":"QFH"
       },
-      {  
+      {
          "name":"NOAA 18",
          "NORAD catalog number":"28654",
          "frequency":137.9125,
@@ -30,7 +30,7 @@
          "priority":"10",
          "sdr":"QFH"
       },
-      {  
+      {
          "name":"METEOR-M 1",
          "NORAD catalog number":"35865",
          "frequency":137.1000,
@@ -43,7 +43,7 @@
          "priority":"20",
          "sdr":"QFH"
       },
-      {  
+      {
          "name":"METEOR-M 2",
          "NORAD catalog number":"40069",
          "frequency":137.1000,
@@ -56,7 +56,7 @@
          "priority":"20",
          "sdr":"QFH"
       },
-      {  
+      {
          "name":"METEOR-M2 2",
          "NORAD catalog number":"44387",
          "frequency":137.9000,
@@ -69,7 +69,7 @@
          "priority":"0",
          "sdr":"QFH"
       },
-      {  
+      {
          "name":"ISS (ZARYA)",
          "NORAD catalog number":"25544",
          "frequency":145.800,
@@ -89,7 +89,7 @@
          "priority":"10",
          "sdr":"ground-plane"
       },
-      {  
+      {
          "name":"RADFXSAT (FOX-1B)",
          "NORAD catalog number":"43017",
          "frequency":145.960,
@@ -99,7 +99,7 @@
          "priority":"10",
          "sdr":"ground-plane"
       },
-      {  
+      {
          "name":"FOX-1D (AO-92)",
          "NORAD catalog number":"43137",
          "frequency":145.880,

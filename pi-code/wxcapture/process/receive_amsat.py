@@ -140,6 +140,11 @@ try:
     # capture pass to wav file
     if REPROCESS != 'Y':
         GAIN_COMMAND, GAIN_DESCRIPTION = get_gain()
+
+        # Sleep until the required start time
+        # to account for at scheduler starting up to 59 seconds early
+        wxcutils_pi.sleep_until_start(float(START_EPOCH))
+
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
                          str(WX_SDR) + ' -M fm -T -f ' + str(PASS_INFO['frequency']) +
                          'M -s 48k ' + GAIN_COMMAND +

@@ -6,6 +6,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
+import time
 from rtlsdr import RtlSdr
 import tweepy
 from PIL import Image, ImageOps
@@ -48,6 +49,7 @@ def tweet_text(tt_config_path, tt_config_file, tt_text):
     tt_config = wxcutils.load_json(tt_config_path, tt_config_file)
 
     # authentication
+    MY_UTIL_LOGGER.debug('Authenticating to Twitter API')
     tt_auth = tweepy.OAuthHandler(tt_config['consumer key'], tt_config['consumer secret'])
     tt_auth.set_access_token(tt_config['access token'], tt_config['access token secret'])
 
@@ -55,7 +57,9 @@ def tweet_text(tt_config_path, tt_config_file, tt_text):
     tt_api = tweepy.API(tt_auth)
 
     # send tweet
+    MY_UTIL_LOGGER.debug('Sending tweet with text = %s', tt_text)
     tt_api.update_status(tt_text)
+    MY_UTIL_LOGGER.debug('Tweet sent')
 
 
 def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
@@ -63,7 +67,7 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
     tt_config = wxcutils.load_json(tt_config_path, tt_config_file)
 
     # authentication
-    MY_UTIL_LOGGER.debug('Authenitcating to Twitter API')
+    MY_UTIL_LOGGER.debug('Authenticating to Twitter API')
     tt_auth = tweepy.OAuthHandler(tt_config['consumer key'], tt_config['consumer secret'])
     tt_auth.set_access_token(tt_config['access token'], tt_config['access token secret'])
 
@@ -100,7 +104,6 @@ def fix_image(fi_source, fi_destination, fi_equalize):
         """fix thick black lines"""
         MY_UTIL_LOGGER.debug('Thick black line to fix between lines %d and %d of thickness %d', ftl_start, ftl_end, ftl_end - ftl_start)
         MY_UTIL_LOGGER.debug('Needs some code adding once I figure how best to handle this!')
-
 
 
     image_height = 0
@@ -216,6 +219,22 @@ def fix_image(fi_source, fi_destination, fi_equalize):
     MY_UTIL_LOGGER.debug('Save image start')
     save_image(fi_destination)
     MY_UTIL_LOGGER.debug('Save image end')
+
+
+def sleep_until_start(sus_time):
+    """sleep until the actual start time"""
+    sus_epoch_now = time.time()
+    MY_UTIL_LOGGER.debug('Actual seconds since epoch now = %f', sus_epoch_now)
+    MY_UTIL_LOGGER.debug('Time required to start = %f', sus_time)
+    sus_delay = sus_time - sus_epoch_now
+    MY_UTIL_LOGGER.debug('Delay required = %f', sus_delay)
+
+    if sus_delay > 0:
+        MY_UTIL_LOGGER.debug('Sleeping %f seconds', sus_delay)
+        time.sleep(sus_delay)
+    else:
+        MY_UTIL_LOGGER.debug('No sleep needed as already %f seconds late', -1 * sus_delay)
+    MY_UTIL_LOGGER.debug('Ready to go on time...')
 
 
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

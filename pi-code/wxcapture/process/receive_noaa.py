@@ -154,6 +154,10 @@ try:
     MY_LOGGER.debug('SDR device ID = %d', WX_SDR)
 
     if REPROCESS != 'Y':
+        # Sleep until the required start time
+        # to account for at scheduler starting up to 59 seconds early
+        wxcutils_pi.sleep_until_start(float(START_EPOCH))
+
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
                          str(WX_SDR) + ' -T -f ' + str(PASS_INFO['frequency']) + 'M '
                          + GAIN_COMMAND +

@@ -271,7 +271,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                 scheduler = 'echo \"' + CODE_PATH + 'receive_noaa.py ' + sat['name'] + ' ' + \
                     str(start_epoch) + ' ' + str(duration) + ' ' + str(max_elevation) + \
                     ' N \" |  at ' + EMAIL_OUTPUT + \
-                    datetime.fromtimestamp(start_epoch).strftime('%H:%M %D')
+                    datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
             # for Meteor, always record daylight passes, conditionally record night passes
             elif sat['type'] == 'METEOR':
                 if is_daylight(float(start_epoch)) == 'Y':
@@ -280,14 +280,14 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                     sat['name'] + ' ' + str(start_epoch) + ' ' + \
                     str(duration) + ' ' + str(max_elevation) + \
                     ' N \" |  at ' + EMAIL_OUTPUT + \
-                    datetime.fromtimestamp(start_epoch).strftime('%H:%M %D')
+                    datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
                 elif sat['night'] == 'yes':
                     MY_LOGGER.debug('Night pass - %s', str(start_epoch))
                     scheduler = 'echo \"' + CODE_PATH + 'receive_meteor.py ' + \
                     sat['name'] + ' ' + str(start_epoch) + ' ' + \
                     str(duration) + ' ' + str(max_elevation) + \
                     ' N \" |  at ' + EMAIL_OUTPUT + \
-                    datetime.fromtimestamp(start_epoch).strftime('%H:%M %D')
+                    datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
                 else:
                     MY_LOGGER.debug('Not scheduled as sensor turned off')
                     MY_LOGGER.debug('Darkness pass - %s', str(start_epoch))
@@ -298,14 +298,14 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                 str(start_epoch) + ' ' + \
                 str(duration) + ' ' + str(max_elevation) + \
                 ' N \" |  at ' + EMAIL_OUTPUT + \
-                datetime.fromtimestamp(start_epoch).strftime('%H:%M %D')
+                datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
             elif sat['type'] == 'AMSAT':
                 scheduler = 'echo \"' + CODE_PATH + 'receive_amsat.py ' + \
                 sat['name'].replace('(', '').replace(')', '').replace(' ', '_') + ' ' + \
                 str(start_epoch) + ' ' + \
                 str(duration) + ' ' + str(max_elevation) + \
                 ' N \" |  at ' + EMAIL_OUTPUT + \
-                datetime.fromtimestamp(start_epoch).strftime('%H:%M %D')
+                datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
             else:
                 MY_LOGGER.debug('No processsing code for %s of type %s', sat['name'], sat['type'])
 

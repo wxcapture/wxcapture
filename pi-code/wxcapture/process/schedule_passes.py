@@ -253,7 +253,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
         MY_LOGGER.debug('Northbound pass')
         direction = 'Northbound'
 
-    plot_title = direction + ' Pass\n'
+    plot_title = sat['name'] + '\n' + direction + ' Pass\n'
 
     capture_reason = 'Not defined'
     if capture == 'no':

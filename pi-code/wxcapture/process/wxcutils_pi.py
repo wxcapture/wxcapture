@@ -31,7 +31,7 @@ def get_logger(logger_name, path, log_file):
     """Create logger"""
     global MY_UTIL_LOGGER
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(wxcutils.get_logger_level())
     logger.addHandler(get_console_handler())
     logger.addHandler(get_file_handler(path, log_file))
     logger.propagate = True

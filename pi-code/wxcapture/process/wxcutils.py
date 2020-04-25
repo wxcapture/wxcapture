@@ -13,9 +13,22 @@ from datetime import datetime
 import pytz
 from tzlocal import get_localzone
 
-
+# logging config
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 MY_UTIL_LOGGER = None
+
+# setup paths to directories
+HOME = os.environ['HOME']
+if HOME == '/root':
+    HOME = '/home/mike/'
+    APP_PATH = HOME + '/wxcapture/'
+    CODE_PATH = APP_PATH + 'web/'
+else:
+    APP_PATH = HOME + '/wxcapture/'
+    CODE_PATH = APP_PATH + 'process/'
+
+LOG_PATH = CODE_PATH + 'logs/'
+CONFIG_PATH = CODE_PATH + 'config/'
 
 
 def get_console_handler():
@@ -32,11 +45,33 @@ def get_file_handler(path, log_file):
     return file_handler
 
 
+def get_logger_level():
+    """get the logging level from the config file"""
+    # logging.DEBUG
+    gll_config_data = load_json_no_logger(CONFIG_PATH, 'config.json')
+    gll_level = gll_config_data['logging level']
+    # default to debug, unless configured otherwise
+    gll_result = logging.DEBUG
+    if gll_level == 'critical':
+        gll_result = logging.CRITICAL
+    elif gll_level == 'error':
+        gll_result = logging.ERROR
+    elif gll_level == 'warning':
+        gll_result = logging.WARNING
+    elif gll_level == 'info':
+        gll_result = logging.INFO
+    elif gll_level == 'debug':
+        gll_result = logging.DEBUG
+    elif gll_level == 'notset':
+        gll_result = logging.NOTSET
+    return gll_result
+
+
 def get_logger(logger_name, path, log_file):
     """Create logger"""
     global MY_UTIL_LOGGER
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(get_logger_level())
     logger.addHandler(get_console_handler())
     logger.addHandler(get_file_handler(path, log_file))
     logger.propagate = True
@@ -90,6 +125,14 @@ def save_file(tmp_file_path, tmp_filename, tmp_payload):
 def load_json(tmp_file_path, tmp_filename):
     """load json file from file system"""
     MY_UTIL_LOGGER.debug('load_json from %s %s', tmp_file_path, tmp_filename)
+    with open(tmp_file_path + tmp_filename) as json_file:
+        data = json.load(json_file)
+    json_file.close()
+    return data
+
+
+def load_json_no_logger(tmp_file_path, tmp_filename):
+    """load json file from file system with no logging"""
     with open(tmp_file_path + tmp_filename) as json_file:
         data = json.load(json_file)
     json_file.close()

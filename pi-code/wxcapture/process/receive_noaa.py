@@ -102,21 +102,26 @@ MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 MY_LOGGER.debug('AUDIO_PATH = %s', AUDIO_PATH)
 
-# extract parameters
-SATELLITE_TYPE = sys.argv[1]
-SATELLITE_NUM = sys.argv[2]
-SATELLITE = SATELLITE_TYPE + ' ' + SATELLITE_NUM
-START_EPOCH = sys.argv[3]
-DURATION = sys.argv[4]
-MAX_ELEVATION = sys.argv[5]
-REPROCESS = sys.argv[6]
-MY_LOGGER.debug('satellite = %s', SATELLITE)
-MY_LOGGER.debug('START_EPOCH = %s', str(START_EPOCH))
-MY_LOGGER.debug('duration = %s', str(DURATION))
-MY_LOGGER.debug('MAX_ELEVATION = %s', str(MAX_ELEVATION))
-MY_LOGGER.debug('REPROCESS = %s', REPROCESS)
-
 try:
+    try:
+        # extract parameters
+        SATELLITE = sys.argv[1]
+        START_EPOCH = sys.argv[2]
+        DURATION = sys.argv[3]
+        MAX_ELEVATION = sys.argv[4]
+        REPROCESS = sys.argv[5]
+    except IndexError as exc:
+        MY_LOGGER.critical('Exception whilst parsing command line parameters: %s %s %s',
+                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+        # re-throw it as this is fatal
+        raise
+
+    MY_LOGGER.debug('satellite = %s', SATELLITE)
+    MY_LOGGER.debug('START_EPOCH = %s', str(START_EPOCH))
+    MY_LOGGER.debug('duration = %s', str(DURATION))
+    MY_LOGGER.debug('MAX_ELEVATION = %s', str(MAX_ELEVATION))
+    MY_LOGGER.debug('REPROCESS = %s', REPROCESS)
+
     # load config
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
 

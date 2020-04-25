@@ -83,6 +83,19 @@ for dir_name in DAY_DIRS:
         wxcutils.copy_file(CONFIG_PATH + 'redirect-2up.html',
                            test_filename)
 
+# add redirects for other website directories
+MY_LOGGER.debug('Creating js/index.html page')
+wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html', TARGET + 'js/index.html')
+
+MY_LOGGER.debug('Creating images/index.html page')
+wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html', TARGET + 'images/index.html')
+
+MY_LOGGER.debug('Creating lightbox/index.html page')
+wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html', TARGET + 'lightbox/index.html')
+
+MY_LOGGER.debug('Creating lightbox/css/index.html page')
+wxcutils.copy_file(CONFIG_PATH + 'redirect-2up.html', TARGET + 'lightbox/css/index.html')
+
 
 MY_LOGGER.debug('Finished finding missing redirects')
 

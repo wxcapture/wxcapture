@@ -21,7 +21,7 @@ import wxcutils_pi
 def get_bias_t():
     """determine if we turn on the bias t"""
     command = ''
-    if IMAGE_OPTIONS['bias t'] == 'on':
+    if PASS_INFO['bias t'] == 'on':
         command = ' -T '
     MY_LOGGER.debug('bias t command = %s', command)
     return command

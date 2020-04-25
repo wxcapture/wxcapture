@@ -8,7 +8,8 @@
 			"frequency range": "135-140 MHz from bandpass filter",
 			"modules": "RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)",
 			"sdr active": "yes",
-			"serial number": "00000001"
+			"serial number": "00000001",
+			"bias t": "on"
 		},
 		"ground-plane": {
 			"antenna": "Ground Plane antenna",
@@ -18,7 +19,8 @@
 			"frequency range": "TBC",
 			"modules": "None additional",
 			"sdr active": "yes",
-			"serial number": "00000002"
+			"serial number": "00000002",
+			"bias t": "off"
 		}
 	}
 }

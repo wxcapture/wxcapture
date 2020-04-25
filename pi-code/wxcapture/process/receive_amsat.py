@@ -27,6 +27,15 @@ def get_gain():
     return command, description
 
 
+def get_bias_t():
+    """determine if we turn on the bias t"""
+    command = ''
+    if IMAGE_OPTIONS['bias t'] == 'on':
+        command = ' -T '
+    MY_LOGGER.debug('bias t command = %s', command)
+    return command
+
+
 def scp_files():
     """move files to output directory"""
     # load config
@@ -140,13 +149,14 @@ try:
     # capture pass to wav file
     if REPROCESS != 'Y':
         GAIN_COMMAND, GAIN_DESCRIPTION = get_gain()
+        BIAS_T = get_bias_t()
 
         # Sleep until the required start time
         # to account for at scheduler starting up to 59 seconds early
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
-                         str(WX_SDR) + ' -M wbfm -T -f ' + str(PASS_INFO['frequency']) +
+                         str(WX_SDR) + BIAS_T + ' -M wbfm -f ' + str(PASS_INFO['frequency']) +
                          'M -s 200k -r 48k ' + GAIN_COMMAND +
                          ' -p 0 | sox -t raw -r 48k -c 1 -b 16 -e s - -t wav \"' +
                          AUDIO_PATH + FILENAME_BASE + '.wav\" rate 48k')

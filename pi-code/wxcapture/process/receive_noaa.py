@@ -26,6 +26,16 @@ def get_gain():
     return command, description
 
 
+
+def get_bias_t():
+    """determine if we turn on the bias t"""
+    command = ''
+    if IMAGE_OPTIONS['bias t'] == 'on':
+        command = ' -T '
+    MY_LOGGER.debug('bias t command = %s', command)
+    return command
+
+
 def scp_files():
     """move files to output directory"""
     # load config
@@ -153,13 +163,15 @@ try:
     WX_SDR = wxcutils_pi.get_sdr_device(PASS_INFO['serial number'])
     MY_LOGGER.debug('SDR device ID = %d', WX_SDR)
 
+    BIAS_T = get_bias_t()
+
     if REPROCESS != 'Y':
         # Sleep until the required start time
         # to account for at scheduler starting up to 59 seconds early
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
-                         str(WX_SDR) + ' -T -f ' + str(PASS_INFO['frequency']) + 'M '
+                         str(WX_SDR) + BIAS_T +' -f ' + str(PASS_INFO['frequency']) + 'M '
                          + GAIN_COMMAND +
                          ' -s ' + IMAGE_OPTIONS['sample rate'] +
                          ' -E deemp -F 9 - | sox -t raw -e signed -c 1 -b 16 -r '

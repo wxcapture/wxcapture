@@ -18,6 +18,15 @@ import wxcutils
 import wxcutils_pi
 
 
+def get_bias_t():
+    """determine if we turn on the bias t"""
+    command = ''
+    if IMAGE_OPTIONS['bias t'] == 'on':
+        command = ' -T '
+    MY_LOGGER.debug('bias t command = %s', command)
+    return command
+
+
 def scp_files():
     """move files to output directory"""
     # load config
@@ -148,12 +157,14 @@ try:
         else:
             GAIN_COMMAND = ' -g ' + IMAGE_OPTIONS['gain'] + ' '
 
+        BIAS_T = get_bias_t()
+
         # Sleep until the required start time
         # to account for at scheduler starting up to 59 seconds early
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
-                         str(WX_SDR) + ' -M raw -T -f ' + str(PASS_INFO['frequency']) +
+                         str(WX_SDR) + BIAS_T + ' -M raw -f ' + str(PASS_INFO['frequency']) +
                          'M -s 768k ' + GAIN_COMMAND +
                          ' -p 0 | sox -t raw -r 768k -c 2 -b 16 -e s - -t wav \"' +
                          AUDIO_PATH + FILENAME_BASE + '.wav\" rate 192k')

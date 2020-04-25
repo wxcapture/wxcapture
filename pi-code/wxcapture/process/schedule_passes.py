@@ -66,6 +66,7 @@ def get_sdr_data(sdr_name):
     modules = '???'
     sdr_active = '???'
     serial_number = '???'
+    bias_t = '???'
     sdrs = SDR_INFO['sdr']
     for sdr_key, sdr_value in sdrs.items():
         MY_LOGGER.debug('key = %s value = %s', sdr_key, sdr_value)
@@ -78,10 +79,11 @@ def get_sdr_data(sdr_name):
             modules = sdrs[sdr_key]['modules']
             sdr_active = sdrs[sdr_key]['sdr active']
             serial_number = sdrs[sdr_key]['serial number']
+            bias_t = sdrs[sdr_key]['bias t']
     MY_LOGGER.debug('%s %s %s %s %s %s %s %s', antenna, chipset, sdr_type,
-                    centre_frequency, frequency_range, modules, sdr_active, serial_number)
+                    centre_frequency, frequency_range, modules, sdr_active, serial_number, bias_t)
     return antenna, chipset, sdr_type, centre_frequency, frequency_range, modules, \
-    sdr_active, serial_number
+    sdr_active, serial_number, bias_t
 
 
 def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
@@ -97,7 +99,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     # get the SDR data
     MY_LOGGER.debug('sat = %s', sat)
     antenna, chipset, sdr_type, centre_frequency, frequency_range, modules, \
-    sdr_active, serial_number = get_sdr_data(sat['sdr'])
+    sdr_active, serial_number, bias_t = get_sdr_data(sat['sdr'])
 
     MY_LOGGER.debug('Grabbing prediction')
     sat_id = sat['NORAD catalog number']
@@ -346,7 +348,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                          'frequency range': frequency_range,
                          'modules': modules,
                          'sdr active': sdr_active,
-                         'serial number': serial_number
+                         'serial number': serial_number,
+                         'bias t': bias_t
                          })
 
     # return new start time for next pass search to start

@@ -1,7 +1,7 @@
 {
-    "tweet to":"@xxxxxxxxx",
-    "consumer key":"xxxxxxxxx",
-    "consumer secret":"xxxxxxxxx",
-    "access token":"xxxxxxxxx",
-    "access token secret":"xxxxxxxxx"
+	"tweet to": "@xxxxxxxxx",
+	"consumer key": "xxxxxxxxx",
+	"consumer secret": "xxxxxxxxx",
+	"access token": "xxxxxxxxx",
+	"access token secret": "xxxxxxxxx"
 }

@@ -1,5 +1,5 @@
-{  
-    "remote user":"USER",
-    "remote directory":"/home/USER/wxcapture/output",
-    "remote host":"192.168.xxx.xxx"
+{
+	"remote user": "USER",
+	"remote directory": "/home/USER/wxcapture/output",
+	"remote host": "192.168.xxx.xxx"
 }

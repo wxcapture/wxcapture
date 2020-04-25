@@ -13,6 +13,6 @@
 	"Link Base": "/wxcapture/",
 	"save .wav files": "no",
 	"email receive output": "N",
-	"plot thumbnail size": "64x64",
+	"plot thumbnail size": "58x64",
 	"logging level": "debug"
 }

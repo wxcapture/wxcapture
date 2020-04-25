@@ -182,7 +182,7 @@ try:
         html.write('<tr><td>' + get_meteor_status('Meteor-M N2') + '</td>')
         html.write('<td>' + get_meteor_status('Meteor-M N2-2') + '</td></tr>')
         html.write('</table>')
-        html.write('<p><a href=\"http://happysat.nl/Meteor/html/Meteor_Status.html\" target=\"_blank\">Data source</a></p>')
+        html.write('<p><a href=\"http://happysat.nl/Meteor/html/Meteor_Status.html\" target=\"_blank\" rel=\"noopener\">Data source</a></p>')
         html.write('</section>')
 
         html.write('<section class=\"content-section container\">')
@@ -193,7 +193,7 @@ try:
         html.write('<td>' + get_noaa_status('NOAA 18') + '</td>')
         html.write('<td>' + get_noaa_status('NOAA 19') + '</td></tr>')
         html.write('</table>')
-        html.write('<p><a href=\"https://www.ospo.noaa.gov/Operations/POES/status.html\" target=\"_blank\">Data source</a></p>')
+        html.write('<p><a href=\"https://www.ospo.noaa.gov/Operations/POES/status.html\" target=\"_blank\" rel=\"noopener\">Data source</a></p>')
         html.write('</section>')
 
         html.write('<section class=\"content-section container\">')
@@ -202,7 +202,7 @@ try:
         html.write('<tr><th>ISS Zarya</th></tr>')
         html.write('<tr><td>' + get_iss_status() + '</td></tr>')
         html.write('</table>')
-        html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\">Data source</a></p>')
+        html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\" rel=\"noopener\"Data source</a></p>')
         html.write('</section>')
 
         # load NOAA options

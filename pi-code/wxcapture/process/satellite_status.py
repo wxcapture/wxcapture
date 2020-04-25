@@ -33,7 +33,7 @@ def get_page(page_url):
     page_content = ''
     with urlopen(page_url) as file_in:
         page_content = file_in.read()
-    # MY_LOGGER.debug('content = %s', page_content)
+    MY_LOGGER.debug('content = %s', page_content)
     return page_content
 
 

@@ -41,6 +41,7 @@ def get_logger(logger_name, path, log_file):
     logger.addHandler(get_file_handler(path, log_file))
     logger.propagate = True
     MY_UTIL_LOGGER = logger
+    MY_UTIL_LOGGER.debug('logger created for %s %s %s', logger_name, path, log_file)
     return logger
 
 
@@ -167,6 +168,7 @@ def validate_single_tle(vt_path, vt_file):
 
 def validate_tle(vt_path):
     """validate all tle files and if not existing, replace with backup"""
+    MY_UTIL_LOGGER.debug('validating tle %s', vt_path)
     validate_single_tle(vt_path, 'weather.tle')
     validate_single_tle(vt_path, 'de421.bsp')
     validate_single_tle(vt_path, 'deltat.data')

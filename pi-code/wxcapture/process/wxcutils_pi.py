@@ -36,6 +36,7 @@ def get_logger(logger_name, path, log_file):
     logger.addHandler(get_file_handler(path, log_file))
     logger.propagate = True
     MY_UTIL_LOGGER = logger
+    MY_UTIL_LOGGER.debug('logger created for %s %s %s', logger_name, path, log_file)
     return logger
 
 
@@ -82,6 +83,7 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
 
 def fix_image(fi_source, fi_destination, fi_equalize):
     """remove noise from image"""
+
 
     def load_image(li_filename):
         """load an image file"""

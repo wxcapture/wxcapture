@@ -146,8 +146,8 @@ try:
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
-                         str(WX_SDR) + ' -M fm -T -f ' + str(PASS_INFO['frequency']) +
-                         'M -s 48k ' + GAIN_COMMAND +
+                         str(WX_SDR) + ' -M wbfm -T -f ' + str(PASS_INFO['frequency']) +
+                         'M -s 200k -r 48k ' + GAIN_COMMAND +
                          ' -p 0 | sox -t raw -r 48k -c 1 -b 16 -e s - -t wav \"' +
                          AUDIO_PATH + FILENAME_BASE + '.wav\" rate 48k')
     MY_LOGGER.debug('-' * 30)

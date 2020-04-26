@@ -105,11 +105,13 @@ MY_LOGGER.debug('AUDIO_PATH = %s', AUDIO_PATH)
 try:
     try:
         # extract parameters
-        SATELLITE = sys.argv[1]
-        START_EPOCH = sys.argv[2]
-        DURATION = sys.argv[3]
-        MAX_ELEVATION = sys.argv[4]
-        REPROCESS = sys.argv[5]
+        SATELLITE_TYPE = sys.argv[1]
+        SATELLITE_NUM = sys.argv[2]
+        SATELLITE = SATELLITE_TYPE + ' ' + SATELLITE_NUM
+        START_EPOCH = sys.argv[3]
+        DURATION = sys.argv[4]
+        MAX_ELEVATION = sys.argv[5]
+        REPROCESS = sys.argv[6]
     except IndexError as exc:
         MY_LOGGER.critical('Exception whilst parsing command line parameters: %s %s %s',
                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
@@ -175,6 +177,7 @@ try:
         # to account for at scheduler starting up to 59 seconds early
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
+        MY_LOGGER.debug('Starting audio capture')
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
                          str(WX_SDR) + BIAS_T +' -f ' + str(PASS_INFO['frequency']) + 'M '
                          + GAIN_COMMAND +
@@ -182,6 +185,15 @@ try:
                          ' -E deemp -F 9 - | sox -t raw -e signed -c 1 -b 16 -r '
                          + IMAGE_OPTIONS['sample rate'] + ' - \"' + AUDIO_PATH +
                          FILENAME_BASE + '.wav\" rate 11025')
+        MY_LOGGER.debug('Finished audio capture')
+        if os.path.isfile(AUDIO_PATH + FILENAME_BASE + '.wav'):
+            MY_LOGGER.debug('Audio file created')
+        else:
+            MY_LOGGER.debug('Audio file NOT created')
+    else:
+        MY_LOGGER.debug('Reprocessing original .wav file')
+
+    MY_LOGGER.debug('-' * 30)
 
     # create map file
     # offset of pass duration / 2 for the pass start time is to avoid
@@ -190,7 +202,7 @@ try:
     # location at the time specified
     # hence the additional time to ensure it is
     START_TIME = int(START_EPOCH) + (int(DURATION) * 0.5)
-    MY_LOGGER.debug('wxmap start time = %d (seconds since unix epoch) duration = %d (seconds)',
+    MY_LOGGER.debug('wxmap start time = %d (seconds since unix epoch) duration = %s (seconds)',
                     START_TIME, str(DURATION))
     wxcutils.run_cmd('/usr/local/bin/wxmap -T \"' + SATELLITE + '\" -H \"'
                      + WORKING_PATH + 'weather.tle\" -p ' +

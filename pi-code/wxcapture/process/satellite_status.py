@@ -52,7 +52,7 @@ def config_validation():
         except ValueError:
             return False
 
-
+    cv_errors_found = False
     cv_results = ''
 
     cv_files_info = wxcutils.load_json(CONFIG_PATH, 'config-validation.json')
@@ -75,6 +75,7 @@ def config_validation():
             cv_results += '<tr>'
         else:
             cv_results += '<tr class=\"row-highlight\">'
+            cv_errors_found = True
         cv_results += '<td>' + cv_filename + '</td><td>' + cv_files_info[cv_filename]['description'] + '</td><td>' + \
             cv_files_info[cv_filename]['required'] + '</td><td>' + cv_files_info[cv_filename]['exists'] + '</td><td>' + \
             cv_files_info[cv_filename]['valid json'] + '</td><td>' + cv_error + '</td></tr>'
@@ -123,6 +124,7 @@ def config_validation():
                 cv_results += '<tr>'
             else:
                 cv_results += '<tr class=\"row-highlight\">'
+                cv_errors_found = True
             if cv_files_info[cv_filename]['field validation'][cv_row]['hidden'] == 'yes':
                 cv_value = '*hidden*'
             cv_results += '<td>' + cv_row + '</td>'
@@ -135,7 +137,12 @@ def config_validation():
 
         cv_results += '</table>'
 
-    return cv_results
+        if cv_errors_found:
+            MY_LOGGER.debug('Config errors found')
+        else:
+            MY_LOGGER.debug('No config errors found')
+
+    return cv_errors_found, cv_results
 
 def get_page(page_url):
     """get the satellite status"""
@@ -267,7 +274,7 @@ try:
     ISS_STATUS_PAGE = get_page('http://ariss-sstv.blogspot.com/')
 
     # config validation
-    CONFIG_HTML = config_validation()
+    CONFIG_ERRORS, CONFIG_HTML = config_validation()
 
     # output as html
     MY_LOGGER.debug('Build webpage')
@@ -337,8 +344,11 @@ try:
         html.write('<section class=\"content-section container\">')
         html.write('<h2 class=\"section-header\">WxCapture Configuration Validation</h2>')
         html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show configuration</button>')
+        if CONFIG_ERRORS:
+            html.write('<h1>Configuration Error(s) Detected - Validate Config!</h1>')
         html.write('<div id=\"configurationDiv\">')
         html.write('<p>Please review any rows highlighted and update the associated configuration file.</p>')
+
         html.write(CONFIG_HTML)
         html.write('</ul></section>')
         html.write('</div>')

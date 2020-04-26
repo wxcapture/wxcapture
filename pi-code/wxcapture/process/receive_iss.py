@@ -120,11 +120,13 @@ MY_LOGGER.debug('AUDIO_PATH = %s', AUDIO_PATH)
 try:
     try:
         # extract parameters
-        SATELLITE = sys.argv[1]
-        START_EPOCH = sys.argv[2]
-        DURATION = sys.argv[3]
-        MAX_ELEVATION = sys.argv[4]
-        REPROCESS = sys.argv[5]
+        SATELLITE_TYPE = sys.argv[1]
+        SATELLITE_NUM = sys.argv[2]
+        SATELLITE = SATELLITE_TYPE + ' (' + SATELLITE_NUM + ')'
+        START_EPOCH = sys.argv[3]
+        DURATION = sys.argv[4]
+        MAX_ELEVATION = sys.argv[5]
+        REPROCESS = sys.argv[6]
     except IndexError as exc:
         MY_LOGGER.critical('Exception whilst parsing command line parameters: %s %s %s',
                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
@@ -187,11 +189,20 @@ try:
         # to account for at scheduler starting up to 59 seconds early
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
+        MY_LOGGER.debug('Starting audio capture')
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
                          str(WX_SDR) + BIAS_T + ' -M fm -f ' + str(PASS_INFO['frequency']) +
                          'M -s 48k ' + GAIN_COMMAND +
                          ' -p 0 | sox -t raw -r 48k -c 1 -b 16 -e s - -t wav \"' +
                          AUDIO_PATH + FILENAME_BASE + '.wav\" rate 48k')
+        MY_LOGGER.debug('Finished audio capture')
+        if os.path.isfile(AUDIO_PATH + FILENAME_BASE + '.wav'):
+            MY_LOGGER.debug('Audio file created')
+        else:
+            MY_LOGGER.debug('Audio file NOT created')
+    else:
+        MY_LOGGER.debug('Reprocessing original .wav file')
+
     MY_LOGGER.debug('-' * 30)
 
     # need to ensure that the following are running:

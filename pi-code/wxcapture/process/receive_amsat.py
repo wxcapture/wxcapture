@@ -163,11 +163,19 @@ try:
         # to account for at scheduler starting up to 59 seconds early
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
+        MY_LOGGER.debug('Starting audio capture')
         wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
                          str(WX_SDR) + BIAS_T + ' -M wbfm -f ' + str(PASS_INFO['frequency']) +
                          'M -s 200k -r 48k ' + GAIN_COMMAND +
                          ' -p 0 | sox -t raw -r 48k -c 1 -b 16 -e s - -t wav \"' +
                          AUDIO_PATH + FILENAME_BASE + '.wav\" rate 48k')
+        if os.path.isfile(AUDIO_PATH + FILENAME_BASE + '.wav'):
+            MY_LOGGER.debug('Audio file created')
+        else:
+            MY_LOGGER.debug('Audio file NOT created')
+    else:
+        MY_LOGGER.debug('Reprocessing original .wav file')
+
     MY_LOGGER.debug('-' * 30)
 
     # no processing code as receiving audio only

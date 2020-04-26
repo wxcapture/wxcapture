@@ -108,7 +108,7 @@
 		"last gain": {
 				"required": "no",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting, e.g. 28.8",
+				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
 				"hidden": "no"
 			}
 		}
@@ -126,7 +126,7 @@
 		"last gain": {
 				"required": "no",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting, e.g. 28.8",
+				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
 				"hidden": "no"
 			}
 		}
@@ -144,7 +144,7 @@
 			"last gain": {
 				"required": "no",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting, e.g. 28.8",
+				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
 				"hidden": "no"
 			},
 			"thumbnail size": {
@@ -222,7 +222,7 @@
 			"last gain": {
 				"required": "no",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting, e.g. 28.8",
+				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
 				"hidden": "no"
 			},
 			"sample rate": {

@@ -330,14 +330,14 @@ try:
             if NOAA_OPTIONS['tweet'] == 'yes':
                 html.write('<li>NOAA - enhancement option = ' + NOAA_OPTIONS['tweet enhancement'] + '</li>')
             if METEOR_OPTIONS['tweet'] == 'yes':
-                html.write('<li>METEOR - format option = thumbnail</li>')
+                html.write('<li>METEOR - thumbnail (full size images are too large for Twitter)</li>')
             html.write('</ul></section>')
 
         # config validation results
         html.write('<section class=\"content-section container\">')
+        html.write('<h2 class=\"section-header\">WxCapture Configuration Validation</h2>')
         html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show configuration</button>')
         html.write('<div id=\"configurationDiv\">')
-        html.write('<h2 class=\"section-header\">WxCapture Configuration Validation</h2>')
         html.write('<p>Please review any rows highlighted and update the associated configuration file.</p>')
         html.write(CONFIG_HTML)
         html.write('</ul></section>')

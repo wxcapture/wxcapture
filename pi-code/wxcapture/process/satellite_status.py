@@ -6,6 +6,7 @@
 import os
 import sys
 import time
+import json
 import subprocess
 from urllib.request import urlopen
 import wxcutils
@@ -27,13 +28,122 @@ def scp_files():
                      scp_config['remote host'] + ':' + scp_config['remote directory'] + '/')
 
 
+def valid_json_file(vjf_file):
+    """validate if a json file is a valid json file"""
+    MY_LOGGER.debug('valid_json_file for %s', vjf_file)
+    try:
+        vjf_json = wxcutils.load_file(CONFIG_PATH, vjf_file)
+        # MY_LOGGER.debug('json = %s', vjf_json)
+        json.loads(vjf_json)
+    except ValueError:
+        MY_LOGGER.debug('valid_json_file exception handler: %s %s %s',
+                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+        return False
+    return True
+
+
+def config_validation():
+    """config"""
+
+    def is_number(test_num):
+        try:
+            float(test_num)
+            return True
+        except ValueError:
+            return False
+
+
+    cv_results = ''
+
+    cv_files_info = wxcutils.load_json(CONFIG_PATH, 'config-validation.json')
+    cv_results += '<h3>File Level Checks</h3><table><tr><th>Filename</th><th>Description</th><th>Required</th><th>Found</th><th>Valid JSON</th><th>Errors</th></tr>'
+    for cv_filename in cv_files_info:
+        MY_LOGGER.debug('cv_filename = %s', cv_filename)
+        MY_LOGGER.debug('description %s', cv_files_info[cv_filename]['description'])
+        MY_LOGGER.debug('required %s', cv_files_info[cv_filename]['required'])
+        cv_error = ''
+        cv_files_info[cv_filename]['exists'] = 'no'
+        if os.path.isfile(CONFIG_PATH + cv_filename):
+            cv_files_info[cv_filename]['exists'] = 'yes'
+        if cv_files_info[cv_filename]['exists'] != 'yes' and cv_files_info[cv_filename]['required'] == 'yes':
+            cv_error = 'Required file is missing'
+        cv_files_info[cv_filename]['valid json'] = 'no'
+        if valid_json_file(cv_filename):
+            cv_files_info[cv_filename]['valid json'] = 'yes'
+        if cv_error == '':
+            cv_error = '(none)'
+            cv_results += '<tr>'
+        else:
+            cv_results += '<tr class=\"row-highlight\">'
+        cv_results += '<td>' + cv_filename + '</td><td>' + cv_files_info[cv_filename]['description'] + '</td><td>' + \
+            cv_files_info[cv_filename]['required'] + '</td><td>' + cv_files_info[cv_filename]['exists'] + '</td><td>' + \
+            cv_files_info[cv_filename]['valid json'] + '</td><td>' + cv_error + '</td></tr>'
+    cv_results += '</table>'
+
+    for cv_filename in cv_files_info:
+        cv_results += '<h3>Content Checks - ' + cv_filename + '</h3><table><tr><th>Key</th><th>Value</th><th>Description</th><th>Required</th><th>Found</th><th>Valid Values</th><th>Errors</th></tr>'
+        cv_test_file = wxcutils.load_json(CONFIG_PATH, cv_filename)
+
+        # MY_LOGGER.debug('Parse = %s', cv_files_info[cv_filename])
+        for cv_row in cv_files_info[cv_filename]['field validation']:
+            MY_LOGGER.debug('%s %s %s',
+                            cv_files_info[cv_filename]['field validation'][cv_row]['required'],
+                            cv_files_info[cv_filename]['field validation'][cv_row]['valid values'],
+                            cv_files_info[cv_filename]['field validation'][cv_row]['description'])
+            cv_error = ''
+            try:
+                MY_LOGGER.debug('testing field %s', cv_row)
+                cv_value = str(cv_test_file[cv_row])
+                cv_found = 'yes'
+                cv_error = ''
+            except KeyError:
+                MY_LOGGER.debug('config_validation exception handler - value missing: %s %s %s',
+                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                cv_value = ''
+                cv_found = 'no'
+                cv_error += 'Field missing from file. '
+            if cv_value == '' and cv_files_info[cv_filename]['field validation'][cv_row]['required'] == 'yes':
+                cv_error += 'Required value is missing. '
+            cv_valid_values = cv_files_info[cv_filename]['field validation'][cv_row]['valid values']
+            if cv_valid_values == '-pattern-':
+                cv_valid_values = 'The value must follow the pattern, as shown in the description'
+            if cv_valid_values == '-number-':
+                cv_valid_values = 'The value must be a number, as shown in the description'
+                if not is_number(cv_value):
+                    cv_error += 'Value is not a number. '
+            if cv_valid_values == '-any-':
+                cv_valid_values = 'The value can have any value, as shown in the description'
+            if '|' in cv_valid_values:
+                if not cv_value in cv_valid_values:
+                    MY_LOGGER.debug('||| NOT')
+                    cv_error += 'Value is not a valid value'
+                cv_valid_values = 'Valid values, separated by a \'|\' are: ' + cv_valid_values
+            if cv_error == '':
+                cv_error = '(none)'
+                cv_results += '<tr>'
+            else:
+                cv_results += '<tr class=\"row-highlight\">'
+            if cv_files_info[cv_filename]['field validation'][cv_row]['hidden'] == 'yes':
+                cv_value = '*hidden*'
+            cv_results += '<td>' + cv_row + '</td>'
+            cv_results += '<td>' + cv_value + '</td>'
+            cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['description'] + '</td>'
+            cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['required'] + '</td>'
+            cv_results += '<td>' + cv_found  + '</td>'
+            cv_results += '<td>' + cv_valid_values + '</td>'
+            cv_results += '<td>' + cv_error + '</td></tr>'
+
+        cv_results += '</table>'
+
+    return cv_results
+
 def get_page(page_url):
     """get the satellite status"""
     MY_LOGGER.debug('Getting page content')
     page_content = ''
     with urlopen(page_url) as file_in:
         page_content = file_in.read()
-    MY_LOGGER.debug('content = %s', page_content)
+    # MY_LOGGER.debug('content = %s', page_content)
     return page_content
 
 
@@ -156,6 +266,9 @@ try:
     NOAA_STATUS_PAGE = get_page('https://www.ospo.noaa.gov/Operations/POES/status.html')
     ISS_STATUS_PAGE = get_page('http://ariss-sstv.blogspot.com/')
 
+    # config validation
+    CONFIG_HTML = config_validation()
+
     # output as html
     MY_LOGGER.debug('Build webpage')
     with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
@@ -171,7 +284,7 @@ try:
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                    '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
         html.write('</head>')
-        html.write('<body>')
+        html.write('<body onload=\"defaulthide()\">')
         html.write(wxcutils.load_file(CONFIG_PATH, 'main-header.txt').replace('PAGE-TITLE',
                                                                               'Satellite Status'))
         html.write('<section class=\"content-section container\">')
@@ -202,23 +315,35 @@ try:
         html.write('<tr><th>ISS Zarya</th></tr>')
         html.write('<tr><td>' + get_iss_status() + '</td></tr>')
         html.write('</table>')
-        html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\" rel=\"noopener\"Data source</a></p>')
+        html.write('<p><a href=\"http://ariss-sstv.blogspot.com/\" target=\"_blank\" rel=\"noopener\">Data source</a></p>')
         html.write('</section>')
 
-        # load NOAA options
+        # load NOAA and Meteor options
         NOAA_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
         METEOR_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-METEOR.json')
+        # if either configured for tweeting, include tweet config info
         if NOAA_OPTIONS['tweet'] == 'yes' or METEOR_OPTIONS['tweet'] == 'yes':
             TWITTER_CONFIG = wxcutils.load_json(CONFIG_PATH, 'config-twitter.json')
             html.write('<section class=\"content-section container\">')
             html.write('<h2 class=\"section-header\">Twitter Feed</h2>')
-            html.write('<p>Tweeting images to <a href=\"https://twitter.com/' + TWITTER_CONFIG['tweet to'].replace('@', '') + '\">' + TWITTER_CONFIG['tweet to'] + '</a> for:</p><ul>')
+            html.write('<p>Tweeting images to <a href=\"https://twitter.com/' + TWITTER_CONFIG['tweet to'].replace('@', '') + '\" target=\"_blank\" rel=\"noopener\">' + TWITTER_CONFIG['tweet to'] + '</a> for:</p><ul>')
             if NOAA_OPTIONS['tweet'] == 'yes':
                 html.write('<li>NOAA - enhancement option = ' + NOAA_OPTIONS['tweet enhancement'] + '</li>')
             if METEOR_OPTIONS['tweet'] == 'yes':
                 html.write('<li>METEOR - format option = thumbnail</li>')
             html.write('</ul></section>')
 
+        # config validation results
+        html.write('<section class=\"content-section container\">')
+        html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show configuration</button>')
+        html.write('<div id=\"configurationDiv\">')
+        html.write('<h2 class=\"section-header\">WxCapture Configuration Validation</h2>')
+        html.write('<p>Please review any rows highlighted and update the associated configuration file.</p>')
+        html.write(CONFIG_HTML)
+        html.write('</ul></section>')
+        html.write('</div>')
+
+        # footer
         html.write('<footer class=\"main-footer\">')
         html.write('<p id=\"footer-text\">Satellite Status last updated at <span class=\"time\">' +
                    time.strftime('%H:%M (' +
@@ -227,6 +352,25 @@ try:
                                  ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
                    '.</p>')
         html.write('</footer>')
+
+        html.write('<script>')
+        html.write('function hideshow() {')
+        html.write('  var x = document.getElementById(\"configurationDiv\");')
+        html.write('  if (x.style.display === \"none\") {')
+        html.write('    x.style.display = \"block\";')
+        html.write('   showhide.innerHTML = \"Hide configuration\";')
+        html.write(' } else {')
+        html.write('   x.style.display = \"none\";')
+        html.write('   showhide.innerHTML = \"Show configuration\";')
+        html.write(' }')
+        html.write('}')
+        html.write('function defaulthide() {')
+        html.write('  var x = document.getElementById(\"configurationDiv\");')
+        html.write('  x.style.display = \"none\";')
+        html.write('  showhide.innerHTML = \"Show configuration\";')
+        html.write('}')
+        html.write('</script>')
+
         html.write('</body></html>')
 
     # acp file to destination
@@ -235,6 +379,5 @@ try:
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

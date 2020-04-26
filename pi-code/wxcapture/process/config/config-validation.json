@@ -1,0 +1,314 @@
+{
+	"config.json": {
+		"description": "WxCapture wide configuration",
+		"required": "yes",
+		"field validation": {
+			"Location": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Location of the receiver - area, country, e.g. Auckland, New Zealand.",
+				"hidden": "no"
+			},
+			"GPS location NS": {
+				"required": "yes",
+				"valid values":  "-pattern-",
+				"description": "Latitude, e.g. 36.8400 S.",
+				"hidden": "no"
+			},
+			"GPS location EW": {
+				"required": "yes",
+				"valid values":  "-pattern-",
+				"description": "Longitude, e.g. 174.7500 E.",
+				"hidden": "no"
+			},
+			"Min Elevation-NOAA": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Min Elevation-METEOR": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Min Elevation-ISS": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Min Elevation-AMSAT": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Pass Highlight Elevation": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Highlight rows which exceed this maximum pass elevation, e.g. 45.",
+				"hidden": "no"
+			},
+			"Pass List Days": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Number of additional days of pass data to calculate, e.g. 3.",
+				"hidden": "no"
+			},
+			"Hide Detail": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Hide detailed pass information, e.g. UTC date and times.",
+				"hidden": "no"
+			},
+			"Link Base": {
+				"required": "yes",
+				"valid values": "-any-",
+				"description": "Link base directory [only partially implemented - do NOT change], e.g. /wxcapture/.",
+				"hidden": "no"
+			},
+			"save .wav files": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Save .wav files after pass - no will delete them.",
+				"hidden": "no"
+			},
+			"email receive output": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Email output of the receive code. It will be also in the log files if the logging level is debug.",
+				"hidden": "no"
+			},
+			"plot thumbnail size": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Size of the generated plot thumbnail, e.g. 58x68.",
+				"hidden": "no"
+			},
+			"logging level": {
+				"required": "yes",
+				"valid values": "critical|error|warning|info|debug|notset",
+				"description": "Python logging level, e.g. debug.",
+				"hidden": "no"
+			}
+		}
+	},
+	"config-AMSAT.json": {
+		"description": "Amateur Satellite configuration",
+		"required": "yes",
+		"field validation": {
+			"gain": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting, e.g. 37.2",
+				"hidden": "no"
+			},
+		"last gain": {
+				"required": "no",
+				"valid values": "-number-",
+				"description": "Previous SDR gain setting, e.g. 28.8",
+				"hidden": "no"
+			}
+		}
+	},
+	"config-ISS.json": {
+		"description": "ISS configuration",
+		"required": "yes",
+		"field validation": {
+			"gain": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting, e.g. 37.2",
+				"hidden": "no"
+			},
+		"last gain": {
+				"required": "no",
+				"valid values": "-number-",
+				"description": "Previous SDR gain setting, e.g. 28.8",
+				"hidden": "no"
+			}
+		}
+	},
+	"config-METEOR.json": {
+		"description": "Meteor configuration",
+		"required": "yes",
+		"field validation": {
+			"gain": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting, e.g. 37.2",
+				"hidden": "no"
+			},
+			"last gain": {
+				"required": "no",
+				"valid values": "-number-",
+				"description": "Previous SDR gain setting, e.g. 28.8",
+				"hidden": "no"
+			},
+			"thumbnail size": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Thumbnail image size in pixels, e.g. 800 800",
+				"hidden": "no"
+			},
+			"thumbnail quality": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "JPEG quality setting for the thumbnail, should be between 1 and 100, e.g. 75",
+				"hidden": "no"
+			},
+			"main image quality": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "JPEG quality setting for the main image, should be between 1 and 100, e.g. 92",
+				"hidden": "no"
+			},
+			"image minimum": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Minimum size of the normal image, below which the pass files will be removed, e.g.150000",
+				"hidden": "no"
+			},
+			"tweet": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Tweet to the configured Twitter account, e.g. yes",
+				"hidden": "no"
+			}
+		}
+	},
+	"config-NOAA.json": {
+		"description": "NOAA  =configuration",
+		"required": "yes",
+		"field validation": {
+			"Branding": {
+				"required": "yes",
+				"valid values": "-any-",
+				"description": "Branding text for the top of all NOAA images, can be blank, e.g. Kiwi Weather",
+				"hidden": "no"
+			},
+			"Population": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Minimum population for cities to be shown on the map, e.g. 10000000",
+				"hidden": "no"
+			},
+			"thumbnail size": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Thumbnail image size in pixels, e.g. 300 300",
+				"hidden": "no"
+			},
+			"thumbnail quality": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "JPEG quality setting for the thumbnail, should be between 1 and 100, e.g. 75",
+				"hidden": "no"
+			},
+			"main image quality": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "JPEG quality setting for the main image, should be between 1 and 100, e.g. 92",
+				"hidden": "no"
+			},
+			"gain": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting, e.g. 37.2",
+				"hidden": "no"
+			},
+			"last gain": {
+				"required": "no",
+				"valid values": "-number-",
+				"description": "Previous SDR gain setting, e.g. 28.8",
+				"hidden": "no"
+			},
+			"sample rate": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR bandwidth in Hz for recording NOAA audio, e.g. 37000",
+				"hidden": "no"
+			},
+			"image minimum": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Minimum size of the normal image, below which the pass files will be removed, e.g. 30000",
+				"hidden": "no"
+			},
+			"tweet": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Tweet to the configured Twitter account, e.g. yes",
+				"hidden": "no"
+			},
+			"tweet enhancement": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Image enhancement to use for the tweet, e.g. mcir-precip",
+				"hidden": "no"
+			}
+		}
+	},
+	"config-scp.json": {
+		"description": "SCP configuration",
+		"required": "yes",
+		"field validation": {
+			"remote user": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Name of the user on the system where the files are copied to via SCP, e.g. USER.",
+				"hidden": "yes"
+			},
+			"remote directory": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Name of the directory on the system where the files are copied to via SCP, e.g. /home/USER/wxcapture/output.",
+				"hidden": "yes"
+			},
+			"remote host": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "IP address for the system where the files are copied to via SCP, e.g. 10.0.0.1.",
+				"hidden": "yes"
+			}
+		}
+	},
+	"config-twitter.json": {
+		"description": "Twitter configuration",
+		"required": "yes",
+		"field validation": {
+			"tweet to": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Twitter handle of the account to tweet from, prefixed by an @, e.g. @RaspberryPiNZ.",
+				"hidden": "no"
+			},
+			"consumer key": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Consumer key for the Twitter API credentials as configured in Twitter",
+				"hidden": "yes"
+			},
+			"consumer secret": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Consumer secret for the Twitter API credentials as configured in Twitter",
+				"hidden": "yes"
+			},
+			"access token": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Access token for the Twitter API credentials as configured in Twitter",
+				"hidden": "yes"
+			},
+			"access token secret": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Access token secret for the Twitter API credentials as configured in Twitter",
+				"hidden": "yes"
+			}
+		}
+	}
+}

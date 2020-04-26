@@ -80,7 +80,7 @@ def get_sdr_data(sdr_name):
             sdr_active = sdrs[sdr_key]['sdr active']
             serial_number = sdrs[sdr_key]['serial number']
             bias_t = sdrs[sdr_key]['bias t']
-    MY_LOGGER.debug('%s %s %s %s %s %s %s %s', antenna, chipset, sdr_type,
+    MY_LOGGER.debug('%s %s %s %s %s %s %s %s %s', antenna, chipset, sdr_type,
                     centre_frequency, frequency_range, modules, sdr_active, serial_number, bias_t)
     return antenna, chipset, sdr_type, centre_frequency, frequency_range, modules, \
     sdr_active, serial_number, bias_t
@@ -623,7 +623,7 @@ try:
 
     # check if we email at job output or not
     EMAIL_OUTPUT = ''
-    if CONFIG_INFO['email receive output'] == 'N':
+    if CONFIG_INFO['email receive output'] == 'no':
         EMAIL_OUTPUT = ' -M '
         MY_LOGGER.debug('email at job output disabled')
     else:
@@ -720,9 +720,8 @@ try:
         html.write('<li>The polar plot can be clicked on to see more detail of the pass.</li>')
         html.write('</ul>')
         html.write('</div>')
-        html.write(CONFIG_INFO['Pass Info'])
         html.write('<table>')
-        if CONFIG_INFO['Hide Detail'] == 'Yes':
+        if CONFIG_INFO['Hide Detail'] == 'yes':
             html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
                        '<th>Polar Plot</th><th>Pass'
                        'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +

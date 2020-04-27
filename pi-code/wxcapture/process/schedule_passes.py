@@ -67,19 +67,22 @@ def get_sdr_data(sdr_name):
     sdr_active = '???'
     serial_number = '???'
     bias_t = '???'
-    sdrs = SDR_INFO['sdr']
-    for sdr_key, sdr_value in sdrs.items():
-        MY_LOGGER.debug('key = %s value = %s', sdr_key, sdr_value)
-        if sdr_key == sdr_name:
-            antenna = sdrs[sdr_key]['antenna']
-            chipset = sdrs[sdr_key]['chipset']
-            sdr_type = sdrs[sdr_key]['sdr type']
-            centre_frequency = sdrs[sdr_key]['centre frequency']
-            frequency_range = sdrs[sdr_key]['frequency range']
-            modules = sdrs[sdr_key]['modules']
-            sdr_active = sdrs[sdr_key]['sdr active']
-            serial_number = sdrs[sdr_key]['serial number']
-            bias_t = sdrs[sdr_key]['bias t']
+
+    sdr_data = wxcutils.load_json(CONFIG_PATH, 'sdr.json')
+
+    for row in sdr_data['sdr']:
+        MY_LOGGER.debug('L1 = %s', row)
+        if row['name'] == sdr_name:
+            antenna = row['antenna']
+            chipset = row['chipset']
+            sdr_type = row['sdr type']
+            centre_frequency = row['centre frequency']
+            frequency_range = row['frequency range']
+            modules = row['modules']
+            sdr_active = row['sdr active']
+            serial_number = row['serial number']
+            bias_t = row['bias t']
+
     MY_LOGGER.debug('%s %s %s %s %s %s %s %s %s', antenna, chipset, sdr_type,
                     centre_frequency, frequency_range, modules, sdr_active, serial_number, bias_t)
     return antenna, chipset, sdr_type, centre_frequency, frequency_range, modules, \

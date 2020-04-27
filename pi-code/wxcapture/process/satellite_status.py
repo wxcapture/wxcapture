@@ -85,55 +85,120 @@ def config_validation():
         cv_results += '<h3>Content Checks - ' + cv_filename + '</h3><table><tr><th>Key</th><th>Value</th><th>Description</th><th>Required</th><th>Found</th><th>Valid Values</th><th>Errors</th></tr>'
         cv_test_file = wxcutils.load_json(CONFIG_PATH, cv_filename)
 
-        # MY_LOGGER.debug('Parse = %s', cv_files_info[cv_filename])
-        for cv_row in cv_files_info[cv_filename]['field validation']:
-            MY_LOGGER.debug('%s %s %s',
-                            cv_files_info[cv_filename]['field validation'][cv_row]['required'],
-                            cv_files_info[cv_filename]['field validation'][cv_row]['valid values'],
-                            cv_files_info[cv_filename]['field validation'][cv_row]['description'])
-            cv_error = ''
-            try:
-                MY_LOGGER.debug('testing field %s', cv_row)
-                cv_value = str(cv_test_file[cv_row])
-                cv_found = 'yes'
+        MY_LOGGER.debug('Parse = %s', cv_files_info[cv_filename])
+
+        if cv_filename == 'sdr.json' or cv_filename == 'satellites.json':
+            MY_LOGGER.debug('sdr and satellites specific checking - %s', cv_filename)
+            
+            cv_field_entry = ''
+            if cv_filename == 'sdr.json':
+                cv_field_entry = 'sdr'
+            if cv_filename == 'satellites.json':
+                cv_field_entry = 'satellites'
+
+            # for every entity
+            MY_LOGGER.debug('looping through entities - %s', cv_field_entry)
+            for cv_file_row1 in cv_test_file[cv_field_entry]:
+                MY_LOGGER.debug('cv_file_row1 = %s', cv_file_row1)
+                cv_name = ''
+
+                for cv_row in cv_files_info[cv_filename]['field validation']:
+                    MY_LOGGER.debug('%s req = %s vv = %s desc = %s',
+                                    cv_row,
+                                    cv_files_info[cv_filename]['field validation'][cv_row]['required'],
+                                    cv_files_info[cv_filename]['field validation'][cv_row]['valid values'],
+                                    cv_files_info[cv_filename]['field validation'][cv_row]['description'])
+                    cv_error = ''
+                    try:
+                        cv_value = str(cv_file_row1[cv_row])
+                        if cv_row == 'name':
+                            cv_name = cv_value
+                        cv_found = 'yes'
+                        cv_error = ''
+                    except KeyError:
+                        MY_LOGGER.debug('config_validation exception handler - value missing: %s %s %s',
+                                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                        cv_value = ''
+                        cv_found = 'no'
+                        cv_error += 'Field missing from file. '
+                    if cv_value == '' and cv_files_info[cv_filename]['field validation'][cv_row]['required'] == 'yes':
+                        cv_error += 'Required value is missing. '
+                    cv_valid_values = cv_files_info[cv_filename]['field validation'][cv_row]['valid values']
+                    if cv_valid_values == '-pattern-':
+                        cv_valid_values = 'The value must follow the pattern, as shown in the description'
+                    if cv_valid_values == '-number-':
+                        cv_valid_values = 'The value must be a number, as shown in the description'
+                        if not is_number(cv_value):
+                            cv_error += 'Value is not a number. '
+                    if cv_valid_values == '-any-':
+                        cv_valid_values = 'The value can have any value, as shown in the description'
+                    if '|' in cv_valid_values:
+                        if not cv_value in cv_valid_values:
+                            cv_error += 'Value is not a valid value'
+                        cv_valid_values = 'Valid values, separated by a \'|\' are: ' + cv_valid_values
+                    if cv_error == '':
+                        cv_error = '(none)'
+                        cv_results += '<tr>'
+                    else:
+                        cv_results += '<tr class=\"row-highlight\">'
+                        cv_errors_found = True
+                    if cv_files_info[cv_filename]['field validation'][cv_row]['hidden'] == 'yes':
+                        cv_value = '*hidden*'
+                    cv_results += '<td>' + cv_name + ' - ' + cv_row + '</td>'
+                    cv_results += '<td>' + cv_value + '</td>'
+                    cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['description'] + '</td>'
+                    cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['required'] + '</td>'
+                    cv_results += '<td>' + cv_found  + '</td>'
+                    cv_results += '<td>' + cv_valid_values + '</td>'
+                    cv_results += '<td>' + cv_error + '</td></tr>'
+        else:
+            for cv_row in cv_files_info[cv_filename]['field validation']:
+                MY_LOGGER.debug('%s %s %s',
+                                cv_files_info[cv_filename]['field validation'][cv_row]['required'],
+                                cv_files_info[cv_filename]['field validation'][cv_row]['valid values'],
+                                cv_files_info[cv_filename]['field validation'][cv_row]['description'])
                 cv_error = ''
-            except KeyError:
-                MY_LOGGER.debug('config_validation exception handler - value missing: %s %s %s',
-                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-                cv_value = ''
-                cv_found = 'no'
-                cv_error += 'Field missing from file. '
-            if cv_value == '' and cv_files_info[cv_filename]['field validation'][cv_row]['required'] == 'yes':
-                cv_error += 'Required value is missing. '
-            cv_valid_values = cv_files_info[cv_filename]['field validation'][cv_row]['valid values']
-            if cv_valid_values == '-pattern-':
-                cv_valid_values = 'The value must follow the pattern, as shown in the description'
-            if cv_valid_values == '-number-':
-                cv_valid_values = 'The value must be a number, as shown in the description'
-                if not is_number(cv_value):
-                    cv_error += 'Value is not a number. '
-            if cv_valid_values == '-any-':
-                cv_valid_values = 'The value can have any value, as shown in the description'
-            if '|' in cv_valid_values:
-                if not cv_value in cv_valid_values:
-                    MY_LOGGER.debug('||| NOT')
-                    cv_error += 'Value is not a valid value'
-                cv_valid_values = 'Valid values, separated by a \'|\' are: ' + cv_valid_values
-            if cv_error == '':
-                cv_error = '(none)'
-                cv_results += '<tr>'
-            else:
-                cv_results += '<tr class=\"row-highlight\">'
-                cv_errors_found = True
-            if cv_files_info[cv_filename]['field validation'][cv_row]['hidden'] == 'yes':
-                cv_value = '*hidden*'
-            cv_results += '<td>' + cv_row + '</td>'
-            cv_results += '<td>' + cv_value + '</td>'
-            cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['description'] + '</td>'
-            cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['required'] + '</td>'
-            cv_results += '<td>' + cv_found  + '</td>'
-            cv_results += '<td>' + cv_valid_values + '</td>'
-            cv_results += '<td>' + cv_error + '</td></tr>'
+                try:
+                    MY_LOGGER.debug('testing field %s', cv_row)
+                    cv_value = str(cv_test_file[cv_row])
+                    cv_found = 'yes'
+                    cv_error = ''
+                except KeyError:
+                    MY_LOGGER.debug('config_validation exception handler - value missing: %s %s %s',
+                                    sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                    cv_value = ''
+                    cv_found = 'no'
+                    cv_error += 'Field missing from file. '
+                if cv_value == '' and cv_files_info[cv_filename]['field validation'][cv_row]['required'] == 'yes':
+                    cv_error += 'Required value is missing. '
+                cv_valid_values = cv_files_info[cv_filename]['field validation'][cv_row]['valid values']
+                if cv_valid_values == '-pattern-':
+                    cv_valid_values = 'The value must follow the pattern, as shown in the description'
+                if cv_valid_values == '-number-':
+                    cv_valid_values = 'The value must be a number, as shown in the description'
+                    if not is_number(cv_value):
+                        cv_error += 'Value is not a number. '
+                if cv_valid_values == '-any-':
+                    cv_valid_values = 'The value can have any value, as shown in the description'
+                if '|' in cv_valid_values:
+                    if not cv_value in cv_valid_values:
+                        cv_error += 'Value is not a valid value'
+                    cv_valid_values = 'Valid values, separated by a \'|\' are: ' + cv_valid_values
+                if cv_error == '':
+                    cv_error = '(none)'
+                    cv_results += '<tr>'
+                else:
+                    cv_results += '<tr class=\"row-highlight\">'
+                    cv_errors_found = True
+                if cv_files_info[cv_filename]['field validation'][cv_row]['hidden'] == 'yes':
+                    cv_value = '*hidden*'
+                cv_results += '<td>' + cv_row + '</td>'
+                cv_results += '<td>' + cv_value + '</td>'
+                cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['description'] + '</td>'
+                cv_results += '<td>' + cv_files_info[cv_filename]['field validation'][cv_row]['required'] + '</td>'
+                cv_results += '<td>' + cv_found  + '</td>'
+                cv_results += '<td>' + cv_valid_values + '</td>'
+                cv_results += '<td>' + cv_error + '</td></tr>'
 
         cv_results += '</table>'
 
@@ -350,8 +415,8 @@ try:
         html.write('<p>Please review any rows highlighted and update the associated configuration file.</p>')
 
         html.write(CONFIG_HTML)
-        html.write('</ul></section>')
         html.write('</div>')
+        html.write('</section>')
 
         # footer
         html.write('<footer class=\"main-footer\">')

@@ -246,7 +246,7 @@
 			"tweet enhancement": {
 				"required": "yes",
 				"valid values": "-pattern-",
-				"description": "Image enhancement to use for the tweet, e.g. mcir-precip",
+				"description": "Image enhancement to use for the tweet, e.g. mcir-precip, which must be an active enhancement in config-NOAA.json",
 				"hidden": "no"
 			}
 		}
@@ -308,6 +308,143 @@
 				"valid values": "-pattern-",
 				"description": "Access token secret for the Twitter API credentials as configured in Twitter",
 				"hidden": "yes"
+			}
+		}
+	},
+	"satellites.json": {
+		"description": "Satellites configuration",
+		"required": "yes",
+		"field validation": {
+			"name": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Descriptive name for the satellite, e.g. METEOR-M 2.",
+				"hidden": "no"
+			},
+			"NORAD catalog number": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "NORAD catalog number for the satellite, e.g. 40069",
+				"hidden": "no"
+			},
+			"frequency": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Frequency that the satellite broadcasts on and that the SDR will be tuned to, e.g. 137.1000",
+				"hidden": "no"
+			},
+			"symbol rate": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Symbol rate for Meteor satellites, e.g. 72000, otherwise set to 0",
+				"hidden": "no"
+			},
+			"mode": {
+				"required": "yes",
+				"valid values": "n/a|qpsk|oqpsk",
+				"description": "Decoder mode for Meteor satellites, e.g. qpsk, otherwise set to n/a",
+				"hidden": "no"
+			},
+			"type": {
+				"required": "yes",
+				"valid values": "NOAA|METEOR|ISS|AMSAT",
+				"description": "Type of satellite, e.g. METEOR",
+				"hidden": "no"
+			},
+			"active": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "If the satellite is active then it will be included in the table of predicted passes, e.g. yes.",
+				"hidden": "no"
+			},
+			"capture": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Controls if the pass will be captured, e.g. yes. Note that this will only happen if the value of active is yes.",
+				"hidden": "no"
+			},
+			"night": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Controls if the pass will be captured at night for Meteor sattellites, otherwise set to yes for other satellites.",
+				"hidden": "no"
+			},
+			"priority": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Relative priority to capture this satellite compared to other satellites, e.g. 10, with higher priority satellites taking priority over lower priority satellites to be captured if there are overlapping passes by multiple satellites.",
+				"hidden": "no"
+			},
+			"sdr": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Which SDR (and antenna) to use to record the capture, e.g. QFH. There must be corresponding data in the sdr.json file for this value.",
+				"hidden": "no"
+			}
+		}
+	},
+	"sdr.json": {
+		"description": "SDR configuration",
+		"required": "yes",
+		"field validation": {
+			"name": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Descriptive name for the SDF, e.g. QFH.",
+				"hidden": "no"
+			},"antenna": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Descriptive name for the antenna that is connected to the SDR, e.g. Quadrifilar Helicoidal antenna",
+				"hidden": "no"
+			},
+			"chipset": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Chipset name used by the SDR, e.g. RTL2838UHIDIR",
+				"hidden": "no"
+			},
+			"sdr type": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Descriptive name for the SDR, e.g. RTL-SDR v3",
+				"hidden": "no"
+			},
+			"centre frequency": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Centre frequency to which the antenna that is connected to the SDR is tuned to, e.g. 137.6 MHz",
+				"hidden": "no"
+			},
+			"frequency range": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Frequency range to which the antenna that is connected to the SDR is sensitive to, e.g. 135-140 MHz from bandpass filter",
+				"hidden": "no"
+			},
+			"modules": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Modules which are between the antenna and the SDR, e.g. RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)",
+				"hidden": "no"
+			},
+			"sdr active": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "If the SDR is active or not, e.g. yes",
+				"hidden": "no"
+			},
+			"serial number": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "SDR serial number, e.g. 00000001",
+				"hidden": "no"
+			},
+			"bias t": {
+				"required": "yes",
+				"valid values": "on|off",
+				"description": "If the bias T needs to be enabled for the SDR, e.g. on. Only do this if there is something using bias T as otherwise you may damage your SDR. This currently assumes an RTL-SDR v3 is being used.",
+				"hidden": "no"
 			}
 		}
 	}

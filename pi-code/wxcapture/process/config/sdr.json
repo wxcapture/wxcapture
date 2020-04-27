@@ -1,6 +1,6 @@
 {
-	"sdr": {
-		"QFH": {
+	"sdr": [{
+			"name": "QFH",
 			"antenna": "Quadrifilar Helicoidal antenna",
 			"chipset": "RTL2838UHIDIR",
 			"sdr type": "RTL-SDR v3",
@@ -11,7 +11,8 @@
 			"serial number": "00000001",
 			"bias t": "on"
 		},
-		"ground-plane": {
+		{
+			"name": "ground-plane",
 			"antenna": "Ground Plane antenna",
 			"chipset": "RTL2838UHIDIR",
 			"sdr type": "RTL-SDR v3",
@@ -22,5 +23,5 @@
 			"serial number": "00000002",
 			"bias t": "off"
 		}
-	}
+	]
 }

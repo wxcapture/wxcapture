@@ -87,9 +87,9 @@ def config_validation():
 
         MY_LOGGER.debug('Parse = %s', cv_files_info[cv_filename])
 
-        if cv_filename == 'sdr.json' or cv_filename == 'satellites.json':
+        if cv_filename in ('sdr.json', 'satellites.json'):
             MY_LOGGER.debug('sdr and satellites specific checking - %s', cv_filename)
-            
+
             cv_field_entry = ''
             if cv_filename == 'sdr.json':
                 cv_field_entry = 'sdr'

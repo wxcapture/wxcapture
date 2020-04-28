@@ -90,29 +90,6 @@ def make_directories(target, element0, element1, element2):
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/images')
     mk_dir(target + element0 + '/' + element1 + '/' + element2 + '/audio')
 
-    test_filename = target + element0 + '/' + element1 + '/index.html'
-    if not os.path.isfile(test_filename):
-        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
-        wxcutils.copy_file(CONFIG_PATH + 'redirect-0up.html',
-                           test_filename)
-
-    test_filename = target + element0 + '/' + element1 + '/' + element2 + '/index.html'
-    if not os.path.isfile(test_filename):
-        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
-        wxcutils.copy_file(CONFIG_PATH + 'redirect-1up.html',
-                           test_filename)
-
-    test_filename = target + element0 + '/' + element1 + '/' + element2 + '/images/index.html'
-    if not os.path.isfile(test_filename):
-        MY_LOGGER.debug('Creating index.html page - %s', test_filename)
-        wxcutils.copy_file(CONFIG_PATH + 'redirect-2up.html',
-                           test_filename)
-
-    test_filename = target + element0 + '/' + element1 + '/' + element2 + '/audio/index.html'
-    if not os.path.isfile(test_filename):
-        wxcutils.copy_file(CONFIG_PATH + 'redirect-2up.html',
-                           test_filename)
-
 
 def get_links(tmp_date_start, tmp_date_now):
     """get a list of links to previous capture pages"""

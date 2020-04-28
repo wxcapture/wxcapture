@@ -36,16 +36,12 @@ MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 try:
-    CMD = Popen(['df']
+    CMD = Popen(['ps', '-ef']
                 , stdout=PIPE, stderr=PIPE)
     STDOUT, STDERR = CMD.communicate()
     MY_LOGGER.debug('stdout:%s', STDOUT)
     MY_LOGGER.debug('stderr:%s', STDERR)
-    results = STDOUT.decode('utf-8').splitlines()
-    for line in results:
-        if '/dev/root' in line:
-            space = line.split()[4].split('%')[0]
-            MY_LOGGER.debug('space  = %s', space)
+
 
     
 except:

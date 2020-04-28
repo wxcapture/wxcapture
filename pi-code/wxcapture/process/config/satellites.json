@@ -131,6 +131,19 @@
 			"capture": "no",
 			"priority": "10",
 			"sdr": "ground-plane"
+		},
+		{
+			"name": "PSAT2 (NO-104)",
+			"NORAD catalog number": "44354",
+			"frequency": 145.825,
+			"symbol rate": 0,
+			"mode": "n/a",
+			"type": "AMSAT",
+			"active": "no",
+			"night": "yes",
+			"capture": "no",
+			"priority": "20",
+			"sdr": "ground-plane"
 		}
 	]
 }

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>WxCapture</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="WxCapture publishes data captured from NOAA and Meteor weather satellites, International Space Station (ISS) SSTV and Amateur Satellites">
+    <meta name="keywords" content="wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud">
+    <meta name="author" content="WxCapture">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="lightbox/css/lightbox.min.css">
+    <link rel="shortcut icon" type="image/png" href="/wxcapture/favicon.png" />
+</head>
+
+<body>
+    <header class="main-header">
+        <nav class="nav main-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="satpass.html">Predictions</a></li>
+                <li><a href="captures.html">Captures</a></li>
+                <li><a href="satellitestatus.html">Status</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </nav>
+        <h1 class="page-name page-name-large">WxCapture</h1>
+    </header>
+
+
+    <section class="content-section container">
+        <!-- NOAA POES Satelites -->
+        <a id="NOAA"></a>
+        <h2 class="section-header">NOAA POES Series Weather Satellites</h2>
+        <table>
+            <tr>
+                <td>
+                    <a class="example-image-link" href="images/noaa_sample_a.jpg"
+                        data-lightbox="images/noaa_sample_a.jpg"><img class="example-image"
+                            src="images/noaa_sample_a_small.jpg" alt="NOAA 18 Image" height=1000 /></a><br> Click on
+                    image for a larger version
+                    <br>or<br>
+                    <a href="images/noaa_sample_a.jpg" target="_blank" rel="noopener">Full size version - opens in a new window</a>
+                </td>
+                <td>
+                    <!-- <h2>NOAA POES Satellites</h2> -->
+                    <h2>General Information:</h2>
+                    <ul>
+                        <li>Passes overhead multiple times a day. (Around dawn and dusk in New Zealand)</li>
+                        <li>Easiest satellites to receive</li>
+                        <li>You can get something even if the signal is really weak</li>
+                        <li>Analogue Signal</li>
+                    </ul>
+
+                    <h2>Satellites:</h2>
+                    <ul>
+                        <li><del>Satellites before NOAA 15 </del> have all failed</li>
+                        <li class="good">NOAA 15</li>
+                        <li><del>NOAA 16 and 17</del> have failed and been decommissioned</li>
+                        <li class="good">NOAA 18</li>
+                        <li class="good">NOAA 19</li>
+                        <li><del>NOAA 20 and <span style="font-weight: bold; font-style: oblique; color: #cccccc;">all future satellites</span></del> no longer broadcast APT</li>
+                    </ul>
+                    <p>More info is on the <a href="satellitestatus.html">satellite status</a> page.</p>
+
+                    <h2>About this pass:</h2>
+                    <ul>
+                        <li><strong>You can see <a href="https://en.wikipedia.org/wiki/Cyclone_Harold" target="_blank" rel="noopener">Cyclone
+                                    Harold</a>, a category 5 cyclone, in the top left of the image.</strong></li>
+                        <li>The eye of the storm is clearly visible</li>
+                        <li>Max pass elevation - 79&deg;</li>
+                        <li>Pass start (NZST) - Mon 06 Apr 2020 09:03:32</li>
+                        <li>Pass end (NZST) - Mon 06 Apr 2020 09:19:25</li>
+                        <li>Pass start (UTC) - Sun 05 Apr 2020 21:03:32</li>
+                        <li>Pass end (UTC) - Sun 05 Apr 2020 21:19:25</li>
+                        <li>SDR type - RTL-SDR v3 (RTL2838UHIDIR)</li>
+                        <li>Antenna - Quadrifilar Helicoidal antenna (137.6 MHz)</li>
+                        <li>Hardware used - RTL-SDR FM Block, Nooelec NOAA Sawbird (LNA + Bandpass Filter)</li>
+                    </ul>
+                    <img src="images/noaa_sample_plot.png" alt="Polar plot" height=300 />
+                </td>
+            </tr>
+        </table>
+    </section>
+
+    <footer class="main-footer">
+        <p id="footer-text">Page last updated at <span class="time">14:00 (NZST)</span> on <span
+                class="time">25/04/2020</span></p>
+    </footer>
+
+    <script src="lightbox/js/lightbox-plus-jquery.min.js"></script>
+</body>
+
+</html>

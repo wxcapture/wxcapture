@@ -89,7 +89,7 @@ a {
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-style: oblique;
     text-decoration: underline;
-    font-size: 2.5em;
+    font-size: 2em;
     font-weight: normal;
     text-align: left;
 }
@@ -132,7 +132,7 @@ tr {
 }
 
 .content-section a:link {
-    color: blue;
+    color: grey;
     font-size: 1.2em;
     font-weight: bold;
 }
@@ -143,7 +143,7 @@ tr {
 }
 
 .content-section a:hover {
-    color: red;
+    color: blue;
     font-weight: bolder;
 }
 

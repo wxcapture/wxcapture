@@ -22,7 +22,7 @@ import wxcutils
 matplotlib.use('Agg')
 
 
-def is_daylight(time_now):
+def is_daylight(id_pass_start, id_pass_end):
     """check if it is daylight at the time"""
     def get_timestamp(tmp_dt):
         part = tmp_dt.strftime('%Y-%m-%d-%H-%M')
@@ -54,9 +54,13 @@ def is_daylight(time_now):
     daylight_end = wxcutils.utc_to_epoch(a_t[1].utc_iso().replace('T', ' ').replace('Z', ''),
                                          '%Y-%m-%d %H:%M:%S')
 
-    if time_now < float(daylight_start) or time_now > float(daylight_end):
-        return 'N'
-    return 'Y'
+    # capture if either:
+    # start of pass is in daylight
+    # OR
+    # end of pass is in daylight
+    if (id_pass_start >= float(daylight_start) and id_pass_start <= float(daylight_end)) or (id_pass_end >= float(daylight_start) and id_pass_end <= float(daylight_end)):
+        return 'Y'
+    return 'N'
 
 def get_sdr_data(sdr_name):
     """extract SDR info"""
@@ -282,7 +286,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                     datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
             # for Meteor, always record daylight passes, conditionally record night passes
             elif sat['type'] == 'METEOR':
-                if is_daylight(float(start_epoch)) == 'Y':
+                if is_daylight(float(start_epoch), float(end_epoch)) == 'Y':
                     MY_LOGGER.debug('Daylight pass - %s', str(start_epoch))
                     scheduler = 'echo \"' + CODE_PATH + 'receive_meteor.py ' + \
                     sat['name'] + ' ' + str(start_epoch) + ' ' + \
@@ -318,8 +322,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                 MY_LOGGER.debug('No processsing code for %s of type %s', sat['name'], sat['type'])
 
         if 'METEOR' in sat['name']:
-            symbol_rate = sat['symbol rate']
-            mode = sat['mode']
+            symbol_rate = sat['meteor symbol rate']
+            mode = sat['meteor mode']
         else:
             symbol_rate = 'n/a'
             mode = 'n/a'

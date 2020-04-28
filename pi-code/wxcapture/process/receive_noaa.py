@@ -64,7 +64,7 @@ def scp_files():
                          scp_config['remote directory'] + '/audio/' +
                          FILENAME_BASE + '.wav.LOCK.' + str(lock_number))
     MY_LOGGER.debug('SCPing .jpg image file')
-    for img_file in glob.glob(CODE_PATH + '*.jpg'):
+    for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.jpg'):
         img_path, img_filename = os.path.split(img_file)
         MY_LOGGER.debug('scp %s %s', img_path, img_filename)
         wxcutils.run_cmd('scp ' + img_file + ' ' +
@@ -75,7 +75,7 @@ def scp_files():
     wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
 
     MY_LOGGER.debug('SCPing .png image file')
-    for img_file in glob.glob(CODE_PATH + '*.png'):
+    for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.png'):
         img_path, img_filename = os.path.split(img_file)
         MY_LOGGER.debug('scp %s %s', img_path, img_filename)
         wxcutils.run_cmd('scp ' + img_file + ' ' +

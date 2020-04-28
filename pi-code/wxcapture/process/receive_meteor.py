@@ -74,7 +74,7 @@ def scp_files():
                      scp_config['remote directory']+ '/' +
                      FILENAME_BASE + 'dec.LOCK.' + str(lock_number))
     MY_LOGGER.debug('SCPing .jpg image file')
-    for img_file in glob.glob(CODE_PATH + '*.jpg'):
+    for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.jpg'):
         img_path, img_filename = os.path.split(img_file)
         MY_LOGGER.debug('scp %s %s', img_path, img_filename)
         wxcutils.run_cmd('scp ' + img_file + ' ' +

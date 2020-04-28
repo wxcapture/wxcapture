@@ -411,12 +411,12 @@ for unlock_file in glob.glob(MY_PATH + '*.UNLOCK'):
     # apply the modal windows fix for all new pass html files
     for file_name in PASS_FILES:
         MY_LOGGER.debug('Applying modal fixes to pass files just copied')
-        MY_LOGGER.debug('file_name = %s', file_name)
-        file_bits = file_name.split('-')
+        MY_LOGGER.debug('file_name = %s', file_name.split('.LOCK.')[0])
+        file_bits = file_name.split('.LOCK.')[0].split('-')
         location = TARGET + file_bits[0] + '/' + file_bits[1] + '/' + file_bits[2] + '/'
         if '.html' in file_name:
-            fix_pass_pages_lib.fix_file(location, file_name)
-
+            MY_LOGGER.debug('fix file %s %s', location, file_name.split('.LOCK.')[0])
+            fix_pass_pages_lib.fix_file(location, file_name.split('.LOCK.')[0])
 
 
 MY_LOGGER.debug('Finished file moving')

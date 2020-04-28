@@ -31,21 +31,25 @@ def scp_files():
                     scp_config['remote user'])
 
     lock_number = wxcutils.create_lock_file()
+    MY_LOGGER.debug('scp - html')
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.html ' +
                      scp_config['remote user'] +
                      '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] +
                      '/' + FILENAME_BASE + '.html.LOCK.' + str(lock_number))
+    MY_LOGGER.debug('scp - txt')
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.txt ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] + '/' +
                      FILENAME_BASE + '.txt.LOCK.' + str(lock_number))
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE +'.json ' +
+    MY_LOGGER.debug('scp - json')
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.json ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory'] + '/' +
-                     + FILENAME_BASE +'.json.LOCK.' + str(lock_number))
+                     FILENAME_BASE + '.json.LOCK.' + str(lock_number))
+    MY_LOGGER.debug('scp - tle')
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + 'weather.tle ' +
                      scp_config['remote user'] + '@' +
                      scp_config['remote host']

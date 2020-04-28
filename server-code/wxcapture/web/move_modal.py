@@ -26,7 +26,7 @@ def mk_dir(directory):
 def find_files(directory, pattern):
     """find files that match the pattern"""
     for root, dirs, files in os.walk(directory):
-        # MY_LOGGER.debug('find_files %s %s %s', root, dirs, files)
+        MY_LOGGER.debug('find_files %s %s %s', root, dirs, files)
         for base_name in files:
             if fnmatch.fnmatch(base_name, pattern):
                 filename = os.path.join(root, base_name)
@@ -324,6 +324,21 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
         return result
 
 
+def process_file(pf_path_filename, pf_source_path, pf_target_path, pf_target_suffix, pf_lock_suffix):
+    """process file, copying it to the correct directory"""
+    MY_LOGGER.debug('process file %s %s %s %s %s', pf_path_filename, pf_source_path, pf_target_path, pf_target_suffix, pf_lock_suffix)
+    pf_filename_lock = pf_path_filename.split(pf_source_path)[1]
+    pf_filename = pf_filename_lock.split(pf_lock_suffix)[0]
+    pf_directory_elements = pf_filename.split('-')
+    MY_LOGGER.debug('filename = %s', pf_filename)
+    # create directory structure
+    make_directories(pf_target_path, pf_directory_elements[0], pf_directory_elements[1], pf_directory_elements[2])
+    # move file
+    pf_move_to_path = pf_target_path + pf_directory_elements[0] + '/' + pf_directory_elements[1] + '/' + pf_directory_elements[2] + '/' + pf_target_suffix
+    MY_LOGGER.debug('Moving %s %s to %s %s', pf_source_path, pf_filename + pf_lock_suffix, pf_move_to_path, pf_filename)
+    wxcutils.move_file(pf_source_path, pf_filename + pf_lock_suffix, pf_move_to_path, pf_filename)
+
+
 # setup paths to directories
 HOME = '/home/mike'
 APP_PATH = HOME + '/wxcapture/web/'
@@ -351,93 +366,79 @@ LOCAL_TIME_ZONE = subprocess.check_output("date").decode('utf-8').split(' ')[-2]
 
 MY_LOGGER.debug('Starting file moving')
 
-# move satpass.html
-if os.path.isfile(MY_PATH + 'satpass.html'):
-    wxcutils.move_file(MY_PATH, 'satpass.html', TARGET, 'satpass.html')
-else:
-    MY_LOGGER.debug('No satpass.html to copy')
+# scan for any unlock files
+for unlock_file in glob.glob(MY_PATH + '*.UNLOCK'):
+    unlock_path, unlock_filename = os.path.split(unlock_file)
+    lock_number = unlock_filename.split('.')[0]
+    lock_suffix = '.LOCK.' + lock_number
+    MY_LOGGER.debug('Unlock file for %s %s - lock # %s lock suffix %s', unlock_path, unlock_filename, lock_number, lock_suffix)
 
-# move satellitestatus.html
-if os.path.isfile(MY_PATH + 'satellitestatus.html'):
-    wxcutils.move_file(MY_PATH, 'satellitestatus.html', TARGET, 'satellitestatus.html')
-else:
-    MY_LOGGER.debug('No satellitestatus.html to copy')
+    # move satpass.html
+    if os.path.isfile(MY_PATH + 'satpass.html' + lock_suffix):
+        wxcutils.move_file(MY_PATH, 'satpass.html' + lock_suffix, TARGET, 'satpass.html')
+    else:
+        MY_LOGGER.debug('No satpass.html to copy')
 
-# move plot files
-ONLY_FILES = [f for f in listdir(MY_PATH + 'images/') if isfile(join(MY_PATH + 'images/', f))]
-MY_LOGGER.debug(ONLY_FILES)
+    # move satellitestatus.html
+    if os.path.isfile(MY_PATH + 'satellitestatus.html' + lock_suffix):
+        wxcutils.move_file(MY_PATH, 'satellitestatus.html' + lock_suffix, TARGET, 'satellitestatus.html')
+    else:
+        MY_LOGGER.debug('No satellitestatus.html to copy')
 
-for x in ONLY_FILES:
-    MY_LOGGER.debug('x = %s', x)
-    elements = x.split('-')
-    make_directories(TARGET, elements[0], elements[1], elements[2])
-    wxcutils.move_file(MY_PATH + 'images/', x,
-                       TARGET + elements[0] + '/' +
-                       elements[1] + '/' + elements[2] + '/images/', x)
+    # find images in the images folder and move them
+    # will include plots, maps and sat images
+    # .png and .jpg extensions
+    MY_LOGGER.debug('Image search = %s', MY_PATH + 'images/*' + lock_suffix)
+    for image_file in glob.glob(MY_PATH + 'images/*' + lock_suffix):
+        MY_LOGGER.debug('Image file = %s', image_file)
+        process_file(image_file, MY_PATH + 'images/', TARGET, 'images/', lock_suffix)
 
-# get a list of the pass html files for fixing
-PASS_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f))]
-MY_LOGGER.debug('________________%s', PASS_FILES)
+    # find audio files in the audio folder and move them
+    # should be just .wav files
+    MY_LOGGER.debug('Audio search = %s', MY_PATH + 'audio/*' + lock_suffix)
+    for audio_file in glob.glob(MY_PATH + 'audio/*' + lock_suffix):
+        MY_LOGGER.debug('Audio file = %s', audio_file)
+        process_file(audio_file, MY_PATH + 'audio/', TARGET, 'audio/', lock_suffix)
 
-# move remaining files, non-plot files, to right subdirectories
-ONLY_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f))]
-ONLY_FILES.extend([f for f in listdir(MY_PATH + 'images/') if isfile(join(MY_PATH + 'images/', f))])
-ONLY_FILES.extend([f for f in listdir(MY_PATH + 'audio/') if isfile(join(MY_PATH + 'audio/', f))])
+    # find .tle files in the output folder and move them
+    MY_LOGGER.debug('.tle search = %s', MY_PATH + '*.tle' + lock_suffix)
+    for tle_file in glob.glob(MY_PATH + '*.tle' + lock_suffix):
+        MY_LOGGER.debug('.tle file = %s', tle_file)
+        process_file(tle_file, MY_PATH, TARGET, '', lock_suffix)
 
-if not ONLY_FILES:
-    MY_LOGGER.debug('No other files to move')
-else:
-    for x in ONLY_FILES:
-        MY_LOGGER.debug('x = %s', x)
-        elements = x.split('-')
-        make_directories(TARGET, elements[0], elements[1], elements[2])
+    # find .json files in the output folder and move them
+    MY_LOGGER.debug('.json search = %s', MY_PATH + '*.json' + lock_suffix)
+    for json_file in glob.glob(MY_PATH + '*.json' + lock_suffix):
+        MY_LOGGER.debug('.json file = %s', json_file)
+        process_file(json_file, MY_PATH, TARGET, '', lock_suffix)
 
-        if files_to_copy(MY_PATH, '*.html', x):
-            MY_LOGGER.debug('Moving html file(s)')
-            wxcutils.move_file(MY_PATH, x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/', x)
-        else:
-            MY_LOGGER.debug('No html file(s) to move')
-        if files_to_copy(MY_PATH, '*.json', x):
-            MY_LOGGER.debug('Moving json file(s)')
-            wxcutils.move_file(MY_PATH, x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/', x)
-        else:
-            MY_LOGGER.debug('No json file(s) to move')
-        if files_to_copy(MY_PATH, '*.txt', x):
-            MY_LOGGER.debug('Moving txt file(s)')
-            wxcutils.move_file(MY_PATH, x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/', x)
-        else:
-            MY_LOGGER.debug('No txt file(s) to move')
-        if files_to_copy(MY_PATH, '*.tle', x):
-            MY_LOGGER.debug('Moving tle file(s)')
-            wxcutils.move_file(MY_PATH, x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/', x)
-        if files_to_copy(MY_PATH, '*.dec', x):
-            MY_LOGGER.debug('Moving dec file(s)')
-            wxcutils.move_file(MY_PATH, x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/', x)
-        else:
-            MY_LOGGER.debug('No dec file(s) to move')
-        if files_to_copy(MY_PATH + 'audio/', '*.wav', x):
-            MY_LOGGER.debug('Moving audio file(s)')
-            wxcutils.move_file(MY_PATH + 'audio/', x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/audio/', x)
-        else:
-            MY_LOGGER.debug('No audio file(s) to move')
-        if files_to_copy(MY_PATH + 'images/', '*.jpg', x):
-            MY_LOGGER.debug('Moving image file(s)')
-            wxcutils.move_file(MY_PATH + 'images/', x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/images/', x)
-        else:
-            MY_LOGGER.debug('No jpg file(s) to move')
-        if files_to_copy(MY_PATH + 'images/', '*.png', x):
-            MY_LOGGER.debug('Moving image file(s)')
-            wxcutils.move_file(MY_PATH + 'images/', x, TARGET + elements[0] + '/' +
-                               elements[1] + '/' + elements[2] + '/images/', x)
-        else:
-            MY_LOGGER.debug('No jpg file(s) to move')
+    # find .txt files in the output folder and move them
+    MY_LOGGER.debug('.txt search = %s', MY_PATH + '*.txt' + lock_suffix)
+    for txt_file in glob.glob(MY_PATH + '*.txt' + lock_suffix):
+        MY_LOGGER.debug('.txt file = %s', txt_file)
+        process_file(txt_file, MY_PATH, TARGET, '', lock_suffix)
+
+    # get a list of the pass html files for fixing
+    PASS_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f))]
+    MY_LOGGER.debug('________________%s', PASS_FILES)
+
+    # find .html files in the output folder and move them
+    MY_LOGGER.debug('.html search = %s', MY_PATH + '*.html' + lock_suffix)
+    for htm_file in glob.glob(MY_PATH + '*.html' + lock_suffix):
+        MY_LOGGER.debug('.html file = %s', htm_file)
+        process_file(htm_file, MY_PATH, TARGET, '', lock_suffix)
+
+    # apply the modal windows fix for all new pass html files
+    for file_name in PASS_FILES:
+        MY_LOGGER.debug('Applying modal fixes to pass files just copied')
+        MY_LOGGER.debug('file_name = %s', file_name)
+        file_bits = file_name.split('-')
+        location = TARGET + file_bits[0] + '/' + file_bits[1] + '/' + file_bits[2] + '/'
+        if '.html' in file_name:
+            fix_pass_pages_lib.fix_file(location, file_name)
+
+    # copying done for this lock, so remove unlock file
+    wxcutils.run_cmd('rm ' + unlock_file)
 
 MY_LOGGER.debug('Finished file moving')
 MY_LOGGER.debug('Starting capture page building')
@@ -481,17 +482,7 @@ MY_LOGGER.debug('Building captures page = %s for %s %s (current month)',
                 FILE_PATH, MONTH_NAME, YEAR)
 PAGE_DATA = build_month_page(FILE_PATH, CAPTURES_PAGE, MONTH, MONTH_NAME, YEAR)
 
-# apply the modal windows fix for all new pass html files
-for file_name in PASS_FILES:
-    MY_LOGGER.debug('Applying modal fixes to pass files just copied')
-    MY_LOGGER.debug('file_name = %s', file_name)
-    file_bits = file_name.split('-')
-    location = TARGET + file_bits[0] + '/' + file_bits[1] + '/' + file_bits[2] + '/'
-    if '.html' in file_name:
-        fix_pass_pages_lib.fix_file(location, file_name)
-
 # build current page which redirects to current month page
-
 # MY_LOGGER.debug('Page data = %s', PAGE_DATA)
 CURRENT_LINK = '/wxcapture/' + YEAR + '/' + MONTH + '/' + CAPTURES_PAGE
 with open(TARGET + CAPTURES_PAGE, 'w') as html:

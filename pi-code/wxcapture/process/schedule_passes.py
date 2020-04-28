@@ -6,6 +6,7 @@ Also produce pass data for today plus the next few days"""
 import os
 import sys
 import math
+import glob
 import subprocess
 from subprocess import Popen, PIPE
 import time
@@ -45,6 +46,8 @@ def is_daylight(time_now):
 
     a_t, a_y = almanac.find_discrete(get_timestamp(start_dt), get_timestamp(end_dt),
                                      almanac.sunrise_sunset(e_e, gps_location))
+    MY_LOGGER.debug(a_t)
+    MY_LOGGER.debug(a_y)
 
     daylight_start = wxcutils.utc_to_epoch(a_t[0].utc_iso().replace('T', ' ').replace('Z', ''),
                                            '%Y-%m-%d %H:%M:%S')
@@ -417,15 +420,22 @@ def scp_files():
     MY_LOGGER.debug('using scp')
     # load config
     scp_config = wxcutils.load_json(CONFIG_PATH, 'config-scp.json')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + 'satpass.html ' + scp_config['remote user'] + '@' + \
-        scp_config['remote host'] + ':' + scp_config['remote directory'] + '/')
+
+    lock_number = wxcutils.create_lock_file()
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + 'satpass.html ' +
+                     scp_config['remote user'] + '@' +
+                     scp_config['remote host'] + ':' + scp_config['remote directory'] + '/' +
+                     'satpass.html.LOCK.' + str(lock_number))
     for sat in SAT_DATA:
         wxcutils.run_cmd('scp ' + IMAGE_PATH + sat['filename_base'] + '-plot.png '
                          + scp_config['remote user']+ '@' + scp_config['remote host']
-                         + ':' + scp_config['remote directory'] + '/images/')
-        wxcutils.run_cmd('scp ' + IMAGE_PATH + sat['filename_base'] + '-plot-tn.png '
+                         + ':' + scp_config['remote directory'] + '/images/' +
+                         sat['filename_base'] + '-plot.png.LOCK.' + str(lock_number))
+        wxcutils.run_cmd('scp ' + IMAGE_PATH + sat['filename_base'] + '-plot.png '
                          + scp_config['remote user']+ '@' + scp_config['remote host']
-                         + ':' + scp_config['remote directory'] + '/images/')
+                         + ':' + scp_config['remote directory'] + '/images/' +
+                         sat['filename_base'] + '-plot-tn.png.LOCK.' + str(lock_number))
+    wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
 
 def process_overlaps():
     """remove passes where there is an overlap between satellites for the same SDR"""
@@ -763,11 +773,11 @@ try:
             html.write('<td>' + plot_link + '</td>')
             html.write('<td>' + get_time_element(elem['start_date_local']) + '</td>')
             html.write('<td>' + get_time_element(elem['end_date_local']) + '</td>')
-            if CONFIG_INFO['Hide Detail'] != 'Yes':
+            if CONFIG_INFO['Hide Detail'] != 'yes':
                 html.write('<td>' + elem['startDate'] + '</td>')
                 html.write('<td>' + elem['endDate'] + '</td>')
             html.write('<td>' + elem['duration_string'] + '</td>')
-            if CONFIG_INFO['Hide Detail'] != 'Yes':
+            if CONFIG_INFO['Hide Detail'] != 'yes':
                 html.write('<td>' + str(elem['frequency']) + '</td>')
                 html.write('<td>' + str(elem['antenna']) + '</td>')
                 html.write('<td>' + elem['direction'] + '</td>')
@@ -785,7 +795,7 @@ try:
         html.write('<h2 class=\"section-header\">Over Next ' + CONFIG_INFO['Pass List Days'] +
                    ' Days Over ' + CONFIG_INFO['Location'] + '</h2>')
         html.write('<table>')
-        if CONFIG_INFO['Hide Detail'] == 'Yes':
+        if CONFIG_INFO['Hide Detail'] == 'yes':
             html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
                        '<th>Pass Start (' + LOCAL_TIME_ZONE +
                        ')</th><th>Pass End (' + LOCAL_TIME_ZONE +
@@ -813,11 +823,11 @@ try:
                        elem['max_elevation_direction'] + '</td>')
             html.write('<td>' + elem['start_date_local'] + '</td>')
             html.write('<td>' + elem['end_date_local'] + '</td>')
-            if CONFIG_INFO['Hide Detail'] != 'Yes':
+            if CONFIG_INFO['Hide Detail'] != 'yes':
                 html.write('<td>' + elem['startDate'] + '</td>')
                 html.write('<td>' + elem['endDate'] + '</td>')
             html.write('<td>' + elem['duration_string'] + '</td>')
-            if CONFIG_INFO['Hide Detail'] != 'Yes':
+            if CONFIG_INFO['Hide Detail'] != 'yes':
                 html.write('<td>' + str(elem['frequency']) + '</td>')
                 html.write('<td>' + str(elem['antenna']) + '</td>')
                 html.write('<td>' + elem['direction'] + '</td>')

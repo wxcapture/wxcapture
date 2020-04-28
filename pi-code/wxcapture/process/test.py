@@ -6,6 +6,8 @@
 import os
 import sys
 import json
+import glob
+import random
 import wxcutils
 
 
@@ -34,7 +36,9 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 try:
 
-
+    for f in glob.glob(CODE_PATH + '*.py'):
+        MY_LOGGER.debug(f)
+    
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

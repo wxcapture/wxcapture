@@ -23,9 +23,12 @@ def scp_files():
     MY_LOGGER.debug('using scp')
     # load config
     scp_config = wxcutils.load_json(CONFIG_PATH, 'config-scp.json')
+    lock_number = wxcutils.create_lock_file()
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + 'satellitestatus.html ' +
                      scp_config['remote user'] + '@' +
-                     scp_config['remote host'] + ':' + scp_config['remote directory'] + '/')
+                     scp_config['remote host'] + ':' + scp_config['remote directory'] + '/' +
+                     'satellitestatus.html.LOCK.' + str(lock_number))
+    wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
 
 
 def valid_json_file(vjf_file):

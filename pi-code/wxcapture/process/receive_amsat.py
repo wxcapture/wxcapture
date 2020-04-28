@@ -44,27 +44,34 @@ def scp_files():
                     scp_config['remote host'], scp_config['remote directory'],
                     scp_config['remote user'])
 
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '*.html ' +
+    lock_number = wxcutils.create_lock_file()
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.html ' +
                      scp_config['remote user'] +
                      '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '*.txt ' +
+                     scp_config['remote directory'] +
+                     '/' + FILENAME_BASE + '.html.LOCK.' + str(lock_number))
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.txt ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/')
+                     scp_config['remote directory'] + '/' +
+                     FILENAME_BASE + '.txt.LOCK.' + str(lock_number))
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE +'.json ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/')
+                     scp_config['remote directory'] + '/' +
+                     + FILENAME_BASE +'.json.LOCK.' + str(lock_number))
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + 'weather.tle ' +
                      scp_config['remote user'] + '@' +
                      scp_config['remote host']
-                     + ':' + scp_config['remote directory'] + '/')
+                     + ':' + scp_config['remote directory'] + '/' +
+                     FILENAME_BASE + 'weather.tle.LOCK.' + str(lock_number))
     MY_LOGGER.debug('SCPing .wav audio file')
     wxcutils.run_cmd('scp ' + AUDIO_PATH + FILENAME_BASE + '.wav ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/audio/')
+                     scp_config['remote directory'] + '/audio/' +
+                     FILENAME_BASE + '.wav.LOCK.' + str(lock_number))
+    wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
     MY_LOGGER.debug('SCP complete')
 
 

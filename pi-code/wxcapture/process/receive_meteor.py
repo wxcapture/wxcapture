@@ -13,6 +13,7 @@ create images plus pass web page"""
 # import libraries
 import os
 import sys
+import glob
 import subprocess
 import wxcutils
 import wxcutils_pi
@@ -35,34 +36,48 @@ def scp_files():
                     scp_config['remote host'], scp_config['remote directory'],
                     scp_config['remote user'])
 
+    lock_number = wxcutils.create_lock_file()
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.html ' +
                      scp_config['remote user'] +
                      '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/')
+                     scp_config['remote directory'] +
+                     '/' + FILENAME_BASE + '.html.LOCK.' + str(lock_number))
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.txt ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/')
+                     scp_config['remote directory'] + '/' +
+                     FILENAME_BASE + '.txt.LOCK.' + str(lock_number))
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE +'.json ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/')
+                     scp_config['remote directory'] + '/' +
+                     + FILENAME_BASE +'.json.LOCK.' + str(lock_number))
     wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + 'weather.tle ' +
                      scp_config['remote user'] + '@' +
                      scp_config['remote host']
-                     + ':' + scp_config['remote directory'] + '/')
-    wxcutils.run_cmd('scp ' + IMAGE_PATH + FILENAME_BASE + '*.jpg ' +
-                     scp_config['remote user']
-                     + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/images/')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.dec ' +
-                     scp_config['remote user']
-                     + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'])
+                     + ':' + scp_config['remote directory'] + '/' +
+                     FILENAME_BASE + 'weather.tle.LOCK.' + str(lock_number))
+    MY_LOGGER.debug('SCPing .wav audio file')
     wxcutils.run_cmd('scp ' + AUDIO_PATH + FILENAME_BASE + '.wav ' +
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/audio/')
+                     scp_config['remote directory'] + '/audio/' +
+                     FILENAME_BASE + '.wav.LOCK.' + str(lock_number))
+    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.dec ' +
+                     scp_config['remote user']
+                     + '@' + scp_config['remote host'] + ':' +
+                     scp_config['remote directory']+ '/' +
+                     FILENAME_BASE + 'dec.LOCK.' + str(lock_number))
+    MY_LOGGER.debug('SCPing .jpg image file')
+    for img_file in glob.glob(CODE_PATH + '*.jpg'):
+        img_path, img_filename = os.path.split(img_file)
+        MY_LOGGER.debug('scp %s %s', img_path, img_filename)
+        wxcutils.run_cmd('scp ' + img_file + ' ' +
+                         scp_config['remote user']
+                         + '@' + scp_config['remote host'] + ':' +
+                         scp_config['remote directory'] + '/images/' +
+                         img_filename + '.LOCK.' + str(lock_number))
+    wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
 
     MY_LOGGER.debug('SCP complete')
 

@@ -7,6 +7,7 @@ import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
+import random
 import json
 import shutil
 from datetime import datetime
@@ -217,3 +218,21 @@ def validate_tle(vt_path):
     validate_single_tle(vt_path, 'deltat.data')
     validate_single_tle(vt_path, 'deltat.preds')
     validate_single_tle(vt_path, 'Leap_Second.dat')
+
+
+def create_lock_file():
+    """create a lock file number"""
+    return random.randint(1000000000, 9999999999)
+
+def create_unlock_file(cuf_scp, cuf_working, cuf_lock_number):
+    """create an unlock file, scp it to the server and delete the unlock file"""
+    MY_UTIL_LOGGER.debug('creating unlock file for %d', cuf_lock_number)
+    cuf_filename = str(cuf_lock_number) + '.UNLOCK' 
+    run_cmd('touch ' + cuf_working + cuf_filename)
+
+    run_cmd('scp ' + cuf_working + cuf_filename + ' ' +
+            cuf_scp['remote user'] + '@' +
+            cuf_scp['remote host'] + ':' + cuf_scp['remote directory'] + '/' +
+            cuf_filename)
+
+    run_cmd('rm ' + cuf_working + cuf_filename)

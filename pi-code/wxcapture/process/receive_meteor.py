@@ -174,10 +174,7 @@ try:
     # timeout 600 rtl_fm -M raw -f 137.9M -s 768k -g 8 -p 0 |
     # sox -t raw -r 768k -c 2 -b 16 -e s - -t wav "meteor_a.wav" rate 192k
     if REPROCESS != 'Y':
-        if IMAGE_OPTIONS['gain'] == 'auto':
-            GAIN_COMMAND = ''
-        else:
-            GAIN_COMMAND = ' -g ' + IMAGE_OPTIONS['gain'] + ' '
+        GAIN_COMMAND, GAIN_DESCRIPTION = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
 
         BIAS_T = get_bias_t()
 

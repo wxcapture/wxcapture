@@ -9,7 +9,7 @@ import json
 import glob
 import random
 import wxcutils
-
+import wxcutils_pi
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -36,8 +36,8 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 try:
 
-    for f in glob.glob(CODE_PATH + '*.py'):
-        MY_LOGGER.debug(f)
+    SAT_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
+    wxcutils_pi.get_gain(SAT_OPTIONS, '37')
     
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',

@@ -99,16 +99,34 @@
 		"description": "Amateur Satellite configuration",
 		"required": "yes",
 		"field validation": {
-			"gain": {
+			"gain 20": {
 				"required": "yes",
 				"valid values": "-number-",
-				"description": "SDR gain setting, e.g. 37.2",
+				"description": "SDR gain setting for up to 20 degree pass maximum elevation, e.g. 37.2",
 				"hidden": "no"
 			},
-		"last gain": {
-				"required": "no",
+			"gain 30": {
+				"required": "yes",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
+				"description": "SDR gain setting for above 20 and less than or equal to 30 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 60": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 30 and less than or equal to 60 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 90": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 60 and less than or equal to 90 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"auto gain": {
+				"required": "no",
+				"valid values": "yes|no",
+				"description": "Use the SDR auto gain, e.g. no. If no, then the gain xx value is used.",
 				"hidden": "no"
 			}
 		}
@@ -117,16 +135,34 @@
 		"description": "ISS configuration",
 		"required": "yes",
 		"field validation": {
-			"gain": {
+			"gain 20": {
 				"required": "yes",
 				"valid values": "-number-",
-				"description": "SDR gain setting, e.g. 37.2",
+				"description": "SDR gain setting for up to 20 degree pass maximum elevation, e.g. 37.2",
 				"hidden": "no"
 			},
-		"last gain": {
-				"required": "no",
+			"gain 30": {
+				"required": "yes",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
+				"description": "SDR gain setting for above 20 and less than or equal to 30 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 60": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 30 and less than or equal to 60 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 90": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 60 and less than or equal to 90 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"auto gain": {
+				"required": "no",
+				"valid values": "yes|no",
+				"description": "Use the SDR auto gain, e.g. no. If no, then the gain xx value is used.",
 				"hidden": "no"
 			}
 		}
@@ -135,16 +171,34 @@
 		"description": "Meteor configuration",
 		"required": "yes",
 		"field validation": {
-			"gain": {
+			"gain 20": {
 				"required": "yes",
 				"valid values": "-number-",
-				"description": "SDR gain setting, e.g. 37.2",
+				"description": "SDR gain setting for up to 20 degree pass maximum elevation, e.g. 37.2",
 				"hidden": "no"
 			},
-			"last gain": {
-				"required": "no",
+			"gain 30": {
+				"required": "yes",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
+				"description": "SDR gain setting for above 20 and less than or equal to 30 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 60": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 30 and less than or equal to 60 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 90": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 60 and less than or equal to 90 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"auto gain": {
+				"required": "no",
+				"valid values": "yes|no",
+				"description": "Use the SDR auto gain, e.g. no. If no, then the gain xx value is used.",
 				"hidden": "no"
 			},
 			"thumbnail size": {
@@ -213,16 +267,34 @@
 				"description": "JPEG quality setting for the main image, should be between 1 and 100, e.g. 92",
 				"hidden": "no"
 			},
-			"gain": {
+			"gain 20": {
 				"required": "yes",
 				"valid values": "-number-",
-				"description": "SDR gain setting, e.g. 37.2",
+				"description": "SDR gain setting for up to 20 degree pass maximum elevation, e.g. 37.2",
 				"hidden": "no"
 			},
-			"last gain": {
-				"required": "no",
+			"gain 30": {
+				"required": "yes",
 				"valid values": "-number-",
-				"description": "Previous SDR gain setting for reference only, e.g. 28.8",
+				"description": "SDR gain setting for above 20 and less than or equal to 30 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 60": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 30 and less than or equal to 60 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"gain 90": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "SDR gain setting for above 60 and less than or equal to 90 degree pass maximum elevation, e.g. 37.2",
+				"hidden": "no"
+			},
+			"auto gain": {
+				"required": "no",
+				"valid values": "yes|no",
+				"description": "Use the SDR auto gain, e.g. no. If no, then the gain xx value is used.",
 				"hidden": "no"
 			},
 			"sample rate": {

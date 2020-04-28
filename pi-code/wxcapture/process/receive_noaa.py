@@ -13,20 +13,6 @@ import wxcutils
 import wxcutils_pi
 
 
-def get_gain():
-    """determine the gain setting, either auto or defined"""
-    command = ''
-    description = ''
-    if IMAGE_OPTIONS['gain'] == 'auto':
-        description = 'Automatic gain control'
-    else:
-        command = ' -g ' + IMAGE_OPTIONS['gain']
-        description = 'Gain set to ' + IMAGE_OPTIONS['gain']
-    MY_LOGGER.debug('gain command = %s', command)
-    MY_LOGGER.debug('description = %s', description)
-    return command, description
-
-
 
 def get_bias_t():
     """determine if we turn on the bias t"""
@@ -184,7 +170,7 @@ try:
     txt.close()
 
     # capture pass to wav file
-    GAIN_COMMAND, GAIN_DESCRIPTION = get_gain()
+    GAIN_COMMAND, GAIN_DESCRIPTION = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
     MY_LOGGER.debug('Frequency = %s', str(PASS_INFO['frequency']))
     MY_LOGGER.debug('Gain command = %s', str(GAIN_COMMAND))
     MY_LOGGER.debug('Sample rate = %s', IMAGE_OPTIONS['sample rate'])

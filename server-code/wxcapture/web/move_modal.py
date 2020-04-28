@@ -419,7 +419,7 @@ for unlock_file in glob.glob(MY_PATH + '*.UNLOCK'):
         process_file(txt_file, MY_PATH, TARGET, '', lock_suffix)
 
     # get a list of the pass html files for fixing
-    PASS_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f))]
+    PASS_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f)) and '.UNLOCK' not in f]
     MY_LOGGER.debug('________________%s', PASS_FILES)
 
     # find .html files in the output folder and move them
@@ -427,6 +427,9 @@ for unlock_file in glob.glob(MY_PATH + '*.UNLOCK'):
     for htm_file in glob.glob(MY_PATH + '*.html' + lock_suffix):
         MY_LOGGER.debug('.html file = %s', htm_file)
         process_file(htm_file, MY_PATH, TARGET, '', lock_suffix)
+
+    # copying done for this lock, so remove unlock file
+    wxcutils.run_cmd('rm ' + unlock_file)
 
     # apply the modal windows fix for all new pass html files
     for file_name in PASS_FILES:
@@ -437,8 +440,7 @@ for unlock_file in glob.glob(MY_PATH + '*.UNLOCK'):
         if '.html' in file_name:
             fix_pass_pages_lib.fix_file(location, file_name)
 
-    # copying done for this lock, so remove unlock file
-    wxcutils.run_cmd('rm ' + unlock_file)
+
 
 MY_LOGGER.debug('Finished file moving')
 MY_LOGGER.debug('Starting capture page building')

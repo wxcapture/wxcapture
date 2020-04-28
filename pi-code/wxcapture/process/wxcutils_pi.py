@@ -239,5 +239,31 @@ def sleep_until_start(sus_time):
     MY_UTIL_LOGGER.debug('Ready to go on time...')
 
 
+def get_gain(gg_config, gg_max_elevation):
+    """determine the gain setting, either auto or defined"""
+    MY_UTIL_LOGGER.debug('get_gain %s', gg_max_elevation)
+    command = ''
+    description = ''
+    if gg_config['auto gain'] == 'yes':
+        description = 'Automatic gain control'
+    else:
+        if int(gg_max_elevation) <= 20:
+            command = ' -g ' + gg_config['gain 20']
+            description = 'Gain set to ' + gg_config['gain20']
+        elif int(gg_max_elevation) <= 30:
+            command = ' -g ' + gg_config['gain 30']
+            description = 'Gain set to ' + gg_config['gain30']
+        elif int(gg_max_elevation) <= 60:
+            command = ' -g ' + gg_config['gain 60']
+            description = 'Gain set to ' + gg_config['gain60']
+        elif int(gg_max_elevation) <= 90:
+            command = ' -g ' + gg_config['gain 90']
+            description = 'Gain set to ' + gg_config['gain90']
+
+    MY_UTIL_LOGGER.debug('gain command = %s', command)
+    MY_UTIL_LOGGER.debug('description = %s', description)
+    return command, description
+
+
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 MY_UTIL_LOGGER = get_logger('wxcutils_pi', '/home/pi/wxcapture/process/logs/', 'wxcutils_pi.log')

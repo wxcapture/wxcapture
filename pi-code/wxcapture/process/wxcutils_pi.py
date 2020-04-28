@@ -249,16 +249,16 @@ def get_gain(gg_config, gg_max_elevation):
     else:
         if int(gg_max_elevation) <= 20:
             command = ' -g ' + gg_config['gain 20']
-            description = 'Gain set to ' + gg_config['gain20']
+            description = 'Gain set to ' + gg_config['gain 20']
         elif int(gg_max_elevation) <= 30:
             command = ' -g ' + gg_config['gain 30']
-            description = 'Gain set to ' + gg_config['gain30']
+            description = 'Gain set to ' + gg_config['gain 30']
         elif int(gg_max_elevation) <= 60:
             command = ' -g ' + gg_config['gain 60']
-            description = 'Gain set to ' + gg_config['gain60']
+            description = 'Gain set to ' + gg_config['gain 60']
         elif int(gg_max_elevation) <= 90:
             command = ' -g ' + gg_config['gain 90']
-            description = 'Gain set to ' + gg_config['gain90']
+            description = 'Gain set to ' + gg_config['gain 90']
 
     MY_UTIL_LOGGER.debug('gain command = %s', command)
     MY_UTIL_LOGGER.debug('description = %s', description)

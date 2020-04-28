@@ -423,13 +423,13 @@
 				"description": "Frequency that the satellite broadcasts on and that the SDR will be tuned to, e.g. 137.1000",
 				"hidden": "no"
 			},
-			"symbol rate": {
+			"meteor symbol rate": {
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "Symbol rate for Meteor satellites, e.g. 72000, otherwise set to 0",
 				"hidden": "no"
 			},
-			"mode": {
+			"meteor mode": {
 				"required": "yes",
 				"valid values": "n/a|qpsk|oqpsk",
 				"description": "Decoder mode for Meteor satellites, e.g. qpsk, otherwise set to n/a",

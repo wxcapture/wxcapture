@@ -244,25 +244,32 @@ def get_gain(gg_config, gg_max_elevation):
     MY_UTIL_LOGGER.debug('get_gain %s', gg_max_elevation)
     command = ''
     description = ''
+    gain_value = ''
     if gg_config['auto gain'] == 'yes':
         description = 'Automatic gain control'
+        gain_value = 'auto'
     else:
         if int(gg_max_elevation) <= 20:
-            command = ' -g ' + gg_config['gain 20']
-            description = 'Gain set to ' + gg_config['gain 20']
+            gain_value = gg_config['gain 20']
+            command = ' -g ' + gain_value
+            description = 'Gain set to ' + gain_value
         elif int(gg_max_elevation) <= 30:
-            command = ' -g ' + gg_config['gain 30']
-            description = 'Gain set to ' + gg_config['gain 30']
+            gain_value = gg_config['gain 30']
+            command = ' -g ' + gain_value
+            description = 'Gain set to ' + gain_value
         elif int(gg_max_elevation) <= 60:
-            command = ' -g ' + gg_config['gain 60']
-            description = 'Gain set to ' + gg_config['gain 60']
+            gain_value = gg_config['gain 60']
+            command = ' -g ' + gain_value
+            description = 'Gain set to ' + gain_value
         elif int(gg_max_elevation) <= 90:
-            command = ' -g ' + gg_config['gain 90']
-            description = 'Gain set to ' + gg_config['gain 90']
+            gain_value = gg_config['gain 90']
+            command = ' -g ' + gain_value
+            description = 'Gain set to ' + gain_value
 
+    MY_UTIL_LOGGER.debug('gain value = %s', gain_value)
     MY_UTIL_LOGGER.debug('gain command = %s', command)
     MY_UTIL_LOGGER.debug('description = %s', description)
-    return command, description
+    return command, description, gain_value
 
 
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

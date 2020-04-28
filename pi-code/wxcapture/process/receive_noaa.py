@@ -170,7 +170,7 @@ try:
     txt.close()
 
     # capture pass to wav file
-    GAIN_COMMAND, GAIN_DESCRIPTION = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
+    GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
     MY_LOGGER.debug('Frequency = %s', str(PASS_INFO['frequency']))
     MY_LOGGER.debug('Gain command = %s', str(GAIN_COMMAND))
     MY_LOGGER.debug('Sample rate = %s', IMAGE_OPTIONS['sample rate'])
@@ -249,7 +249,7 @@ try:
         html.write('<li>Orbit - ' + PASS_INFO['orbit'] + '</li>')
         html.write('<li>SDR type - ' + PASS_INFO['sdr type'] + ' (' +
                    PASS_INFO['chipset'] + ')</li>')
-        html.write('<li>SDR gain - ' + IMAGE_OPTIONS['gain'] + 'dB</li>')
+        html.write('<li>SDR gain - ' + GAIN_VALUE + 'dB</li>')
         html.write('<li>Antenna - ' + PASS_INFO['antenna'] + ' (' +
                    PASS_INFO['centre frequency'] + ')</li>')
         html.write('<li>Frequency range - ' + PASS_INFO['frequency range'] + '</li>')
@@ -383,7 +383,7 @@ try:
                 for row in lines:
                     if 'Gain' in row:
                         gain = row
-                        if IMAGE_OPTIONS['gain'] == 'auto':
+                        if GAIN_VALUE == 'auto':
                             gain = gain + \
                                 'dB image processing / automatic gain SDR'
                         else:

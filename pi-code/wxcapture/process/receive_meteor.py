@@ -174,7 +174,7 @@ try:
     # timeout 600 rtl_fm -M raw -f 137.9M -s 768k -g 8 -p 0 |
     # sox -t raw -r 768k -c 2 -b 16 -e s - -t wav "meteor_a.wav" rate 192k
     if REPROCESS != 'Y':
-        GAIN_COMMAND, GAIN_DESCRIPTION = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
+        GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
 
         BIAS_T = get_bias_t()
 
@@ -414,7 +414,7 @@ try:
             html.write('<li>Orbit - ' + PASS_INFO['orbit'] + '</li>')
             html.write('<li>SDR type - ' + PASS_INFO['sdr type'] + ' (' +
                        PASS_INFO['chipset'] + ')</li>')
-            html.write('<li>SDR gain - ' + IMAGE_OPTIONS['gain'] + 'dB</li>')
+            html.write('<li>SDR gain - ' + GAIN_VALUE + 'dB</li>')
             html.write('<li>Antenna - ' + PASS_INFO['antenna'] + ' (' +
                        PASS_INFO['centre frequency'] + ')</li>')
             html.write('<li>Frequency range - ' + PASS_INFO['frequency range'] + '</li>')

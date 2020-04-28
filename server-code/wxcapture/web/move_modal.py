@@ -172,6 +172,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                     data += '<li>' + pass_date.strftime('%a') + ' ' + \
                         ordinal(int(day)) + '</li><ul>'
                 satellite = '???'
+                # need to update this to drive off satellites.json
                 if 'NOAA' in filename:
                     satellite = filename[61:68].replace('_', ' ')
                 elif 'METEOR-M_2' in filename:
@@ -186,6 +187,8 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                     satellite = 'FOX-1B'
                 elif 'FOX-1D' in filename:
                     satellite = 'FOX-1D'
+                elif 'PSAT2' in filename:
+                    satellite = 'PSAT2'
 
                 utc_time = filename[52:60].replace('-', ':')
                 utc_date = filename[30:40]

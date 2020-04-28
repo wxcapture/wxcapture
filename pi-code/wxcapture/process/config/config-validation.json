@@ -33,7 +33,7 @@
 				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
 				"hidden": "no"
 			},
-			"Min Elevation-ISS": {
+			"Min Elevation-SSTV": {
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
@@ -149,8 +149,8 @@
 			}
 		}
 	},
-	"config-ISS.json": {
-		"description": "ISS configuration",
+	"config-SSTV.json": {
+		"description": "SSTV configuration",
 		"required": "yes",
 		"field validation": {
 			"gain 20": {
@@ -437,7 +437,7 @@
 			},
 			"type": {
 				"required": "yes",
-				"valid values": "NOAA|METEOR|ISS|AMSAT",
+				"valid values": "NOAA|METEOR|SSTV|AMSAT",
 				"description": "Type of satellite, e.g. METEOR",
 				"hidden": "no"
 			},

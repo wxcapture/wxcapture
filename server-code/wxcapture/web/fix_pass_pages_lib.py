@@ -137,7 +137,7 @@ def fix_file(ff_path, ff_filename):
     ff_page = update_page(ff_page, '<table border = 1>', '<table>')
 
     # fix audio link - amsat and ISS only
-    if 'ISS' in ff_filename or 'SAUDISAT' in ff_filename or 'FOX' in ff_filename:
+    if 'ISS' in ff_filename or 'SSTV' in ff_filename or 'SAUDISAT' in ff_filename or 'FOX' in ff_filename:
         audio_pos = ff_path.find('/wxcapture/')
         audio_path = ff_path[audio_pos:] + 'audio/'
         MY_LOGGER.debug('audio_path = %s', audio_path)

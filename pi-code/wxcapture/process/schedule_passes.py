@@ -304,8 +304,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                     MY_LOGGER.debug('Not scheduled as sensor turned off')
                     MY_LOGGER.debug('Darkness pass - %s', str(start_epoch))
                     capture_reason = 'Darkness and using visible light sensor'
-            elif sat['type'] == 'ISS':
-                scheduler = 'echo \"' + CODE_PATH + 'receive_iss.py ' + \
+            elif sat['type'] == 'SSTV':
+                scheduler = 'echo \"' + CODE_PATH + 'receive_sstv.py ' + \
                 sat['name'].replace('(', '').replace(')', '') + ' ' + \
                 str(start_epoch) + ' ' + \
                 str(duration) + ' ' + str(max_elevation) + \

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run pactl and QSSTV
 Needs to be run from VNC and left running
-Otherwise receive_iss.py will not be able
+Otherwise receive_sstv.py will not be able
 to decode sstv images"""
 
 import os

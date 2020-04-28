@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""capture and process ISS satellite pass
+"""capture and process SSTV satellite pass
 create images plus pass web page"""
 
-# capture and process ISS satellite pass
+# capture and process SSTV satellite pass
 # create audio plus pass web page
 
 # import libraries
@@ -107,7 +107,7 @@ CONFIG_PATH = CODE_PATH + 'config/'
 AUDIO_PATH = APP_PATH + 'audio/'
 
 # start logging
-MODULE = 'receive_iss'
+MODULE = 'receive_sstv'
 MY_LOGGER = wxcutils.get_logger(MODULE, LOG_PATH, MODULE + '.log')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
 MY_LOGGER.debug('Execution start')
@@ -150,7 +150,7 @@ try:
     SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')
 
     # load image options
-    IMAGE_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-ISS.json')
+    IMAGE_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-SSTV.json')
 
     # get local time zone
     LOCAL_TIME_ZONE = subprocess.check_output("date"). \
@@ -174,7 +174,7 @@ try:
 
     # write out process information
     with open(OUTPUT_PATH + FILENAME_BASE + '.txt', 'w') as txt:
-        txt.write('./receive-ISS.py ' + sys.argv[1] + ' ' + sys.argv[2] +
+        txt.write('./receive_sstv.py ' + sys.argv[1] + ' ' + sys.argv[2] +
                   ' ' + sys.argv[3] + ' ' + sys.argv[4] + ' ' + sys.argv[5] +
                   ' ' + sys.argv[6])
     txt.close()
@@ -215,7 +215,7 @@ try:
 
     # start the playback
     MY_LOGGER.debug('start pactl to play back the recording to QSSTV')
-    # paplay -d virtual-cable /home/pi/sstv/audio/2019-08-02-14-16-25-ISS_ZARYA.wav
+    # e.g. paplay -d virtual-cable /home/pi/sstv/audio/2019-08-02-14-16-25-ISS_ZARYA.wav
     CMD = Popen(['/usr/bin/paplay', '-d', 'virtual-cable',
                  AUDIO_PATH + FILENAME_BASE + '.wav'], stdout=PIPE, stderr=PIPE)
     STDOUT, STDERR = CMD.communicate()
@@ -280,7 +280,7 @@ try:
             html.write('</table>')
 
         html.write('<a href=\"audio/' + FILENAME_BASE +
-                   '.wav' + '\"><h2>ISS Audio</h2></a>')
+                   '.wav' + '\"><h2>SSTV Audio</h2></a>')
 
         html.write('<p>Click on the link to play or download the audio .wav file.</p>')
 

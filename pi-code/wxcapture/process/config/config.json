@@ -4,7 +4,7 @@
 	"GPS location EW": "174.8938 E",
 	"Min Elevation-NOAA": "15",
 	"Min Elevation-METEOR": "15",
-	"Min Elevation-ISS": "15",
+	"Min Elevation-SSTV": "15",
 	"Min Elevation-AMSAT": "15",
 	"Pass Highlight Elevation": "45",
 	"Pass List Days": "3",

@@ -97,7 +97,7 @@
 				"required": "yes",
 				"valid values": "-pattern-",
 				"description": "Drive location to monitor for space used, e.g. /dev/root.",
-				"hidden": "no"
+				"hidden": "yes"
 			},
 			"drive space error": {
 				"required": "yes",

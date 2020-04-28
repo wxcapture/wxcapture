@@ -8,6 +8,7 @@ import sys
 import time
 import json
 import subprocess
+from subprocess import Popen, PIPE
 from urllib.request import urlopen
 import wxcutils
 
@@ -212,6 +213,40 @@ def config_validation():
 
     return cv_errors_found, cv_results
 
+
+def drive_validation(dv_config):
+    """validate drive space utilisation"""
+    dv_errors_found = False
+    dv_space = 'unknown'
+
+    dv_cmd = Popen(['df'], stdout=PIPE, stderr=PIPE)
+    dv_stdout, dv_stderr = dv_cmd.communicate()
+    MY_LOGGER.debug('stdout:%s', dv_stdout)
+    MY_LOGGER.debug('stderr:%s', dv_stderr)
+    dv_results = dv_stdout.decode('utf-8').splitlines()
+    for dv_line in dv_results:
+        if dv_config['drive space location'] in dv_line:
+            dv_space = dv_line.split()[4].split('%')[0]
+    MY_LOGGER.debug('dv_space  = %s', dv_space)
+
+    dv_results = '<h3>Pi Drive Space Free = '
+    if dv_space == 'unknown':
+        dv_errors_found = True
+        dv_results += 'not determined</h3>'
+    else:
+        dv_results += dv_space + '%</h3>'
+        if int(dv_space) > int(dv_config['drive space error']):
+            dv_results += '<h1>Drive space is critically low - urgently reduce space used</h1>'
+            dv_errors_found = True
+        elif int(dv_space) > int(dv_config['drive space warning']):
+            dv_results += '<h1>Drive space is getting low - review space used</h1>'
+            dv_errors_found = True
+
+    MY_LOGGER.debug('dv_results = %s', dv_results)
+
+    return dv_errors_found, dv_results
+
+
 def get_page(page_url):
     """get the satellite status"""
     MY_LOGGER.debug('Getting page content')
@@ -336,6 +371,9 @@ MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 try:
+    # load config
+    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
     # grap the status web pages
     METEOR_STATUS_PAGE = get_page('http://happysat.nl/Meteor/html/Meteor_Status.html')
     NOAA_STATUS_PAGE = get_page('https://www.ospo.noaa.gov/Operations/POES/status.html')
@@ -344,6 +382,9 @@ try:
     # config validation
     CONFIG_ERRORS, CONFIG_HTML = config_validation()
 
+    # drive space validation
+    DRIVE_ERRORS, DRIVE_HTML = drive_validation(CONFIG_INFO)
+    
     # output as html
     MY_LOGGER.debug('Build webpage')
     with open(OUTPUT_PATH + 'satellitestatus.html', 'w') as html:
@@ -412,11 +453,13 @@ try:
         html.write('<section class=\"content-section container\">')
         html.write('<h2 class=\"section-header\">WxCapture Configuration Validation</h2>')
         html.write('<button onclick=\"hideshow()\" id=\"showhide\" class=\"showhidebutton\">Show configuration</button>')
+        if DRIVE_ERRORS:
+            html.write('<h1>Storage Space Issue Detected!</h1>')
         if CONFIG_ERRORS:
             html.write('<h1>Configuration Error(s) Detected - Validate Config!</h1>')
         html.write('<div id=\"configurationDiv\">')
+        html.write(DRIVE_HTML)
         html.write('<p>Please review any rows highlighted and update the associated configuration file.</p>')
-
         html.write(CONFIG_HTML)
         html.write('</div>')
         html.write('</section>')

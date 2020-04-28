@@ -14,5 +14,8 @@
 	"save .wav files": "no",
 	"email receive output": "no",
 	"plot thumbnail size": "58x64",
-	"logging level": "debug"
+	"logging level": "debug",
+	"drive space location": "/dev/root",
+	"drive space error": "90",
+	"drive space warning": "70"
 }

@@ -92,6 +92,24 @@
 				"valid values": "critical|error|warning|info|debug|notset",
 				"description": "Python logging level, e.g. debug.",
 				"hidden": "no"
+			},
+			"drive space location": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Drive location to monitor for space used, e.g. /dev/root.",
+				"hidden": "no"
+			},
+			"drive space error": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Monitored drive space location percent remaining error threshold, e.g. 90.",
+				"hidden": "no"
+			},
+			"drive space warning": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Monitored drive space location percent remaining warning threshold, e.g. 70.",
+				"hidden": "no"
 			}
 		}
 	},

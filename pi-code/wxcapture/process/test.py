@@ -8,6 +8,7 @@ import sys
 import json
 import glob
 import random
+from subprocess import Popen, PIPE
 import wxcutils
 import wxcutils_pi
 
@@ -35,9 +36,17 @@ MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 try:
+    CMD = Popen(['df']
+                , stdout=PIPE, stderr=PIPE)
+    STDOUT, STDERR = CMD.communicate()
+    MY_LOGGER.debug('stdout:%s', STDOUT)
+    MY_LOGGER.debug('stderr:%s', STDERR)
+    results = STDOUT.decode('utf-8').splitlines()
+    for line in results:
+        if '/dev/root' in line:
+            space = line.split()[4].split('%')[0]
+            MY_LOGGER.debug('space  = %s', space)
 
-    SAT_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
-    wxcutils_pi.get_gain(SAT_OPTIONS, '37')
     
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',

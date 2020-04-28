@@ -1,9 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Raleway:wght@100&&family=Roboto');
-
 * {
     box-sizing: border-box;
     color: black;
-    /* font-family: 'Raleway', normal; */
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
@@ -38,7 +35,7 @@ a {
 
 .main-nav {
     border-bottom: 1px solid rgba(255, 255, 255, .3);
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: bold;
     text-align: center;
 }
@@ -47,15 +44,11 @@ a {
     padding: 0 1%;
 }
 
-/* body, html {
-    height: 100%;
-} */
 
 .main-header {
     background-blend-mode: multiply;
     background-color: rgba(0, 0, 0, .3);
     background-size: cover;
-    padding-bottom: 30px;
 
     /* Parallax Scrolling */
     background-image: url("images/headerbackground.jpg");
@@ -64,13 +57,12 @@ a {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    padding-bottom: 30px;
+    padding-bottom: 5;
 }
 
 .page-name {
     color: white;
     font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    ;
     font-size: 10em;
     margin: 0;
     font-weight: bold;
@@ -79,26 +71,22 @@ a {
 }
 
 .page-name-large {
-    font-size: 4em;
+    font-size: 3em;
 }
 
 .row-highlight {
-    /* background-color: #00E000; */
     background-color: #8595AE;
 }
 
 .container {
     color: gray;
     margin: 0 auto;
-    /* max-width: 1400px; */
     padding: 0 1.5em;
 }
 
 .section-header {
     color: #000000;
     font-family: Georgia, 'Times New Roman', Times, serif;
-    /* color: black;
-    font-family: "Roberto"; */
     font-style: oblique;
     text-decoration: underline;
     font-size: 2.5em;
@@ -125,20 +113,14 @@ a {
 table {
     border-collapse: collapse;
     border: 3px solid black;
-
-    /* border-collapse does not work with rounded corners! :'( */
-    /* border-radius: 10px; */
 }
 
 th,
 td {
-    /* border-radius: 10px; */
-    /* border: 1px solid black; */
     padding: 10px;
 }
 
 .content-section td {
-    /* border: 1px solid black; */
     color: black;
     font-weight: bold;
     text-align: left;

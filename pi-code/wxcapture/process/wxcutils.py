@@ -20,7 +20,7 @@ MY_UTIL_LOGGER = None
 
 # setup paths to directories
 HOME = os.environ['HOME']
-if HOME == '/root':
+if HOME == '/root' or HOME == '/home/mike':
     HOME = '/home/mike/'
     APP_PATH = HOME + '/wxcapture/'
     CODE_PATH = APP_PATH + 'web/'

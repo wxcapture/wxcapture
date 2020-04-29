@@ -38,7 +38,7 @@ def build_pass_json():
     MY_LOGGER.debug('building pass json')
     json_data = []
     for filename in find_files(TARGET, '*.html'):
-        if not ('index.html' in filename or 'captures.html' in filename or 'resources.html' in filename or 'satellitestatus.html' in filename or 'satpass.html' in filename):
+        if not ('index.html' in filename or 'captures.html' in filename or 'resources.html' in filename or 'satellitestatus.html' in filename or 'satpass.html' in filename or 'meteor_index.html' in filename or 'meteor.html' in filename):
             # MY_LOGGER.debug('found pass page - filename = %s', filename)
             bpj_file_path, html_file = os.path.split(filename)
             base_filename, base_extension = os.path.splitext(html_file)
@@ -157,51 +157,54 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
             data += '<ul>'
             cp_html.write('<ul>')
             for filename in filename_list:
-                new_day = filename.replace(tmp_file_path + tmp_dir, '')[0:2]
-                if day != new_day:
-                    if day != '':
-                        cp_html.write('</ul>')
-                        data += '</ul>'
-                    day = new_day
-                    MY_LOGGER.debug('filename = %s', filename)
-                    pass_date = datetime. \
-                        strptime(filename.replace(tmp_file_path + tmp_dir,
-                                                  '')[3:13], '%Y-%m-%d')
-                    cp_html.write('<li>' + pass_date.strftime('%a') + ' ' +
-                                  ordinal(int(day)) + '</li><ul>')
-                    data += '<li>' + pass_date.strftime('%a') + ' ' + \
-                        ordinal(int(day)) + '</li><ul>'
-                satellite = '???'
-                # need to update this to drive off satellites.json
-                if 'NOAA' in filename:
-                    satellite = filename[61:68].replace('_', ' ')
-                elif 'METEOR-M_2' in filename:
-                    satellite = 'Meteor-M 2'
-                elif 'METEOR-M2_2' in filename:
-                    satellite = 'Meteor-M2 2'
-                elif 'ISS_ZARYA' in filename:
-                    satellite = 'ISS'
-                elif 'SAUDISAT_1C_SO-50' in filename:
-                    satellite = 'SAUDISAT-1C (SO-50)'
-                elif 'RADFXSAT' in filename:
-                    satellite = 'FOX-1B'
-                elif 'FOX-1D' in filename:
-                    satellite = 'FOX-1D'
-                elif 'PSAT2' in filename:
-                    satellite = 'PSAT2'
+                if 'meteor.html' in filename:
+                    MY_LOGGER.debug('Skipping meteor.html page')
+                else:
+                    new_day = filename.replace(tmp_file_path + tmp_dir, '')[0:2]
+                    if day != new_day:
+                        if day != '':
+                            cp_html.write('</ul>')
+                            data += '</ul>'
+                        day = new_day
+                        MY_LOGGER.debug('filename = %s', filename)
+                        pass_date = datetime. \
+                            strptime(filename.replace(tmp_file_path + tmp_dir,
+                                                    '')[3:13], '%Y-%m-%d')
+                        cp_html.write('<li>' + pass_date.strftime('%a') + ' ' +
+                                    ordinal(int(day)) + '</li><ul>')
+                        data += '<li>' + pass_date.strftime('%a') + ' ' + \
+                            ordinal(int(day)) + '</li><ul>'
+                    satellite = '???'
+                    # need to update this to drive off satellites.json
+                    if 'NOAA' in filename:
+                        satellite = filename[61:68].replace('_', ' ')
+                    elif 'METEOR-M_2' in filename:
+                        satellite = 'Meteor-M 2'
+                    elif 'METEOR-M2_2' in filename:
+                        satellite = 'Meteor-M2 2'
+                    elif 'ISS_ZARYA' in filename:
+                        satellite = 'ISS'
+                    elif 'SAUDISAT_1C_SO-50' in filename:
+                        satellite = 'SAUDISAT-1C (SO-50)'
+                    elif 'RADFXSAT' in filename:
+                        satellite = 'FOX-1B'
+                    elif 'FOX-1D' in filename:
+                        satellite = 'FOX-1D'
+                    elif 'PSAT2' in filename:
+                        satellite = 'PSAT2'
 
-                utc_time = filename[52:60].replace('-', ':')
-                utc_date = filename[30:40]
-                local_date_time = wxcutils.epoch_to_local(wxcutils.utc_to_epoch(utc_time + ' ' + \
-                                                 utc_date, '%H:%M:%S %Y/%m/%d'), \
-                                                 '%H:%M:%S %a %d')
-                cp_html.write('<li><a href="' + filename.replace(tmp_file_path, '')
-                              + '" rel=\"modal:open\">UTC ' + utc_time + ' (' + LOCAL_TIME_ZONE + ' ' +
-                              local_date_time +
-                              ') ' + satellite + '</a></li>')
-                data += '<li><a href="' + filename.replace(tmp_file_path, '') + \
-                    '">UTC ' + utc_time + ' (' + LOCAL_TIME_ZONE + ' ' + \
-                    local_date_time + ') ' + satellite + '</a></li>'
+                    utc_time = filename[52:60].replace('-', ':')
+                    utc_date = filename[30:40]
+                    local_date_time = wxcutils.epoch_to_local(wxcutils.utc_to_epoch(utc_time + ' ' + \
+                                                    utc_date, '%H:%M:%S %Y/%m/%d'), \
+                                                    '%H:%M:%S %a %d')
+                    cp_html.write('<li><a href="' + filename.replace(tmp_file_path, '')
+                                + '" rel=\"modal:open\">UTC ' + utc_time + ' (' + LOCAL_TIME_ZONE + ' ' +
+                                local_date_time +
+                                ') ' + satellite + '</a></li>')
+                    data += '<li><a href="' + filename.replace(tmp_file_path, '') + \
+                        '">UTC ' + utc_time + ' (' + LOCAL_TIME_ZONE + ' ' + \
+                        local_date_time + ') ' + satellite + '</a></li>'
             cp_html.write('</ul>')
             data += '</ul>'
         return data

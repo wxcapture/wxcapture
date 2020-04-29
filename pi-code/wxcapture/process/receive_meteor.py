@@ -175,12 +175,12 @@ try:
     WX_SDR = wxcutils_pi.get_sdr_device(PASS_INFO['serial number'])
     MY_LOGGER.debug('SDR device ID = %d', WX_SDR)
 
+    GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
+
     # capture pass to wav file
     # timeout 600 rtl_fm -M raw -f 137.9M -s 768k -g 8 -p 0 |
     # sox -t raw -r 768k -c 2 -b 16 -e s - -t wav "meteor_a.wav" rate 192k
     if REPROCESS != 'Y':
-        GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
-
         BIAS_T = get_bias_t()
 
         # Sleep until the required start time

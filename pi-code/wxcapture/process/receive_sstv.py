@@ -184,9 +184,10 @@ try:
     WX_SDR = wxcutils_pi.get_sdr_device(PASS_INFO['serial number'])
     MY_LOGGER.debug('SDR device ID = %d', WX_SDR)
 
+    GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
+
     # capture pass to wav file
     if REPROCESS != 'Y':
-        GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
         BIAS_T = get_bias_t()
 
         # Sleep until the required start time

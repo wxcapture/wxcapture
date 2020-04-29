@@ -110,6 +110,12 @@
 				"valid values": "-number-",
 				"description": "Monitored drive space location percent remaining warning threshold, e.g. 70.",
 				"hidden": "no"
+			},
+			"twilight allowance": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Allowance in minutes to account for difference between sunrise and civil sunrise, e.g. 45.",
+				"hidden": "no"
 			}
 		}
 	},
@@ -252,7 +258,7 @@
 		}
 	},
 	"config-NOAA.json": {
-		"description": "NOAA  =configuration",
+		"description": "NOAA configuration",
 		"required": "yes",
 		"field validation": {
 			"Branding": {

@@ -17,5 +17,6 @@
 	"logging level": "debug",
 	"drive space location": "/dev/root",
 	"drive space error": "90",
-	"drive space warning": "70"
+	"drive space warning": "70",
+	"twilight allowance": "45"
 }

@@ -58,7 +58,10 @@ def is_daylight(id_pass_start, id_pass_end):
     # start of pass is in daylight
     # OR
     # end of pass is in daylight
-    if (id_pass_start >= float(daylight_start) and id_pass_start <= float(daylight_end)) or (id_pass_end >= float(daylight_start) and id_pass_end <= float(daylight_end)):
+    id_twighlight = float(CONFIG_INFO['twilight allowance']) * 60
+    MY_LOGGER.debug('twighlight allowance in seconds = %f', id_twighlight)
+    if ((id_pass_start >= (float(daylight_start) - id_twighlight)) and (id_pass_start <= (float(daylight_end) + id_twighlight))) or \
+        ((id_pass_end >= (float(daylight_start) - id_twighlight)) and (id_pass_end <= (float(daylight_end) + id_twighlight))):
         return 'Y'
     return 'N'
 
@@ -348,8 +351,8 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                          'plot_title': plot_title,
                          'filename_base': filename_base,
                          'priority': sat['priority'],
-                         'symbol rate': symbol_rate,
-                         'mode': mode,
+                         'meteor symbol rate': symbol_rate,
+                         'meteor mode': mode,
                          'antenna': antenna,
                          'chipset': chipset,
                          'sdr': sat['sdr'],

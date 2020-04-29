@@ -72,7 +72,7 @@ def scp_files():
                      scp_config['remote user']
                      + '@' + scp_config['remote host'] + ':' +
                      scp_config['remote directory']+ '/' +
-                     FILENAME_BASE + 'dec.LOCK.' + str(lock_number))
+                     FILENAME_BASE + '.dec.LOCK.' + str(lock_number))
     MY_LOGGER.debug('SCPing .jpg image file')
     for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.jpg'):
         img_path, img_filename = os.path.split(img_file)

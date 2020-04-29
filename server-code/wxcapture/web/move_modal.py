@@ -176,6 +176,7 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
                             ordinal(int(day)) + '</li><ul>'
                     satellite = '???'
                     # need to update this to drive off satellites.json
+                    MY_LOGGER.debug('filename replace %s', filename)
                     if 'NOAA' in filename:
                         satellite = filename[61:68].replace('_', ' ')
                     elif 'METEOR-M_2' in filename:

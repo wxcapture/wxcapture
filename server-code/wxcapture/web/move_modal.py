@@ -308,6 +308,12 @@ def process_file(pf_path_filename, pf_source_path, pf_target_path, pf_target_suf
     pf_move_to_path = pf_target_path + pf_directory_elements[0] + '/' + pf_directory_elements[1] + '/' + pf_directory_elements[2] + '/' + pf_target_suffix
     MY_LOGGER.debug('Moving %s %s to %s %s', pf_source_path, pf_filename + pf_lock_suffix, pf_move_to_path, pf_filename)
     wxcutils.move_file(pf_source_path, pf_filename + pf_lock_suffix, pf_move_to_path, pf_filename)
+    # remove any existing .html.backup file as this will prevent files being reprocessed
+    # as the existing .html.backup file will be used instead of the new .html file which
+    # will be overwritten
+    if '.html' in pf_filename:
+        MY_LOGGER.debug('Deleting old .html.backup file')
+        wxcutils.run_cmd('rm ' + pf_move_to_path + '/' + pf_filename + '.backup')
 
 
 # setup paths to directories

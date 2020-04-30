@@ -1,4 +1,5 @@
 {
 	"discord token": "xxxxxxxxx",
-	"server": "xxxxxxxxx"
+	"server": "xxxxxxxxx",
+    "webhook": "xxxxxxxxx"
 }

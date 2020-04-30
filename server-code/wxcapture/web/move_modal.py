@@ -39,7 +39,7 @@ def build_pass_json():
     MY_LOGGER.debug('building pass json')
     json_data = []
     for filename in find_files(TARGET, '*.html'):
-        if not ('index.html' in filename or 'captures.html' in filename or 'resources.html' in filename or 'satellitestatus.html' in filename or 'satpass.html' in filename or 'meteor_index.html' in filename or 'meteor.html' in filename):
+        if not ('index.html' in filename or 'config.html' in filename or 'captures.html' in filename or 'resources.html' in filename or 'satellitestatus.html' in filename or 'satpass.html' in filename or 'meteor_index.html' in filename or 'meteor.html' in filename):
             # MY_LOGGER.debug('found pass page - filename = %s', filename)
             bpj_file_path, html_file = os.path.split(filename)
             base_filename, base_extension = os.path.splitext(html_file)
@@ -160,6 +160,8 @@ def build_month_page(bpm_file_path, bpm_file_name, bpm_month, bpm_month_name, bp
             for filename in filename_list:
                 if 'meteor.html' in filename:
                     MY_LOGGER.debug('Skipping meteor.html page')
+                elif  'config.html' in filename:
+                    MY_LOGGER.debug('Skipping config.html page')
                 else:
                     new_day = filename.replace(tmp_file_path + tmp_dir, '')[0:2]
                     if day != new_day:
@@ -371,6 +373,12 @@ try:
         else:
             MY_LOGGER.debug('No satellitestatus.html to copy')
 
+        # move config.html
+        if os.path.isfile(MY_PATH + 'config.html' + lock_suffix):
+            wxcutils.move_file(MY_PATH, 'config.html' + lock_suffix, TARGET, 'config.html')
+        else:
+            MY_LOGGER.debug('No config.html to copy')
+
         # find images in the images folder and move them
         # will include plots, maps and sat images
         # .png and .jpg extensions
@@ -403,6 +411,12 @@ try:
         for txt_file in glob.glob(MY_PATH + '*.txt' + lock_suffix):
             MY_LOGGER.debug('.txt file = %s', txt_file)
             process_file(txt_file, MY_PATH, TARGET, '', lock_suffix)
+
+        # find .dec files in the output folder and move them
+        MY_LOGGER.debug('.txt search = %s', MY_PATH + '*.dec' + lock_suffix)
+        for dec_file in glob.glob(MY_PATH + '*.dec' + lock_suffix):
+            MY_LOGGER.debug('.dec file = %s', dec_file)
+            process_file(dec_file, MY_PATH, TARGET, '', lock_suffix)
 
         # get a list of the pass html files for fixing
         PASS_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f)) and '.UNLOCK' not in f]

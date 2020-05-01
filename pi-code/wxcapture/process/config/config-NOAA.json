@@ -13,6 +13,7 @@
 	"image minimum": "3000",
 	"tweet": "yes",
 	"tweet enhancement": "mcir-precip",
+	"tweet min elevation": "20",
 	"enhancements": {
 		"008": {
 			"description": "Contrast - channel A image",

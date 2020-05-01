@@ -260,6 +260,12 @@
 				"valid values": "yes|no",
 				"description": "Tweet to the configured Twitter account, e.g. yes",
 				"hidden": "no"
+			},
+			"tweet min elevation": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Minimum elevation to tweet an image, e.g. 20",
+				"hidden": "no"
 			}
 		}
 	},
@@ -349,6 +355,12 @@
 				"required": "yes",
 				"valid values": "-pattern-",
 				"description": "Image enhancement to use for the tweet, e.g. mcir-precip, which must be an active enhancement in config-NOAA.json",
+				"hidden": "no"
+			},
+			"tweet min elevation": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Minimum elevation to tweet an image, e.g. 20",
 				"hidden": "no"
 			}
 		}

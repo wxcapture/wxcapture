@@ -8,5 +8,6 @@
 	"thumbnail quality": "75",
 	"main image quality": "90",
 	"image minimum": "150000",
-	"tweet": "yes"
+	"tweet": "yes",
+	"tweet min elevation": "20"
 }

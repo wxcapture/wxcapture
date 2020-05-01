@@ -7,6 +7,7 @@ create images plus pass web page"""
 import os
 import sys
 import glob
+import time
 import subprocess
 from subprocess import Popen, PIPE
 import wxcutils
@@ -476,6 +477,22 @@ try:
             MY_LOGGER.critical('Tweet exception handler: %s %s %s',
                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
         MY_LOGGER.debug('Tweeted!')
+
+        # send to Discord webhooks, if configured
+        # can only do this if tweeting as using the tweet's public image URL
+        if IMAGE_OPTIONS['discord webhooks'] == 'yes':
+            # sleep to allow Twitter to process the tweet!
+            MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
+            time.sleep(30)
+            MY_LOGGER.debug('Sleep over, try the webhook API')
+            wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json',
+                                 wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
+                                 SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
+                                 MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                 PASS_INFO['NOAA Channel A'].replace('Channel A: ', ''),
+                                 PASS_INFO['NOAA Channel B'].replace('Channel B: ', ''))
+        else:
+            MY_LOGGER.debug('Discord webhooks not configured')
     else:
         MY_LOGGER.debug('Tweeting not configured')
 

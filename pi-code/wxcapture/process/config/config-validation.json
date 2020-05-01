@@ -266,6 +266,18 @@
 				"valid values": "-number-",
 				"description": "Minimum elevation to tweet an image, e.g. 20",
 				"hidden": "no"
+			},
+			"discord webhooks": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Send post to Discord webhooks (tweet must be yes for this to happen), e.g. yes",
+				"hidden": "no"
+			},
+			"discord colour": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Discord post colour bar which uses rrggbb for the colour as a hexidecimal value, e.g. ff0000",
+				"hidden": "no"
 			}
 		}
 	},
@@ -361,6 +373,18 @@
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "Minimum elevation to tweet an image, e.g. 20",
+				"hidden": "no"
+			},
+			"discord webhooks": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Send post to Discord webhooks (tweet must be yes for this to happen), e.g. yes",
+				"hidden": "no"
+			},
+			"discord colour": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Discord post colour bar which uses rrggbb for the colour as a hexidecimal value, e.g. ff0000",
 				"hidden": "no"
 			}
 		}

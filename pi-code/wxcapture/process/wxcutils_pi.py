@@ -9,6 +9,7 @@ import sys
 import time
 from rtlsdr import RtlSdr
 import tweepy
+from discord_webhook import DiscordWebhook, DiscordEmbed
 from PIL import Image, ImageOps
 import wxcutils
 
@@ -79,6 +80,87 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
     MY_UTIL_LOGGER.debug('Sending tweet with text = %s, image = %s', tt_text, tt_image_file)
     tt_status = tt_api.update_with_media(tt_image_file, tt_text)
     MY_UTIL_LOGGER.debug('Tweet sent with status = %s', tt_status)
+
+
+def tweet_get_image_url(tgiu_config_path, tgiu_config_file):
+    """get the url for the image in the last tweet"""
+    tgiu_config = wxcutils.load_json(tgiu_config_path, tgiu_config_file)
+
+    # authentication
+    MY_UTIL_LOGGER.debug('Authenticating to Twitter API')
+    tgiu_auth = tweepy.OAuthHandler(tgiu_config['consumer key'], tgiu_config['consumer secret'])
+    tgiu_auth.set_access_token(tgiu_config['access token'], tgiu_config['access token secret'])
+
+    # get api
+    tgiu_api = tweepy.API(tgiu_auth)
+
+    tgiu_twitter_handle = tgiu_config['tweet to'][1:]
+    MY_UTIL_LOGGER.debug('last tweet for %s', tgiu_twitter_handle)
+
+    tgiu_imagesfile = ''
+    for tgiu_tweet in tweepy.Cursor(tgiu_api.user_timeline, tweet_mode='extended').items() :
+            if 'media' in tgiu_tweet.entities:
+                for tgiu_image in tgiu_tweet.entities['media']:
+                    tgiu_imagesfile = str(tgiu_image['media_url'])
+            break
+
+    MY_UTIL_LOGGER.debug(tgiu_imagesfile)
+    return tgiu_imagesfile
+
+
+def webhooks(w_config_path, w_config_file, w_imagesfile, w_satellite,
+             w_location, w_colour, w_elevation, w_duration, w_pass_start,
+             w_channel_a, w_channel_b):
+    """send data to webhooks as configured"""
+    MY_UTIL_LOGGER.debug('webhooks called with %s %s %s %s %s %s %s %s %s %s %s',
+                         w_config_path, w_config_file, w_imagesfile, w_satellite,
+                         w_location, w_colour, w_elevation, w_duration, w_pass_start,
+                         w_channel_a, w_channel_b)
+    MY_UTIL_LOGGER.debug('types are: %s %s %s %s %s %s %s %s %s %s %s',
+                         type(w_config_path), type(w_config_file), type(w_imagesfile), type(w_satellite),
+                         type(w_location), type(w_colour), type(w_elevation), type(w_duration), type(w_pass_start),
+                         type(w_channel_a), type(w_channel_b))
+
+    # convert w_colour from hex string to an int
+    w_colour = int(w_colour, 16)
+    MY_UTIL_LOGGER.debug('type for w_colour = %s', type(w_colour))
+
+    w_config = wxcutils.load_json(w_config_path, w_config_file)
+
+    MY_UTIL_LOGGER.debug('Iterate through webhooks')
+    for w_row in w_config['webhooks']:
+        w_webhook = DiscordWebhook(url=w_row)
+
+        # create embed object for webhook
+        w_embed = DiscordEmbed(title=w_satellite, description=w_location, color=w_colour)
+
+        # set author
+        w_embed.set_author(name=w_config['author'], url=w_config['author url'], icon_url=w_config['author icon'])
+
+        # set image
+        w_embed.set_image(url=w_imagesfile)
+
+        # set footer
+        w_embed.set_footer(text=w_config['footer'])
+
+        # set timestamp (default is now)
+        w_embed.set_timestamp()
+
+        # add fields to embed
+        w_embed.add_embed_field(name='Satellite', value=':satellite_orbital:' + w_satellite)
+        w_embed.add_embed_field(name='Max Elevation', value=(w_elevation + '°'))
+        w_embed.add_embed_field(name='Duration', value=(w_duration + ' seconds'))
+        w_embed.add_embed_field(name='Pass start', value='04:33:35 April 30  2020 (NZST)')
+        if w_channel_a != '':
+            w_embed.add_embed_field(name='Channel A', value=w_channel_a)
+        if w_channel_b != '':
+           w_embed.add_embed_field(name='Channel B', value=w_channel_b)
+
+        # add embed object to webhook
+        w_webhook.add_embed(w_embed)
+
+        w_response = w_webhook.execute()
+        MY_UTIL_LOGGER.debug('response = %s', w_response)
 
 
 def fix_image(fi_source, fi_destination, fi_equalize):

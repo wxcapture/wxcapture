@@ -16,4 +16,5 @@ server-website/wxcapture/temp_json_test.json
 # pi code
 server-code/wxcapture/web/test.py
 server-code/wxcapture/web/metline.py
+server-code/wxcapture/web/twitter_test.py
 

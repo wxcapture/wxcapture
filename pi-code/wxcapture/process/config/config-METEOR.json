@@ -9,5 +9,7 @@
 	"main image quality": "90",
 	"image minimum": "150000",
 	"tweet": "yes",
-	"tweet min elevation": "20"
+	"tweet min elevation": "20",
+	"discord webhooks": "yes",
+	"discord colour": "ff0000"
 }

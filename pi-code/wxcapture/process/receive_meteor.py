@@ -14,6 +14,7 @@ create images plus pass web page"""
 import os
 import sys
 import glob
+import time
 import subprocess
 import wxcutils
 import wxcutils_pi
@@ -320,19 +321,19 @@ try:
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
                                  IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
 
-                # create a tidied up image for tweeting
+                # create a processed image
                 wxcutils_pi.fix_image(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp',
-                                      WORKING_PATH + FILENAME_BASE + '-tweet.bmp', 'Y')
+                                      WORKING_PATH + FILENAME_BASE + '-processed.bmp', 'Y')
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE +  '-tweet.bmp > ' + IMAGE_PATH +
-                                 FILENAME_BASE + '-tweet.jpg')
-                wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-tweet.jpg')
+                                 ' ' + WORKING_PATH + FILENAME_BASE +  '-processed.bmp > ' + IMAGE_PATH +
+                                 FILENAME_BASE + '-processed.jpg')
+                wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
                 wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                                 '-tweet-rectified.jpg\" | pnmscale -xysize ' +
+                                 '-processed-rectified.jpg\" | pnmscale -xysize ' +
                                  IMAGE_OPTIONS['thumbnail size'] +
                                  ' | cjpeg -opti -progr -qual ' +
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                                 IMAGE_PATH + FILENAME_BASE + '-tweet-rectified-tn.jpg\"')
+                                 IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg\"')
 
                 # move .dec file to output directory
                 MY_LOGGER.debug('move .dec file to output directory')
@@ -357,8 +358,8 @@ try:
         wxcutils.run_cmd('rm ' + AUDIO_PATH + FILENAME_BASE + '.wav')
 
     # ensure that we have at least one image created over the minimum size
-    # no need to check for tweet image since this is only created off the
-    # main image, so it must exist for the tweet image to be created
+    # no need to check for processed image since this is only created off the
+    # main image, so it must exist for the processed image to be created
     MY_LOGGER.debug('check file size of main image')
     CREATE_PAGE = False
     try:
@@ -432,21 +433,20 @@ try:
             html.write('<p>Click on the image to get the full size image.</p>')
 
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'):
-                MY_LOGGER.debug('Adding combined colour image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified.jpg'))
+                MY_LOGGER.debug('Adding image')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'))
                 html.write('<h3>Colour Image</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +
                            '-cc-rectified.jpg' + '\"><img src=\"images/' +
                            FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
 
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified.jpg'):
-                MY_LOGGER.debug('Adding tweet image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-tweet-rectified.jpg'))
-                html.write('<h3>Tweeted Image</h3>')
-                html.write('<p>Tweet uses thumbnail of the full size image</p>')
+            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg'):
+                MY_LOGGER.debug('Adding processed image')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg'))
+                html.write('<h3>Processed Image</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-tweet-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-tweet-rectified-tn.jpg' + '\"></a>')
+                           '-processed-rectified.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-processed-rectified-tn.jpg' + '\"></a>')
 
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'):
                 MY_LOGGER.debug('Adding channel 0 image')
@@ -484,13 +484,27 @@ try:
             TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \
                 ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
-            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-tweet-rectified-tn.jpg'
+            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg'
             try:
                 wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
             except:
                 MY_LOGGER.critical('Tweet exception handler: %s %s %s',
                                    sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
             MY_LOGGER.debug('Tweeted!')
+            # send to Discord webhooks, if configured
+            # can only do this if tweeting as using the tweet's public image URL
+            if IMAGE_OPTIONS['discord webhooks'] == 'yes':
+                # sleep to allow Twitter to process the tweet!
+                MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
+                time.sleep(30)
+                MY_LOGGER.debug('Sleep over, try the webhook API')
+                wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json',
+                                     wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
+                                     SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
+                                     MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                     '', '')
+            else:
+                MY_LOGGER.debug('Discord webhooks not configured')
         else:
             MY_LOGGER.debug('Tweeting not configured')
     else:

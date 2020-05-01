@@ -1,5 +1,9 @@
 {
 	"discord token": "xxxxxxxxx",
 	"server": "xxxxxxxxx",
-    "webhook": "xxxxxxxxx"
+    "webhooks": ["xxxxxxxxx", "xxxxxxxxx"],
+    "author": "xxxxxxxxx",
+    "author url": "xxxxxxxxx",
+    "author icon": "xxxxxxxxx",
+    "footer": "WxCapture"
 }

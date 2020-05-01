@@ -60,8 +60,8 @@ def is_daylight(id_pass_start, id_pass_end):
     # end of pass is in daylight
     id_twighlight = float(CONFIG_INFO['twilight allowance']) * 60
     MY_LOGGER.debug('twighlight allowance in seconds = %f', id_twighlight)
-    if ((id_pass_start >= (float(daylight_start) - id_twighlight)) and (id_pass_start <= (float(daylight_end) + id_twighlight))) or \
-        ((id_pass_end >= (float(daylight_start) - id_twighlight)) and (id_pass_end <= (float(daylight_end) + id_twighlight))):
+    if (float(daylight_start) - id_twighlight) <= id_pass_start <= (float(daylight_end) + id_twighlight) or \
+        (float(daylight_start) - id_twighlight) <= id_pass_end <= (float(daylight_end) + id_twighlight):
         return 'Y'
     return 'N'
 
@@ -707,7 +707,7 @@ try:
                    '<meta charset=\"UTF-8\">'
                    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                    '<meta name=\"description\" content=\"Predicted satellite pass times / dates for NOAA and Meteor weather satellite plus the International Space Station (ISS) and Amsat (Amateur Satellites)\">'
-                   '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
+                   '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                    '<meta name=\"author\" content=\"WxCapture\">'
                    '<title>Satellite Pass Predictions'
                    '</title>'

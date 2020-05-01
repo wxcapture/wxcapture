@@ -289,7 +289,7 @@ try:
                    '<meta charset=\"UTF-8\">'
                    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                    '<meta name=\"description\" content=\"Satellite transmission status for Meteor-M and NOAA weather satellites, International Space Station (ISS) SSTV and WxCapture Twitter Feed\">'
-                   '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
+                   '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                    '<meta name=\"author\" content=\"WxCapture\">'
                    '<title>configuration Status</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'

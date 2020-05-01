@@ -138,8 +138,8 @@ def move_output_files():
             process_file(dec_file, MY_PATH, TARGET, '', lock_suffix)
 
         # get a list of the pass html files for fixing
-        PASS_FILES = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f)) and '.UNLOCK' not in f]
-        MY_LOGGER.debug('________________%s', PASS_FILES)
+        pass_files = [f for f in listdir(MY_PATH) if isfile(join(MY_PATH, f)) and '.UNLOCK' not in f]
+        MY_LOGGER.debug('________________%s', pass_files)
 
         # find .html files in the output folder and move them
         MY_LOGGER.debug('.html search = %s', MY_PATH + '*.html' + lock_suffix)
@@ -151,7 +151,7 @@ def move_output_files():
         wxcutils.run_cmd('rm ' + unlock_file)
 
         # apply the modal windows fix for all new pass html files
-        for file_name in PASS_FILES:
+        for file_name in pass_files:
             MY_LOGGER.debug('Applying modal fixes to pass files just copied')
             MY_LOGGER.debug('file_name = %s', file_name.split('.LOCK.')[0])
             file_bits = file_name.split('.LOCK.')[0].split('-')
@@ -294,9 +294,9 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                         satellite = sat_test['name']
 
                 cp_html.write('<li><a href="' + filename_row['filename']
-                                + '" rel=\"modal:open\">'  + filename_row['time'].replace('-', ':') + ' - '
-                                + satellite + '</a></li>')
- 
+                              + '" rel=\"modal:open\">'  + filename_row['time'].replace('-', ':') + ' - '
+                              + satellite + '</a></li>')
+
             cp_html.write('</ul>')
 
     MY_LOGGER.debug('build_month_page for %s %s %s %s %s', bpm_file_path, bpm_file_name,
@@ -310,7 +310,7 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                       '<meta charset=\"UTF-8\">'
                       '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                       '<meta name=\"description\" content=\"xyzzy\">'
-                      '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
+                      '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                       '<meta name=\"author\" content=\"WxCapture\">'
                       '<title>Captures ' + cp_label + '</title>'
                       '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
@@ -405,68 +405,67 @@ def build_capture_pages():
     passes = sorted(ALL_PASSES, key=lambda k: k['local sort'])
 
     # find the start of time
-    MOVE_CONFIG = wxcutils.load_json(CONFIG_PATH, 'config-move.json')
-    MY_LOGGER.debug('Start of time is %s %s', MOVE_CONFIG['Start Month'], MOVE_CONFIG['Start Year'])
-    DATE_START = datetime.strptime('01 ' + MOVE_CONFIG['Start Month'] + ' ' + \
-        MOVE_CONFIG['Start Year'], '%d %m %Y')
-    DATE_NOW = datetime.now()
+    move_config = wxcutils.load_json(CONFIG_PATH, 'config-move.json')
+    MY_LOGGER.debug('Start of time is %s %s', move_config['Start Month'], move_config['Start Year'])
+    date_start = datetime.strptime('01 ' + move_config['Start Month'] + ' ' + \
+        move_config['Start Year'], '%d %m %Y')
+    date_now = datetime.now()
 
     # get the historic links data to include in all pages
-    HISTORIC_LINKS = get_links(DATE_START, DATE_NOW)
+    historic_links = get_links(date_start, date_now)
 
     # if between 1:00:00am and 1:01:59 - rebuild all previous content pages
     # not perfectly efficient, but means that all pages have the link list for all
     # months / years recorded after that month
-    HOURS = int(time.strftime('%H'))
-    MINUTES = int(time.strftime('%M'))
+    hours = int(time.strftime('%H'))
+    minutes = int(time.strftime('%M'))
 
-    # if (HOURS == 1) and (MINUTES in (0, 1)):
-    if 1 == 1:
+    if (hours == 1) and (minutes in (0, 1)):
         # rebuilding all pages overnight
         MY_LOGGER.debug('Building pages for all mmonths / years overnight')
-        for dt in rrule.rrule(rrule.MONTHLY, dtstart=DATE_START, until=DATE_NOW):
-            month = dt.strftime('%m')
-            month_name = dt.strftime('%B')
-            year = dt.strftime('%Y')
+        for d_t in rrule.rrule(rrule.MONTHLY, dtstart=date_start, until=date_now):
+            month = d_t.strftime('%m')
+            month_name = d_t.strftime('%B')
+            year = d_t.strftime('%Y')
             file_path = OUTPUT_PATH + '/wxcapture/' + year + '/' + month + '/'
             MY_LOGGER.debug('Building captures page = %s for %s %s', file_path, month_name, year)
-            build_month_page(passes, file_path, CAPTURES_PAGE, month, month_name, year, HISTORIC_LINKS)
+            build_month_page(passes, file_path, CAPTURES_PAGE, month, month_name, year, historic_links)
 
     # rebuild the page for this month
     # do this every time we run to get latest pass included
-    DAY = DATE_NOW.strftime('%d')
-    MONTH = DATE_NOW.strftime('%m')
-    MONTH_NAME = DATE_NOW.strftime('%B')
-    YEAR = DATE_NOW.strftime('%Y')
-    MY_LOGGER.debug('Local date = %s %s (%s) %s', DAY, MONTH, MONTH_NAME, YEAR)
-    FILE_PATH = OUTPUT_PATH + '/wxcapture/' + YEAR + '/' + MONTH + '/'
+    day = date_now.strftime('%d')
+    month = date_now.strftime('%m')
+    month_name = date_now.strftime('%B')
+    year = date_now.strftime('%Y')
+    MY_LOGGER.debug('Local date = %s %s (%s) %s', day, month, month_name, year)
+    file_path = OUTPUT_PATH + '/wxcapture/' + year + '/' + month + '/'
     MY_LOGGER.debug('Building captures page = %s for %s %s (current month)',
-                    FILE_PATH, MONTH_NAME, YEAR)
-    build_month_page(passes, FILE_PATH, CAPTURES_PAGE, MONTH, MONTH_NAME, YEAR, HISTORIC_LINKS)
+                    file_path, month_name, year)
+    build_month_page(passes, file_path, CAPTURES_PAGE, month, month_name, year, historic_links)
 
     # build current page which redirects to current month page
     # MY_LOGGER.debug('Page data = %s', PAGE_DATA)
-    CURRENT_LINK = '/wxcapture/' + YEAR + '/' + MONTH + '/' + CAPTURES_PAGE
+    current_link = '/wxcapture/' + year + '/' + month + '/' + CAPTURES_PAGE
     with open(TARGET + CAPTURES_PAGE, 'w') as html:
         # html header
-        LABEL = MONTH_NAME + ' ' + YEAR
+        label = month_name + ' ' + year
         html.write('<!DOCTYPE html>')
         html.write('<html lang=\"en\"><head>'
                    '<meta charset=\"UTF-8\">'
                    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                    '<meta name=\"description\" content=\"WxCapture redirection page to current captures plus historic monthly / yearly captures\">'
-                   '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
+                   '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                    '<meta name=\"author\" content=\"WxCapture\">'
                    '<title>Captures</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                    '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
-        html.write('<meta http-equiv = \"refresh\" content=\"0; url=\'' + CURRENT_LINK + '\'\" />')
+        html.write('<meta http-equiv = \"refresh\" content=\"0; url=\'' + current_link + '\'\" />')
         html.write('</head>')
         html.write('<body>')
         html.write('<section class=\"content-section container\">')
         html.write('<h2 class=\"section-header\">Redirect Page</h2>')
         html.write('<p>Your browser should be redirecting you to the page for the current month - ')
-        html.write('<a href=\"' + CURRENT_LINK + '\">' + LABEL + '</a>.</p>')
+        html.write('<a href=\"' + current_link + '\">' + label + '</a>.</p>')
         html.write('<p>Click the link if you have not been redirected.</p>')
         html.write('</section>')
 
@@ -497,6 +496,10 @@ CAPTURES_PAGE = 'captures.html'
 try:
     # get local time zone
     LOCAL_TIME_ZONE = subprocess.check_output("date").decode('utf-8').split(' ')[-2]
+
+    # load config
+    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
 
     # load satellites
     SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')

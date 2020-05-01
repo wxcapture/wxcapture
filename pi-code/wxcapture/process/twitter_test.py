@@ -6,6 +6,9 @@
 import os
 
 from datetime import datetime
+from datetime import datetime, date, time, timedelta
+import tweepy
+from tweepy import Cursor
 import wxcutils
 import wxcutils_pi
 
@@ -33,14 +36,46 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
+CONFIG = wxcutils.load_json(CONFIG_PATH, 'config-twitter.json')
+
+# authentication
+MY_LOGGER.debug('Authenticating to Twitter API')
+AUTH = tweepy.OAuthHandler(CONFIG['consumer key'], CONFIG['consumer secret'])
+AUTH.set_access_token(CONFIG['access token'], CONFIG['access token secret'])
+
+# get api
+auth_api = tweepy.API(AUTH)
+
+twitter_handle = 'RaspberryPiNZ'
+
+MY_LOGGER.debug("Getting data for %s", twitter_handle)
+item = auth_api.get_user(twitter_handle)
+MY_LOGGER.debug("name: %s", item.name)
+MY_LOGGER.debug("screen_name: %s", item.screen_name)
+MY_LOGGER.debug("description: %s", item.description)
+MY_LOGGER.debug("statuses_count: %s", str(item.statuses_count))
+MY_LOGGER.debug("friends_count: %s", str(item.friends_count))
+MY_LOGGER.debug("followers_count: %s", str(item.followers_count))
+
+MY_LOGGER.debug('looking at posts')
+hashtags = []
+mentions = []
+tweet_count = 0
+end_date = datetime.utcnow() - timedelta(days=1)
+for status in Cursor(auth_api.user_timeline, id=twitter_handle).items():
+    tweet_count += 1
+    MY_LOGGER.debug('counter = %d', tweet_count)
+    MY_LOGGER.debug(status)
+
+    break
 
 
-wxcutils_pi.tweet_text(CONFIG_PATH, 'config-twitter.json',
-                      'hello world (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+# wxcutils_pi.tweet_text(CONFIG_PATH, 'config-twitter.json',
+#                       'hello world (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
-wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json',
-                             'hello world with image (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                             IMAGE_PATH + '2020-04-18-20-11-28-NOAA_18-norm-tn.jpg')
+# wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json',
+#                              'hello world with image (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+#                              IMAGE_PATH + '2020-04-18-20-11-28-NOAA_18-norm-tn.jpg')
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

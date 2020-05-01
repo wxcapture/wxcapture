@@ -478,7 +478,7 @@ try:
         MY_LOGGER.debug('using scp')
         scp_files()
         # tweet?
-        if IMAGE_OPTIONS['tweet'] == 'yes' and int(MAX_ELEVATION) >= IMAGE_OPTIONS['tweet min elevation']:
+        if IMAGE_OPTIONS['tweet'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
             MY_LOGGER.debug('Tweeting pass')
             LOCATION_HASHTAGS = '#' + CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
             TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \

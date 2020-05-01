@@ -463,7 +463,7 @@ try:
         MY_LOGGER.debug('Deleting .wav audio file')
         wxcutils.run_cmd('rm ' + AUDIO_PATH + FILENAME_BASE + '.wav')
 
-    if IMAGE_OPTIONS['tweet'] == 'yes' and int(MAX_ELEVATION) >= IMAGE_OPTIONS['tweet min elevation']:
+    if IMAGE_OPTIONS['tweet'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
         MY_LOGGER.debug('Tweeting pass - enhancement type = %s', IMAGE_OPTIONS['tweet enhancement'])
         LOCATION_HASHTAGS = '#' + CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
         TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \

@@ -363,12 +363,6 @@
 				"description": "Tweet to the configured Twitter account, e.g. yes",
 				"hidden": "no"
 			},
-			"tweet enhancement": {
-				"required": "yes",
-				"valid values": "-pattern-",
-				"description": "Image enhancement to use for the tweet, e.g. mcir-precip, which must be an active enhancement in config-NOAA.json",
-				"hidden": "no"
-			},
 			"tweet min elevation": {
 				"required": "yes",
 				"valid values": "-number-",

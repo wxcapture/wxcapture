@@ -498,11 +498,11 @@ try:
                 MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
                 time.sleep(30)
                 MY_LOGGER.debug('Sleep over, try the webhook API')
-                wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json',
+                wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
                                      wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
                                      SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
                                      MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
-                                     '', '')
+                                     '', '', 'Visible light image')
             else:
                 MY_LOGGER.debug('Discord webhooks not configured')
         else:

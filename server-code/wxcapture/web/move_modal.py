@@ -74,7 +74,9 @@ def build_pass_json():
 def move_output_files():
     """move the files from the output directories to the correct locations"""
     # scan for any unlock files
+    files_moved = False
     for unlock_file in glob.glob(MY_PATH + '*.UNLOCK'):
+        files_moved = True
         unlock_path, unlock_filename = os.path.split(unlock_file)
         lock_number = unlock_filename.split('.')[0]
         lock_suffix = '.LOCK.' + lock_number
@@ -132,7 +134,7 @@ def move_output_files():
             process_file(txt_file, MY_PATH, TARGET, '', lock_suffix)
 
         # find .dec files in the output folder and move them
-        MY_LOGGER.debug('.txt search = %s', MY_PATH + '*.dec' + lock_suffix)
+        MY_LOGGER.debug('.dec search = %s', MY_PATH + '*.dec' + lock_suffix)
         for dec_file in glob.glob(MY_PATH + '*.dec' + lock_suffix):
             MY_LOGGER.debug('.dec file = %s', dec_file)
             process_file(dec_file, MY_PATH, TARGET, '', lock_suffix)
@@ -151,14 +153,18 @@ def move_output_files():
         wxcutils.run_cmd('rm ' + unlock_file)
 
         # apply the modal windows fix for all new pass html files
+        MY_LOGGER.debug('Modal move check')
+        MY_LOGGER.debug(pass_files)
         for file_name in pass_files:
-            MY_LOGGER.debug('Applying modal fixes to pass files just copied')
-            MY_LOGGER.debug('file_name = %s', file_name.split('.LOCK.')[0])
-            file_bits = file_name.split('.LOCK.')[0].split('-')
-            location = TARGET + file_bits[0] + '/' + file_bits[1] + '/' + file_bits[2] + '/'
-            if '.html' in file_name:
-                MY_LOGGER.debug('fix file %s %s', location, file_name.split('.LOCK.')[0])
-                fix_pass_pages_lib.fix_file(location, file_name.split('.LOCK.')[0])
+            if 'config.html' not in file_name and 'satpass.html' not in file_name and 'meteor_index.html' not in file_name and 'satellitestatus' not in file_name:
+                MY_LOGGER.debug('Applying modal fixes to pass files just copied')
+                MY_LOGGER.debug('file_name = %s', file_name.split('.LOCK.')[0])
+                file_bits = file_name.split('.LOCK.')[0].split('-')
+                location = TARGET + file_bits[0] + '/' + file_bits[1] + '/' + file_bits[2] + '/'
+                if '.html' in file_name:
+                    MY_LOGGER.debug('fix file %s %s', location, file_name.split('.LOCK.')[0])
+                    fix_pass_pages_lib.fix_file(location, file_name.split('.LOCK.')[0])
+    return files_moved
 
 
 def ordinal(num):
@@ -210,8 +216,9 @@ def process_file(pf_path_filename, pf_source_path, pf_target_path, pf_target_suf
     # as the existing .html.backup file will be used instead of the new .html file which
     # will be overwritten
     if '.html' in pf_filename:
-        MY_LOGGER.debug('Deleting old .html.backup file')
-        wxcutils.run_cmd('rm ' + pf_move_to_path + '/' + pf_filename + '.backup')
+        if os.path.isfile(pf_move_to_path + '/' + pf_filename + '.backup'):
+            MY_LOGGER.debug('Deleting old .html.backup file')
+            wxcutils.run_cmd('rm ' + pf_move_to_path + '/' + pf_filename + '.backup')
 
 
 def get_links(tmp_date_start, tmp_date_now):
@@ -510,17 +517,24 @@ try:
             SAT_DATA.append({'code': sat['name'].replace(' ', '_').replace('(', '').replace(')', ''), 'name': sat['name']})
 
     MY_LOGGER.debug('Starting file moving')
-    move_output_files()
+    FILES_MOVED = move_output_files()
     MY_LOGGER.debug('Finished file moving')
 
-    MY_LOGGER.debug('Build json passes file')
-    ALL_PASSES = []
-    build_pass_json()
-    MY_LOGGER.debug('Finished json passes file')
+    if FILES_MOVED:
+        MY_LOGGER.debug('Build json passes file')
+        ALL_PASSES = []
+        build_pass_json()
+        MY_LOGGER.debug('Finished json passes file')
 
-    MY_LOGGER.debug('Starting capture page building')
-    build_capture_pages()
-    MY_LOGGER.debug('Finished capture page building')
+        MY_LOGGER.debug('Starting capture page building')
+        build_capture_pages()
+        MY_LOGGER.debug('Finished capture page building')
+    elif int(time.strftime('%H')) == 1 and int(time.strftime('%M')) in (0, 1):
+        MY_LOGGER.debug('Starting capture page building - overnight run')
+        build_capture_pages()
+        MY_LOGGER.debug('Finished capture page building - overnight run')
+    else:
+        MY_LOGGER.debug('No further work required.')
 
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',

@@ -12,7 +12,30 @@
 	"sample rate": "37000",
 	"image minimum": "3000",
 	"tweet": "yes",
-	"tweet enhancement": "mcir-precip",
+	"tweet groups": [{
+		"group 1": [{
+				"type": "mcir-precip",
+				"text": "Latest weather satellite pass over [LOCATION] from [SATELLITE] on [PASS START], highlighting potential precipitation."
+			},
+			{
+				"type": "hvct-precip",
+				"text": "[SATELLITE] weather satellite pass over [LOCATION] captured on [PASS START], highlighting potential precipitation."
+			}
+		],
+		"group 2": [{
+				"type": "therm",
+				"text": "Air temperature map captured by the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START]."
+			},
+			{
+				"type": "sea",
+				"text": "Sea temperature map captured by the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START]. Note that cloud may block some areas from showing the sea temperature."
+			},
+			{
+				"type": "contrasta",
+				"text": "[CHANNEL A] from the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START]."
+			}
+		]
+	}],
 	"tweet min elevation": "20",
 	"discord webhooks": "yes",
 	"discord colour": "00ff00",

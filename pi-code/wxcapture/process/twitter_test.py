@@ -35,18 +35,18 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 
 
-wxcutils_pi.tweet_text(CONFIG_PATH, 'config-twitter.json',
-                      'hello world (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+# wxcutils_pi.tweet_text(CONFIG_PATH, 'config-twitter.json',
+#                       'hello world (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
-wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json',
-                             'hello world with image (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                             IMAGE_PATH + '2020-04-18-20-11-28-NOAA_18-norm-tn.jpg')
+# wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json',
+#                              'hello world with image (original I know) ' + datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+#                              IMAGE_PATH + '2020-04-18-20-11-28-NOAA_18-norm-tn.jpg')
 
-# wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json',
-#                      url,
-#                      'NOAA 19', 'Pass over Auckland, New Zealand', 'ff0000',
-#                      '63', '912', '04:33:35 April 30  2020 (NZST)',
-#                      '1 (visible)', '4 (thermal infred)')
+wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json',
+                     'http://pbs.twimg.com/media/EW9jYMeU0AAIobA.jpg',
+                     'NOAA 19', 'Manual Test - Pass over Auckland, New Zealand', 'ff0000',
+                     '63', '912', '04:33:35 April 30  2020 (NZST)',
+                     '1 (visible)', '4 (thermal infred)')
 
 
 MY_LOGGER.debug('Execution end')

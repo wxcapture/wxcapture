@@ -2,8 +2,5 @@
 	"discord token": "xxxxxxxxx",
 	"server": "xxxxxxxxx",
     "webhooks": ["xxxxxxxxx", "xxxxxxxxx"],
-    "author": "xxxxxxxxx",
-    "author url": "xxxxxxxxx",
-    "author icon": "xxxxxxxxx",
-    "footer": "WxCapture"
+    "footer": "WxCapture | Find full size images and past captures at [SITE]"
 }

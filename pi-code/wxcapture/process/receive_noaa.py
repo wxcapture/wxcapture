@@ -7,6 +7,7 @@ create images plus pass web page"""
 import os
 import sys
 import glob
+import random
 import time
 import subprocess
 from subprocess import Popen, PIPE
@@ -465,34 +466,57 @@ try:
         wxcutils.run_cmd('rm ' + AUDIO_PATH + FILENAME_BASE + '.wav')
 
     if IMAGE_OPTIONS['tweet'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
-        MY_LOGGER.debug('Tweeting pass - enhancement type = %s', IMAGE_OPTIONS['tweet enhancement'])
+
+        MY_LOGGER.debug('Tweeting pass(es)')
         LOCATION_HASHTAGS = '#' + CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
-        TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \
-            ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
+        for tweet_group in IMAGE_OPTIONS['tweet groups']:
+            for tweet_option in tweet_group:
+                random_pick = random.randint(1, len(tweet_group[tweet_option])) - 1
+                enhancement = tweet_group[tweet_option][random_pick]['type']
+                tweet_text = tweet_group[tweet_option][random_pick]['text']
+                pass_description = ''
+                for enhancement_group in IMAGE_OPTIONS['enhancements']:
+                    if IMAGE_OPTIONS['enhancements'][enhancement_group]['filename'] == enhancement:
+                        pass_description = IMAGE_OPTIONS['enhancements'][enhancement_group]['description']
+                MY_LOGGER.debug('enahancement = %s', enhancement)
+                MY_LOGGER.debug('initial tweet_text = %s', tweet_text)
+                MY_LOGGER.debug('pass_description = %s', pass_description)
 
-        TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + IMAGE_OPTIONS['tweet enhancement'] + '.jpg'
-        try:
-            wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
-        except:
-            MY_LOGGER.critical('Tweet exception handler: %s %s %s',
-                               sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-        MY_LOGGER.debug('Tweeted!')
+                # replace tags with variable values
+                tweet_text = tweet_text.replace('[LOCATION]', CONFIG_INFO['Location'])
+                tweet_text = tweet_text.replace('[PASS START]', PASS_INFO['start_date_local'])
+                tweet_text = tweet_text.replace('[SATELLITE]', SATELLITE)
+                tweet_text = tweet_text.replace('[CHANNEL A]', PASS_INFO['NOAA Channel A'])
+                tweet_text = tweet_text.replace('[CHANNEL B]', PASS_INFO['NOAA Channel B'])
+                tweet_text = tweet_text.replace('[MAX ELEVATION]', MAX_ELEVATION)
+                tweet_text = tweet_text.replace('[DURATION]', DURATION)
 
-        # send to Discord webhooks, if configured
-        # can only do this if tweeting as using the tweet's public image URL
-        if IMAGE_OPTIONS['discord webhooks'] == 'yes':
-            # sleep to allow Twitter to process the tweet!
-            MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
-            time.sleep(30)
-            MY_LOGGER.debug('Sleep over, try the webhook API')
-            wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json',
-                                 wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
-                                 SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
-                                 MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
-                                 PASS_INFO['NOAA Channel A'].replace('Channel A: ', ''),
-                                 PASS_INFO['NOAA Channel B'].replace('Channel B: ', ''))
-        else:
-            MY_LOGGER.debug('Discord webhooks not configured')
+                tweet_text += ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
+
+                tweet_image = IMAGE_PATH + FILENAME_BASE + '-' + enhancement + '.jpg'
+                try:
+                    wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', tweet_text, tweet_image)
+                except:
+                    MY_LOGGER.critical('Tweet exception handler: %s %s %s',
+                                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                MY_LOGGER.debug('Tweeted!')
+
+                # send to Discord webhooks, if configured
+                # can only do this if tweeting as using the tweet's public image URL
+                if IMAGE_OPTIONS['discord webhooks'] == 'yes':
+                    # sleep to allow Twitter to process the tweet!
+                    MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
+                    time.sleep(30)
+                    MY_LOGGER.debug('Sleep over, try the webhook API')
+                    wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
+                                         wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
+                                         SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
+                                         MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                         PASS_INFO['NOAA Channel A'].replace('Channel A: ', ''),
+                                         PASS_INFO['NOAA Channel B'].replace('Channel B: ', ''),
+                                         pass_description)
+                else:
+                    MY_LOGGER.debug('Discord webhooks not configured')
     else:
         MY_LOGGER.debug('Tweeting not configured')
 

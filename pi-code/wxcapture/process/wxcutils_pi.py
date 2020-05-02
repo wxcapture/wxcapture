@@ -98,34 +98,30 @@ def tweet_get_image_url(tgiu_config_path, tgiu_config_file):
     MY_UTIL_LOGGER.debug('last tweet for %s', tgiu_twitter_handle)
 
     tgiu_imagesfile = ''
-    for tgiu_tweet in tweepy.Cursor(tgiu_api.user_timeline, tweet_mode='extended').items() :
-            if 'media' in tgiu_tweet.entities:
-                for tgiu_image in tgiu_tweet.entities['media']:
-                    tgiu_imagesfile = str(tgiu_image['media_url'])
-            break
+    for tgiu_tweet in tweepy.Cursor(tgiu_api.user_timeline, tweet_mode='extended').items():
+        if 'media' in tgiu_tweet.entities:
+            for tgiu_image in tgiu_tweet.entities['media']:
+                tgiu_imagesfile = str(tgiu_image['media_url'])
+        break
 
     MY_UTIL_LOGGER.debug(tgiu_imagesfile)
     return tgiu_imagesfile
 
 
-def webhooks(w_config_path, w_config_file, w_imagesfile, w_satellite,
+def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_satellite,
              w_location, w_colour, w_elevation, w_duration, w_pass_start,
-             w_channel_a, w_channel_b):
+             w_channel_a, w_channel_b, w_description):
     """send data to webhooks as configured"""
-    MY_UTIL_LOGGER.debug('webhooks called with %s %s %s %s %s %s %s %s %s %s %s',
-                         w_config_path, w_config_file, w_imagesfile, w_satellite,
+    MY_UTIL_LOGGER.debug('webhooks called with %s %s %s %s %s %s %s %s %s %s %s %s %s',
+                         w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_satellite,
                          w_location, w_colour, w_elevation, w_duration, w_pass_start,
-                         w_channel_a, w_channel_b)
-    MY_UTIL_LOGGER.debug('types are: %s %s %s %s %s %s %s %s %s %s %s',
-                         type(w_config_path), type(w_config_file), type(w_imagesfile), type(w_satellite),
-                         type(w_location), type(w_colour), type(w_elevation), type(w_duration), type(w_pass_start),
-                         type(w_channel_a), type(w_channel_b))
+                         w_channel_a, w_channel_b, w_description)
 
     # convert w_colour from hex string to an int
     w_colour = int(w_colour, 16)
-    MY_UTIL_LOGGER.debug('type for w_colour = %s', type(w_colour))
 
     w_config = wxcutils.load_json(w_config_path, w_config_file)
+    w_site_config = wxcutils.load_json(w_config_path, w_site_config_file)
 
     MY_UTIL_LOGGER.debug('Iterate through webhooks')
     for w_row in w_config['webhooks']:
@@ -134,17 +130,11 @@ def webhooks(w_config_path, w_config_file, w_imagesfile, w_satellite,
         # create embed object for webhook
         w_embed = DiscordEmbed(title=w_satellite, description=w_location, color=w_colour)
 
-        # set author
-        w_embed.set_author(name=w_config['author'], url=w_config['author url'], icon_url=w_config['author icon'])
-
         # set image
         w_embed.set_image(url=w_imagesfile)
 
         # set footer
-        w_embed.set_footer(text=w_config['footer'])
-
-        # set timestamp (default is now)
-        w_embed.set_timestamp()
+        w_embed.set_footer(text=w_config['footer'].replace('[SITE]', w_site_config['website']))
 
         # add fields to embed
         w_embed.add_embed_field(name='Satellite', value=':satellite_orbital:' + w_satellite)
@@ -154,7 +144,9 @@ def webhooks(w_config_path, w_config_file, w_imagesfile, w_satellite,
         if w_channel_a != '':
             w_embed.add_embed_field(name='Channel A', value=w_channel_a)
         if w_channel_b != '':
-           w_embed.add_embed_field(name='Channel B', value=w_channel_b)
+            w_embed.add_embed_field(name='Channel B', value=w_channel_b)
+        if w_description != '':
+            w_embed.add_embed_field(name='Pass Description', value=w_description)
 
         # add embed object to webhook
         w_webhook.add_embed(w_embed)

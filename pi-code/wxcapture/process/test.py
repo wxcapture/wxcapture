@@ -36,14 +36,28 @@ MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 try:
-    CMD = Popen(['ps', '-ef']
-                , stdout=PIPE, stderr=PIPE)
-    STDOUT, STDERR = CMD.communicate()
-    MY_LOGGER.debug('stdout:%s', STDOUT)
-    MY_LOGGER.debug('stderr:%s', STDERR)
+
+    IMAGE_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
+
+    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
 
 
-    
+    for tweet_group in IMAGE_OPTIONS['tweet groups']:
+        for tweet_option in tweet_group:
+            random_pick = random.randint(1, len(tweet_group[tweet_option])) - 1
+            enhancement = tweet_group[tweet_option][random_pick]['type']
+            tweet_text = tweet_group[tweet_option][random_pick]['text'].replace('[LOCATION]', CONFIG_INFO['Location']) 
+            MY_LOGGER.debug('enahancement = %s', enhancement)
+            MY_LOGGER.debug('tweet_text = %s', tweet_text)
+
+        description = ''
+        for enhancement_group in IMAGE_OPTIONS['enhancements']:
+            if IMAGE_OPTIONS['enhancements'][enhancement_group]['filename'] == enhancement:
+                description = IMAGE_OPTIONS['enhancements'][enhancement_group]['description']
+        MY_LOGGER.debug('>> %s', description)
+ 
+ 
+
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

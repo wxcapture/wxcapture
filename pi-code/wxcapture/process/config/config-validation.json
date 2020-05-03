@@ -383,26 +383,26 @@
 			}
 		}
 	},
-	"config-scp.json": {
-		"description": "SCP configuration",
+	"config-rsync.json": {
+		"description": "rsync configuration",
 		"required": "yes",
 		"field validation": {
 			"remote user": {
 				"required": "yes",
 				"valid values": "-pattern-",
-				"description": "Name of the user on the system where the files are copied to via SCP, e.g. USER.",
+				"description": "Name of the user on the system where the files are copied to via rsync, e.g. USER.",
 				"hidden": "yes"
 			},
 			"remote directory": {
 				"required": "yes",
 				"valid values": "-pattern-",
-				"description": "Name of the directory on the system where the files are copied to via SCP, e.g. /home/USER/wxcapture/output.",
+				"description": "Name of the directory on the system where the files are copied to via rsync, e.g. /home/USER/wxcapture/output.",
 				"hidden": "yes"
 			},
 			"remote host": {
 				"required": "yes",
 				"valid values": "-pattern-",
-				"description": "IP address for the system where the files are copied to via SCP, e.g. 10.0.0.1.",
+				"description": "IP address for the system where the files are copied to via rsync, e.g. 10.0.0.1.",
 				"hidden": "yes"
 			}
 		}

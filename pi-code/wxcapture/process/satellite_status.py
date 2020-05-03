@@ -17,17 +17,14 @@ def parse(line):
     return result.decode('utf-8').replace(' ', '').replace('<td>', '').replace('</td>', '').rstrip()
 
 
-def scp_files():
-    """scp files"""
-    MY_LOGGER.debug('using scp')
-    # load config
-    scp_config = wxcutils.load_json(CONFIG_PATH, 'config-scp.json')
-    lock_number = wxcutils.create_lock_file()
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + 'satellitestatus.html ' +
-                     scp_config['remote user'] + '@' +
-                     scp_config['remote host'] + ':' + scp_config['remote directory'] + '/' +
-                     'satellitestatus.html.LOCK.' + str(lock_number))
-    wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
+def migrate_files():
+    """migrate files to server"""
+    MY_LOGGER.debug('migrating files')
+    files_to_copy = []
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': 'satellitestatus.html', 'destination path': '', 'copied': 'no'})
+    MY_LOGGER.debug('Files to copy = %s', files_to_copy)
+    wxcutils.migrate_files(files_to_copy)
+    MY_LOGGER.debug('Completed migrating files')
 
 
 def get_page(page_url):
@@ -238,9 +235,9 @@ try:
 
         html.write('</body></html>')
 
-    # acp file to destination
-    MY_LOGGER.debug('SCP files')
-    scp_files()
+    # migrate files to destination
+    MY_LOGGER.debug('migrate files')
+    migrate_files()
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

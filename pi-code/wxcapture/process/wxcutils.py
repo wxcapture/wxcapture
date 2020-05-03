@@ -7,9 +7,9 @@ import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
-import random
 import json
 import shutil
+import uuid
 from datetime import datetime
 import pytz
 from tzlocal import get_localzone
@@ -17,10 +17,9 @@ from tzlocal import get_localzone
 # logging config
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 MY_UTIL_LOGGER = None
-
 # setup paths to directories
 HOME = os.environ['HOME']
-if HOME == '/root' or HOME == '/home/mike':
+if HOME in('/root', '/home/mike'):
     HOME = '/home/mike/'
     APP_PATH = HOME + '/wxcapture/'
     CODE_PATH = APP_PATH + 'web/'
@@ -30,6 +29,7 @@ else:
 
 LOG_PATH = CODE_PATH + 'logs/'
 CONFIG_PATH = CODE_PATH + 'config/'
+QUEUE_PATH = CODE_PATH + 'queue/'
 
 
 def get_console_handler():
@@ -198,10 +198,12 @@ def local_to_utc(local, mask):
     """ convert local to UTC"""
     return epoch_to_utc(local_to_epoch(local, mask), mask)
 
+
 def ordinal(num):
     """get the ordinalinal date description"""
     return str(num) + ("th" if 4 <= num % 100 <= 20 else
                        {1: "st", 2: "nd", 3: "rd"}.get(num % 10, "th"))
+
 
 def validate_single_tle(vt_path, vt_file):
     """validate a tle file exists, if not replace with backup file"""
@@ -209,6 +211,7 @@ def validate_single_tle(vt_path, vt_file):
         MY_UTIL_LOGGER.debug('tle file does not exist - %s %s - replacing with backup',
                              vt_path, vt_file)
         copy_file(vt_path + '/' + vt_file + '.old', vt_path + '/' + vt_file)
+
 
 def validate_tle(vt_path):
     """validate all tle files and if not existing, replace with backup"""
@@ -220,19 +223,14 @@ def validate_tle(vt_path):
     validate_single_tle(vt_path, 'Leap_Second.dat')
 
 
-def create_lock_file():
-    """create a lock file number"""
-    return random.randint(1000000000, 9999999999)
+def migrate_files(sf_files):
+    """migrate files to remote server"""
+    MY_UTIL_LOGGER.debug('migrate_files %s', sf_files)
 
-def create_unlock_file(cuf_scp, cuf_working, cuf_lock_number):
-    """create an unlock file, scp it to the server and delete the unlock file"""
-    MY_UTIL_LOGGER.debug('creating unlock file for %d', cuf_lock_number)
-    cuf_filename = str(cuf_lock_number) + '.UNLOCK' 
-    run_cmd('touch ' + cuf_working + cuf_filename)
+    # generate unique id for lock
+    sf_lock_id = uuid.uuid4().hex
+    MY_UTIL_LOGGER.debug('sf_lock_id %s', sf_lock_id)
 
-    run_cmd('scp ' + cuf_working + cuf_filename + ' ' +
-            cuf_scp['remote user'] + '@' +
-            cuf_scp['remote host'] + ':' + cuf_scp['remote directory'] + '/' +
-            cuf_filename)
+    sf_lock = {'lock': sf_lock_id, 'files': sf_files}
 
-    run_cmd('rm ' + cuf_working + cuf_filename)
+    save_json(QUEUE_PATH, sf_lock_id + '.json', sf_lock)

@@ -114,7 +114,7 @@ try:
     # write out process information
     with open(OUTPUT_PATH + FILENAME_BASE + '.txt', 'w') as txt:
         txt.write('./receive_amsat.py ' + sys.argv[1] + ' ' + sys.argv[2] +
-                  ' ' + sys.argv[3] + ' ' + sys.argv[4] + ' ' + sys.argv[5])
+                  ' ' + sys.argv[3] + ' ' + sys.argv[4] + ' ' + 'Y')
     txt.close()
 
     # determine the device index based on the serial number

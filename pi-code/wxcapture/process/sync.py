@@ -41,8 +41,8 @@ def process_file(pf_file_name):
     for pf_file in pf_file_data['files']:
         if pf_file['copied'] == 'no':
             MY_LOGGER.debug('To copy - %s %s %s %s', pf_file['source path'], pf_file['source file'], pf_file['destination path'], pf_file['copied'])
-            pf_result = do_sync(pf_file['source path'] + pf_file['source file'],
-                                RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + ':' + RSYNC_CONFIG['remote directory'] + '/' + pf_file['destination path'] + pf_file['source file'] + '.LOCK.' + pf_lock_id)
+            pf_result = do_sync(pf_file['source path'] + '/' + pf_file['source file'],
+                                RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + ':' + RSYNC_CONFIG['remote directory'] + '/' + pf_file['destination path'] + '/' + pf_file['source file'] + '.LOCK.' + pf_lock_id)
             if pf_result:
                 pf_file['copied'] = 'yes'
 
@@ -66,7 +66,7 @@ def process_file(pf_file_name):
             MY_LOGGER.debug('lock file copied over successfully')
             wxcutils.run_cmd('rm ' + QUEUE_PATH + pf_unlock_file)
             wxcutils.save_json(QUEUE_PATH, pf_file_name, pf_file_data)
-            wxcutils.move_file(QUEUE_PATH, pf_file_name, QUEUE_PATH, pf_file_name + '.COMPLETE')
+            wxcutils.run_cmd('rm ' + QUEUE_PATH + pf_file_name)
         else:
             MY_LOGGER.debug('Work still to be done, save file for future processing')
             wxcutils.save_json(QUEUE_PATH, pf_file_name, pf_file_data)

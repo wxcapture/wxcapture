@@ -12,6 +12,7 @@ create images plus pass web page"""
 
 # import libraries
 import os
+from os import path
 import sys
 import glob
 import time
@@ -128,7 +129,7 @@ try:
     with open(OUTPUT_PATH + FILENAME_BASE + '.txt', 'w') as txt:
         txt.write('./receive_meteor.py ' + sys.argv[1] + ' ' + sys.argv[2] +
                   ' ' + sys.argv[3] + ' ' + sys.argv[4] + ' ' + sys.argv[5] +
-                  ' ' + sys.argv[6])
+                  ' ' + 'Y')
     txt.close()
 
     # determine the device index based on the serial number
@@ -445,26 +446,30 @@ try:
                 ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
             TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg'
-            try:
-                wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
-            except:
-                MY_LOGGER.critical('Tweet exception handler: %s %s %s',
-                                   sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-            MY_LOGGER.debug('Tweeted!')
-            # send to Discord webhooks, if configured
-            # can only do this if tweeting as using the tweet's public image URL
-            if IMAGE_OPTIONS['discord webhooks'] == 'yes':
-                # sleep to allow Twitter to process the tweet!
-                MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
-                time.sleep(30)
-                MY_LOGGER.debug('Sleep over, try the webhook API')
-                wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
-                                     wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
-                                     SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
-                                     MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
-                                     '', '', 'Visible light image')
+            # only proceed if the image exists
+            if path.exists(TWEET_IMAGE):
+                try:
+                    wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
+                except:
+                    MY_LOGGER.critical('Tweet exception handler: %s %s %s',
+                                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                MY_LOGGER.debug('Tweeted!')
+                # send to Discord webhooks, if configured
+                # can only do this if tweeting as using the tweet's public image URL
+                if IMAGE_OPTIONS['discord webhooks'] == 'yes':
+                    # sleep to allow Twitter to process the tweet!
+                    MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
+                    time.sleep(30)
+                    MY_LOGGER.debug('Sleep over, try the webhook API')
+                    wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
+                                         wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
+                                         SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
+                                         MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                         '', '', 'Visible light image')
+                else:
+                    MY_LOGGER.debug('Discord webhooks not configured')
             else:
-                MY_LOGGER.debug('Discord webhooks not configured')
+                MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.')
         else:
             MY_LOGGER.debug('Tweeting not configured')
     else:

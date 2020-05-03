@@ -5,6 +5,7 @@ create images plus pass web page"""
 
 # import libraries
 import os
+from os import path
 import sys
 import glob
 import random
@@ -33,7 +34,6 @@ def migrate_files():
     files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.txt', 'destination path': '', 'copied': 'no'})
     files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.json', 'destination path': '', 'copied': 'no'})
     files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + 'weather.tle', 'destination path': '', 'copied': 'no'})
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.dec', 'destination path': '', 'copied': 'no'})
     if CONFIG_INFO['save .wav files'] == 'yes':
         files_to_copy.append({'source path': AUDIO_PATH, 'source file': FILENAME_BASE + '.wav', 'destination path': 'audio/', 'copied': 'no'})
     for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.jpg'):
@@ -126,7 +126,7 @@ try:
     with open(OUTPUT_PATH + FILENAME_BASE + '.txt', 'w') as txt:
         txt.write('./receive_noaa.py ' + sys.argv[1] + ' ' + sys.argv[2] + ' '
                   + sys.argv[3] + ' ' + sys.argv[4] + ' ' + sys.argv[5] + ' '
-                  + sys.argv[6])
+                  + 'Y')
     txt.close()
 
     # capture pass to wav file
@@ -426,9 +426,20 @@ try:
 
     if IMAGE_OPTIONS['tweet'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
 
-        MY_LOGGER.debug('Tweeting pass(es)')
+        # create a copy of the tweet groups
+        # validate if image for each enhancement in the tweet groups exists, if not, remove as an option
+        # if no options exist in tweet group, remove the group
+        TWEET_GROUPS = IMAGE_OPTIONS['tweet groups']
+        MY_LOGGER.debug('removing options where there is no file')
+        for tweet_group in TWEET_GROUPS:
+            for tweet_option in tweet_group:
+                for row in tweet_group[tweet_option]:
+                    if not path.exists(IMAGE_PATH + FILENAME_BASE + '-' + row['type'] + '.jpg'):
+                        tweet_group[tweet_option].remove(row)
+
+        MY_LOGGER.debug('Tweeting pass(s)')
         LOCATION_HASHTAGS = '#' + CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
-        for tweet_group in IMAGE_OPTIONS['tweet groups']:
+        for tweet_group in TWEET_GROUPS:
             for tweet_option in tweet_group:
                 random_pick = random.randint(1, len(tweet_group[tweet_option])) - 1
                 enhancement = tweet_group[tweet_option][random_pick]['type']

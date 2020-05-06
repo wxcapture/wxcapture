@@ -25,58 +25,23 @@ def get_bias_t():
     return command
 
 
-def scp_files():
-    """move files to output directory"""
-    # load config
-    scp_config = wxcutils.load_json(CONFIG_PATH, 'config-scp.json')
-    MY_LOGGER.debug('SCPing files to remote server %s directory %s as user %s',
-                    scp_config['remote host'], scp_config['remote directory'],
-                    scp_config['remote user'])
-
-    lock_number = wxcutils.create_lock_file()
-    MY_LOGGER.debug('scp - html')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.html ' +
-                     scp_config['remote user'] +
-                     '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] +
-                     '/' + FILENAME_BASE + '.html.LOCK.' + str(lock_number))
-    MY_LOGGER.debug('scp - txt')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.txt ' +
-                     scp_config['remote user']
-                     + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/' +
-                     FILENAME_BASE + '.txt.LOCK.' + str(lock_number))
-    MY_LOGGER.debug('scp - json')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + '.json ' +
-                     scp_config['remote user']
-                     + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/' +
-                     FILENAME_BASE + '.json.LOCK.' + str(lock_number))
-    MY_LOGGER.debug('scp - tle')
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + FILENAME_BASE + 'weather.tle ' +
-                     scp_config['remote user'] + '@' +
-                     scp_config['remote host']
-                     + ':' + scp_config['remote directory'] + '/' +
-                     FILENAME_BASE + 'weather.tle.LOCK.' + str(lock_number))
-    MY_LOGGER.debug('SCPing .wav audio file')
-    wxcutils.run_cmd('scp ' + AUDIO_PATH + FILENAME_BASE + '.wav ' +
-                     scp_config['remote user']
-                     + '@' + scp_config['remote host'] + ':' +
-                     scp_config['remote directory'] + '/audio/' +
-                     FILENAME_BASE + '.wav.LOCK.' + str(lock_number))
-
-    MY_LOGGER.debug('SCPing .png image file')
+def migrate_files():
+    """migrate files to server"""
+    MY_LOGGER.debug('migrating files')
+    files_to_copy = []
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.html', 'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.txt', 'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.json', 'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + 'weather.tle', 'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.dec', 'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': AUDIO_PATH, 'source file': FILENAME_BASE + '.wav', 'destination path': 'audio/', 'copied': 'no'})
     for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.png'):
         img_path, img_filename = os.path.split(img_file)
-        MY_LOGGER.debug('scp %s %s', img_path, img_filename)
-        wxcutils.run_cmd('scp ' + img_file + ' ' +
-                         scp_config['remote user']
-                         + '@' + scp_config['remote host'] + ':' +
-                         scp_config['remote directory'] + '/images/' +
-                         img_filename + '.LOCK.' + str(lock_number))
-    wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
+        files_to_copy.append({'source path': img_path, 'source file': img_filename, 'destination path': 'images/', 'copied': 'no'})
 
-    MY_LOGGER.debug('SCP complete')
+    MY_LOGGER.debug('Files to copy = %s', files_to_copy)
+    wxcutils.migrate_files(files_to_copy)
+    MY_LOGGER.debug('Completed migrating files')
 
 
 def find_files():
@@ -176,7 +141,7 @@ try:
     with open(OUTPUT_PATH + FILENAME_BASE + '.txt', 'w') as txt:
         txt.write('./receive_sstv.py ' + sys.argv[1] + ' ' + sys.argv[2] +
                   ' ' + sys.argv[3] + ' ' + sys.argv[4] + ' ' + sys.argv[5] +
-                  ' ' + sys.argv[6])
+                  ' ' + 'Y')
     txt.close()
 
     # determine the device index based on the serial number
@@ -290,9 +255,9 @@ try:
 
     html.close()
 
-    # move files to destinations
-    MY_LOGGER.debug('using scp')
-    scp_files()
+    # migrate files to destinations
+    MY_LOGGER.debug('migrate files to destinations')
+    migrate_files()
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

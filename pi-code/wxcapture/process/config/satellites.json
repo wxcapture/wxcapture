@@ -59,7 +59,7 @@
 			"meteor mode": "qpsk",
 			"type": "METEOR",
 			"active": "yes",
-			"night": "yes",
+			"night": "no",
 			"capture": "yes",
 			"priority": "20",
 			"sdr": "QFH"

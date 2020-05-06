@@ -6,7 +6,6 @@ Also produce pass data for today plus the next few days"""
 import os
 import sys
 import math
-import glob
 import subprocess
 from subprocess import Popen, PIPE
 import time
@@ -422,27 +421,18 @@ def remove_jobs(match):
             wxcutils.run_cmd('atrm ' + id_value.decode('utf-8'))
 
 
-def scp_files():
-    """scp files"""
-    MY_LOGGER.debug('using scp')
-    # load config
-    scp_config = wxcutils.load_json(CONFIG_PATH, 'config-scp.json')
-
-    lock_number = wxcutils.create_lock_file()
-    wxcutils.run_cmd('scp ' + OUTPUT_PATH + 'satpass.html ' +
-                     scp_config['remote user'] + '@' +
-                     scp_config['remote host'] + ':' + scp_config['remote directory'] + '/' +
-                     'satpass.html.LOCK.' + str(lock_number))
+def migrate_files():
+    """migrate files to server"""
+    MY_LOGGER.debug('migrating files')
+    files_to_copy = []
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': 'satpass.html', 'destination path': '', 'copied': 'no'})
     for sat in SAT_DATA:
-        wxcutils.run_cmd('scp ' + IMAGE_PATH + sat['filename_base'] + '-plot.png '
-                         + scp_config['remote user']+ '@' + scp_config['remote host']
-                         + ':' + scp_config['remote directory'] + '/images/' +
-                         sat['filename_base'] + '-plot.png.LOCK.' + str(lock_number))
-        wxcutils.run_cmd('scp ' + IMAGE_PATH + sat['filename_base'] + '-plot.png '
-                         + scp_config['remote user']+ '@' + scp_config['remote host']
-                         + ':' + scp_config['remote directory'] + '/images/' +
-                         sat['filename_base'] + '-plot-tn.png.LOCK.' + str(lock_number))
-    wxcutils.create_unlock_file(scp_config, WORKING_PATH, lock_number)
+        files_to_copy.append({'source path': IMAGE_PATH, 'source file': sat['filename_base'] + '-plot.png', 'destination path': 'images/', 'copied': 'no'})
+        files_to_copy.append({'source path': IMAGE_PATH, 'source file': sat['filename_base'] + '-plot-tn.png', 'destination path': 'images/', 'copied': 'no'})
+    MY_LOGGER.debug('Files to copy = %s', files_to_copy)
+    wxcutils.migrate_files(files_to_copy)
+    MY_LOGGER.debug('Completed migrating files')
+
 
 def process_overlaps():
     """remove passes where there is an overlap between satellites for the same SDR"""
@@ -874,9 +864,9 @@ try:
         html.write('</body></html>')
         html.close()
 
-    # acp file to destination
-    MY_LOGGER.debug('SCP files')
-    scp_files()
+    # migrate files to destination
+    MY_LOGGER.debug('migrate files')
+    migrate_files()
 
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',

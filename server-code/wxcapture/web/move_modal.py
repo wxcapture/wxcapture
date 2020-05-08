@@ -365,7 +365,7 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                       time.strftime('%H:%M (' +
                                     subprocess.check_output("date").
                                     decode('utf-8').split(' ')[-2] +
-                                    ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
+                                    ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
                       '.</p>')
         cp_html.write('</footer>')
 

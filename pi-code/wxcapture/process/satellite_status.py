@@ -229,7 +229,7 @@ try:
                    time.strftime('%H:%M (' +
                                  subprocess.check_output("date").
                                  decode('utf-8').split(' ')[-2] +
-                                 ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
+                                 ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
                    '.</p>')
         html.write('</footer>')
 

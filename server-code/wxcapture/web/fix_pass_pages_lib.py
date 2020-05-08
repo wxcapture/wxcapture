@@ -67,7 +67,7 @@ def fix_file(ff_path, ff_filename):
                 thumb_img = fi_page[second_pos_left:(second_pos_right)]
                 bits = main_img[:10].split('-')
 
-                img_path = CONFIG_INFO['Link Base'] + '/' + bits[0] + '/' + bits[1] + '/' + bits[2] + '/images/'
+                img_path = CONFIG_INFO['Link Base'] + bits[0] + '/' + bits[1] + '/' + bits[2] + '/images/'
 
                 MY_LOGGER.debug('%d %s %s %s', parse_pos, main_img, thumb_img, img_path)
 

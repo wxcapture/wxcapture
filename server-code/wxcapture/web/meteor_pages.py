@@ -62,12 +62,12 @@ try:
                 cp_html.write('<html lang=\"en\"><head>'
                               '<meta charset=\"UTF-8\">'
                               '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                              '<meta name=\"description\" content=\"xyzzy\">'
+                              '<meta name=\"description\" content=\"Monthly Meteor images page\">'
                               '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
                               '<meta name=\"author\" content=\"WxCapture\">'
                               '<title>' + cp_label + '</title>'
                               '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
-                              '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>'
+                              '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + '/favicon.png\"/>'
                               '<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>')
                 cp_html.write('</head>')
                 cp_html.write('<body>')
@@ -114,12 +114,12 @@ try:
         cp_html.write('<html lang=\"en\"><head>'
                       '<meta charset=\"UTF-8\">'
                       '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                      '<meta name=\"description\" content=\"xyzzy\">'
+                      '<meta name=\"description\" content=\"Monthly Meteor images page\">'
                       '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                       '<meta name=\"author\" content=\"WxCapture\">'
                       '<title>' + CP_LABEL + '</title>'
                       '<link rel=\"stylesheet\" href=\"css/styles.css\">'
-                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>'
+                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + '/favicon.png\"/>'
                       '<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>')
         cp_html.write('</head>')
         cp_html.write('<body>')

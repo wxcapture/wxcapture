@@ -172,7 +172,7 @@ try:
                    '<meta name=\"author\" content=\"WxCapture\">'
                    '<title>Satellite Status</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
-                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
+                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>')
         html.write('</head>')
         html.write('<body>')
         html.write(wxcutils.load_file(CONFIG_PATH, 'main-header.txt').replace('PAGE-TITLE',

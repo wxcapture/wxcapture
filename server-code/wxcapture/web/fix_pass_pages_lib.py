@@ -67,7 +67,7 @@ def fix_file(ff_path, ff_filename):
                 thumb_img = fi_page[second_pos_left:(second_pos_right)]
                 bits = main_img[:10].split('-')
 
-                img_path = '/wxcapture/' + bits[0] + '/' + bits[1] + '/' + bits[2] + '/images/'
+                img_path = CONFIG_INFO['Link Base'] + '/' + bits[0] + '/' + bits[1] + '/' + bits[2] + '/images/'
 
                 MY_LOGGER.debug('%d %s %s %s', parse_pos, main_img, thumb_img, img_path)
 
@@ -102,6 +102,9 @@ def fix_file(ff_path, ff_filename):
 
     MY_LOGGER.debug('fix_file %s %s', ff_path, ff_filename)
 
+    # load config
+    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
     # create page backup file
     # only if there isn't an existing .backup file (i.e. our backup of the original)
     if not os.path.isfile(ff_path + ff_filename + '.backup'):
@@ -118,11 +121,11 @@ def fix_file(ff_path, ff_filename):
 
     # add stylesheets
     MY_LOGGER.debug('add stylesheets')
-    ff_page = update_page(ff_page, '</head>', '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\"><meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\"><meta name=\"author\" content=\"WxCapture\"><link rel=\"stylesheet\" href=\"/wxcapture/css/styles.css\"><link rel=\"stylesheet\" href=\"/wxcapture/lightbox/css/lightbox.min.css\"></head>')
+    ff_page = update_page(ff_page, '</head>', '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\"><meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\"><meta name=\"author\" content=\"WxCapture\"><link rel=\"stylesheet\" href=\"/css/styles.css\"><link rel=\"stylesheet\" href=\"/lightbox/css/lightbox.min.css\"></head>')
 
     # add script code
     MY_LOGGER.debug('add script code')
-    ff_page = update_page(ff_page, '</body>', '<script src=\"/wxcapture/lightbox/js/lightbox-plus-jquery.min.js\"></script></body>')
+    ff_page = update_page(ff_page, '</body>', '<script src=\"/lightbox/js/lightbox-plus-jquery.min.js\"></script></body>')
 
     # remove table start
     MY_LOGGER.debug('remove table start')
@@ -145,6 +148,10 @@ def fix_file(ff_path, ff_filename):
 
     # update img tags to use lightbox
     ff_page = fix_img(ff_page, ff_path, ff_filename)
+
+    # # fix document root offsets
+    # MY_LOGGER.debug('fix document root offsets')
+    # ff_page = update_page(ff_page, '/wxcapture', CONFIG_INFO['Link Base'])
 
     # MY_LOGGER.debug('%s', ff_page)
 

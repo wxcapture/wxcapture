@@ -10,7 +10,7 @@
 	"Pass List Days": "3",
 	"Pass Info": "",
 	"Hide Detail": "yes",
-	"Link Base": "/wxcapture/",
+	"Link Base": "",
 	"save .wav files": "yes",
 	"email receive output": "no",
 	"plot thumbnail size": "58x64",

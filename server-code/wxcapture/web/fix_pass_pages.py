@@ -28,7 +28,6 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 # set up paths
 MY_PATH = '/home/mike/wxcapture/output/'
 TARGET = '/media/storage/html/wxcapture/'
-OUTPUT_PATH = '/media/storage/html'
 
 # see if args passed
 try:

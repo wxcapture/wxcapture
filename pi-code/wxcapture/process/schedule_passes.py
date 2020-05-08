@@ -703,7 +703,7 @@ try:
                    '</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                    '<link rel=\"stylesheet\" href=\"lightbox/css/lightbox.min.css\">'
-                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
+                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>')
         html.write('</head>')
         html.write('<body onload=\"defaulthide()\">')
         html.write(wxcutils.load_file(CONFIG_PATH,

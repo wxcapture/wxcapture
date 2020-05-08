@@ -66,7 +66,7 @@
 			"Link Base": {
 				"required": "yes",
 				"valid values": "-any-",
-				"description": "Link base directory [only partially implemented - do NOT change], e.g. /wxcapture/.",
+				"description": "Link base directory [note that changing this will require updating the static html pages too], e.g. /wxcapture/.",
 				"hidden": "no"
 			},
 			"save .wav files": {

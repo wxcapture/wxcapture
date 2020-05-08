@@ -149,10 +149,6 @@ def fix_file(ff_path, ff_filename):
     # update img tags to use lightbox
     ff_page = fix_img(ff_page, ff_path, ff_filename)
 
-    # # fix document root offsets
-    # MY_LOGGER.debug('fix document root offsets')
-    # ff_page = update_page(ff_page, '/wxcapture', CONFIG_INFO['Link Base'])
-
     # MY_LOGGER.debug('%s', ff_page)
 
     # save file

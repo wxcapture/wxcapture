@@ -30,18 +30,17 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 # set up paths
 MY_PATH = '/home/mike/wxcapture/output/'
-TARGET = '/media/storage/html/wxcapture/'
-OUTPUT_PATH = '/media/storage/html'
-
 MY_LOGGER.debug('MY_PATH = %s', MY_PATH)
-MY_LOGGER.debug('TARGET = %s', TARGET)
-MY_LOGGER.debug('OUTPUT_PATH = %s', OUTPUT_PATH)
+
 
 MY_LOGGER.debug('Starting file creation')
 
 try:
     # load config
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
+    TARGET = CONFIG_INFO['web doc root location']
+    MY_LOGGER.debug('TARGET = %s', TARGET)
 
     # find the files to skip, changing only those for satellite passes
     INDEX = []
@@ -67,7 +66,7 @@ try:
                               '<meta name=\"author\" content=\"WxCapture\">'
                               '<title>' + cp_label + '</title>'
                               '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
-                              '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + '/favicon.png\"/>'
+                              '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>'
                               '<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>')
                 cp_html.write('</head>')
                 cp_html.write('<body>')
@@ -81,11 +80,11 @@ try:
                 for filename_row in fix_pass_pages_lib.find_files(TARGET + year + '/' + month + '/', '*-norm-tn.jpg'):
                     if os.path.getsize(filename_row) > 3000:
                         images_found += 1
-                        web_filename = filename_row.split(OUTPUT_PATH)[1]
+                        web_filename = filename_row.split(TARGET)[1]
                         path_part, file_part = os.path.split(web_filename)
                         MY_LOGGER.debug('Filename = %s, path = %s, file = %s',
                                         web_filename, path_part, file_part)
-                        cp_html.write('<a href=\"' + web_filename.replace('-tn', '') + '\">' + '<img src=\"' + web_filename + '\"></a>')
+                        cp_html.write('<a href=\"' + CONFIG_INFO['Link Base'] + web_filename.replace('-tn', '') + '\">' + '<img src=\"' + CONFIG_INFO['Link Base'] + web_filename + '\"></a>')
                 if images_found > 0:
                     INDEX.append({'month': month, 'year': year, 'date': year + month, 'page': noaa_filename})
                 cp_html.write('</section>')
@@ -119,7 +118,7 @@ try:
                       '<meta name=\"author\" content=\"WxCapture\">'
                       '<title>' + CP_LABEL + '</title>'
                       '<link rel=\"stylesheet\" href=\"css/styles.css\">'
-                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + '/favicon.png\"/>'
+                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>'
                       '<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>')
         cp_html.write('</head>')
         cp_html.write('<body>')

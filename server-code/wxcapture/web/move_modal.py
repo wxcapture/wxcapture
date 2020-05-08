@@ -321,7 +321,7 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                       '<meta name=\"author\" content=\"WxCapture\">'
                       '<title>Captures ' + cp_label + '</title>'
                       '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
-                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + '/favicon.png\"/>'
+                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>'
                       '<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>'
                       '<script src=\"../../js/jquery.modal.min.js\"></script>'
                       '<link rel=\"stylesheet\" href=\"../../css/jquery.modal.min.css\" />')
@@ -465,7 +465,7 @@ def build_capture_pages():
                    '<meta name=\"author\" content=\"WxCapture\">'
                    '<title>Captures</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
-                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + '/favicon.png\"/>')
+                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>')
         html.write('<meta http-equiv = \"refresh\" content=\"0; url=\'' + current_link + '\'\" />')
         html.write('</head>')
         html.write('<body>')

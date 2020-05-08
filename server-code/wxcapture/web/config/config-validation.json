@@ -1,0 +1,68 @@
+{
+	"config.json": {
+		"description": "WxCapture wide configuration",
+		"required": "yes",
+		"field validation": {
+			"logging level": {
+				"required": "yes",
+				"valid values": "critical|error|warning|info|debug|notset",
+				"description": "Python logging level, e.g. debug.",
+				"hidden": "no"
+			},
+			"Link Base": {
+				"required": "yes",
+				"valid values": "-any-",
+				"description": "Link base directory [note that changing this will require updating the static html pages too], e.g. /.",
+				"hidden": "no"
+			},
+			"web doc root location": {
+				"required": "yes",
+				"valid values": "-pasttern-",
+				"description": "Absolute path to the directory used for the web document root, e.g. /media/hdd/wxcapture/.",
+				"hidden": "yes"
+			},
+			"webpage keywords": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "A list of the keywords to be included in the header part of each dynamically created webpage, e.g. wxcapture, weather, satellite",
+				"hidden": "no"
+			},
+			"drive space location": {
+				"required": "yes",
+				"valid values": "-pattern-",
+				"description": "Drive location to monitor for space used, e.g. /dev/root.",
+				"hidden": "yes"
+			},
+			"drive space error": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Monitored drive space location percent remaining error threshold, e.g. 90.",
+				"hidden": "no"
+			},
+			"drive space warning": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Monitored drive space location percent remaining warning threshold, e.g. 70.",
+				"hidden": "no"
+			}
+		}
+	},
+	"config-move.json": {
+		"description": "Amateur Satellite configuration",
+		"required": "yes",
+		"field validation": {
+		"Start Month": {
+			"required": "yes",
+			"valid values": "-pasttern-",
+			"description": "Start month number for the captures page links, e.g. 05.",
+			"hidden": "no"
+		},
+		"Start Year": {
+			"required": "yes",
+			"valid values": "-pasttern-",
+			"description": "Start year for the captures page links, e.g. 2019.",
+			"hidden": "no"
+			}
+		}
+	}
+}

@@ -25,9 +25,12 @@ MY_LOGGER.debug('APP_PATH = %s', APP_PATH)
 MY_LOGGER.debug('LOG_PATH = %s', LOG_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
+# load config
+CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
 # set up paths
 MY_PATH = '/home/mike/wxcapture/output/'
-TARGET = '/media/storage/html/wxcapture/'
+TARGET = CONFIG_INFO['web doc root location']
 
 # see if args passed
 try:

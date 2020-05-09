@@ -53,14 +53,14 @@ def build_pass_json():
                     result = entry.replace('.jpg', '').replace(bpj_file_path + '/images/', '').replace(base_filename, '')
                     image_enhancements.append(result[1:])
 
-            json_data.append({'path': filename_root.replace(OUTPUT_PATH, ''),
+            json_data.append({'path': filename_root.replace(TARGET, ''),
                               'enhancement': image_enhancements
                              })
             # build data for catures pages
             # MY_LOGGER.debug('filename_root = %s', filename_root.replace(TARGET, '')[11:30])
             local_sort = wxcutils.epoch_to_local(wxcutils.utc_to_epoch(filename_root.replace(TARGET, '')[11:30], '%Y-%m-%d-%H-%M-%S'), '%Y-%m-%d-%H-%M-%S')
             # MY_LOGGER.debug('local = %s', local)
-            ALL_PASSES.append({'path': filename_root.replace(OUTPUT_PATH, ''),
+            ALL_PASSES.append({'path': filename_root.replace(TARGET, ''),
                                'local sort': local_sort,
                                'local year': local_sort[:4],
                                'local month': local_sort[5:7],
@@ -357,7 +357,7 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
 
         cp_html.write('<section class=\"content-section container\">')
         cp_html.write('<h2 class=\"section-header\">' + cp_label + '</h2>')
-        write_month(OUTPUT_PATH, CONFIG_INFO['Link Base'] + bpm_year + '/' + bpm_month + '/',
+        write_month(TARGET, CONFIG_INFO['Link Base'] + bpm_year + '/' + bpm_month + '/',
                     bpm_month_name + ' ' + bpm_year, bpm_passes, bpm_year, bpm_month)
         cp_html.write('</ul></section>')
         cp_html.write('<footer class=\"main-footer\">')
@@ -434,7 +434,7 @@ def build_capture_pages():
             month = d_t.strftime('%m')
             month_name = d_t.strftime('%B')
             year = d_t.strftime('%Y')
-            file_path = OUTPUT_PATH + CONFIG_INFO['Link Base'] + year + '/' + month + '/'
+            file_path = TARGET + CONFIG_INFO['Link Base'] + year + '/' + month + '/'
             MY_LOGGER.debug('Building captures page = %s for %s %s', file_path, month_name, year)
             build_month_page(passes, file_path, CAPTURES_PAGE, month, month_name, year, historic_links)
 
@@ -445,7 +445,7 @@ def build_capture_pages():
     month_name = date_now.strftime('%B')
     year = date_now.strftime('%Y')
     MY_LOGGER.debug('Local date = %s %s (%s) %s', day, month, month_name, year)
-    file_path = OUTPUT_PATH + CONFIG_INFO['Link Base'] + year + '/' + month + '/'
+    file_path = TARGET + CONFIG_INFO['Link Base'] + year + '/' + month + '/'
     MY_LOGGER.debug('Building captures page = %s for %s %s (current month)',
                     file_path, month_name, year)
     build_month_page(passes, file_path, CAPTURES_PAGE, month, month_name, year, historic_links)
@@ -494,10 +494,12 @@ MY_LOGGER.debug('APP_PATH = %s', APP_PATH)
 MY_LOGGER.debug('LOG_PATH = %s', LOG_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
+# load config
+CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
 # set up paths
 MY_PATH = '/home/mike/wxcapture/output/'
-TARGET = '/media/storage/html/wxcapture/'
-OUTPUT_PATH = '/media/storage/html/wxcapture/'
+TARGET = CONFIG_INFO['web doc root location']
 CAPTURES_PAGE = 'captures.html'
 
 try:

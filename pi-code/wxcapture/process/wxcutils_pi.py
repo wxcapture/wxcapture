@@ -6,6 +6,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
+import os
 import time
 from rtlsdr import RtlSdr
 import tweepy
@@ -345,6 +346,6 @@ def get_gain(gg_config, gg_max_elevation):
     MY_UTIL_LOGGER.debug('description = %s', description)
     return command, description, gain_value
 
-
+HOME = os.environ['HOME']
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-MY_UTIL_LOGGER = get_logger('wxcutils_pi', '/home/pi/wxcapture/process/logs/', 'wxcutils_pi.log')
+MY_UTIL_LOGGER = get_logger('wxcutils_pi', HOME + '/wxcapture/process/logs/', 'wxcutils_pi.log')

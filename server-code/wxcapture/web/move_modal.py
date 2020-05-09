@@ -295,12 +295,12 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                     cp_html.write('</li><ul>')
 
                 satellite = '???'
-                MY_LOGGER.debug('finding satellite name for %s', filename_row['filename'])
+                # MY_LOGGER.debug('finding satellite name for %s', filename_row['filename'])
                 for sat_test in SAT_DATA:
                     if sat_test['code'] in filename_row['filename']:
                         satellite = sat_test['name']
 
-                cp_html.write('<li><a href="' + filename_row['filename'][8:]
+                cp_html.write('<li><a href="' + CONFIG_INFO['Link Base'] + filename_row['filename']
                               + '" rel=\"modal:open\">'  + filename_row['time'].replace('-', ':') + ' - '
                               + satellite + '</a></li>')
 

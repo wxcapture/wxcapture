@@ -309,8 +309,8 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
     MY_LOGGER.debug('build_month_page for %s %s %s %s %s', bpm_file_path, bpm_file_name,
                     bpm_month, bpm_month_name, bpm_year)
     # create directories in case they don't exist
-    mk_dir(CONFIG_INFO['web doc root location'] + bpm_year)
-    mk_dir(CONFIG_INFO['web doc root location'] + bpm_year + '/' + bpm_month)
+    mk_dir(CONFIG_INFO['web doc root location'] + '/' + bpm_year)
+    mk_dir(CONFIG_INFO['web doc root location'] + '/' + bpm_year + '/' + bpm_month)
     # now create captures page
     with open(bpm_file_path + bpm_file_name, 'w') as cp_html:
         # html header

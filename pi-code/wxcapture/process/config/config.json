@@ -8,7 +8,7 @@
 	"Min Elevation-AMSAT": "15",
 	"Pass Highlight Elevation": "45",
 	"Pass List Days": "3",
-	"Pass Info": "",
+	"Pass overlap threshold": "100",
 	"Hide Detail": "yes",
 	"Link Base": "/",
 	"save .wav files": "yes",

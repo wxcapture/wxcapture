@@ -57,6 +57,12 @@
 				"description": "Number of additional days of pass data to calculate, e.g. 3.",
 				"hidden": "no"
 			},
+			"Pass overlap threshold": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Number of seconds to potentially adjust overlapping passes e.g. 100.",
+				"hidden": "no"
+			},
 			"Hide Detail": {
 				"required": "yes",
 				"valid values": "yes|no",

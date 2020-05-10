@@ -784,20 +784,20 @@ try:
         html.write('</ul>')
         html.write('</div>')
         html.write('<table>')
-        if CONFIG_INFO['Hide Detail'] == 'yes':
-            html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
-                       '<th>Polar Plot</th><th>Pass'
-                       'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
-                       LOCAL_TIME_ZONE + ')</th><th>Pass Duration (min:sec)</th>'
-                       '<th>Visible to the Eye? (min:sec)?</th><th>Capturing?</th></tr>\n')
-        else:
-            html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
-                       '<th>Polar Plot</th><th>Pass'
-                       'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
-                       LOCAL_TIME_ZONE + ')</th><th>Pass Start (UTC)</th><th>'
-                       'Pass End (UTC)</th><th>Pass Duration (min:sec)</th><th>'
-                       'Frequency (MHz)</th><th>Antenna</th><th>Direction</th>'
-                       '<th>Visible to the Eye? (min:sec)?</th><th>Capturing?</th></tr>\n')
+        html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
+                    '<th>Polar Plot</th><th>Pass'
+                    'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
+                    LOCAL_TIME_ZONE + ')</th>')
+        if CONFIG_INFO['Hide Detail'] != 'yes':
+            html.write('<th>Pass Start (UTC)</th><th>Pass End (UTC)</th>')
+        html.write('<th>Pass Duration (min:sec)</th>')
+        if CONFIG_INFO['Hide Detail'] != 'yes':
+            html.write('<th>Frequency (MHz)</th><th>Antenna</th><th>Direction</th>')
+        html.write('<th>Visible to the Eye? (min:sec)?</th>')
+        if CONFIG_INFO['Hide Capturing'] != 'yes':
+            html.write('<th>Capturing?</th>')
+        html.write('</tr>')
+                       
         # iterate through list
         MY_LOGGER.debug('Iterating through satellites')
         for elem in SAT_DATA:
@@ -832,10 +832,11 @@ try:
                 html.write('<td>' + str(elem['antenna']) + '</td>')
                 html.write('<td>' + elem['direction'] + '</td>')
             html.write('<td>' + elem['visible'] + '</td>')
-            if elem['scheduler'] != '':
-                html.write('<td>Yes - ' + elem['capture reason'] + '</td>')
-            else:
-                html.write('<td>No - ' + elem['capture reason'] + '</td>')
+            if CONFIG_INFO['Hide Capturing'] != 'yes':
+                if elem['scheduler'] != '':
+                    html.write('<td>Yes - ' + elem['capture reason'] + '</td>')
+                else:
+                    html.write('<td>No - ' + elem['capture reason'] + '</td>')
             html.write('</tr>')
             MY_LOGGER.debug('Row generated')
         html.write('</table>')

@@ -66,7 +66,13 @@
 			"Hide Detail": {
 				"required": "yes",
 				"valid values": "yes|no",
-				"description": "Hide detailed pass information, e.g. UTC date and times.",
+				"description": "Hide detailed pass information, with examples including UTC date and times, e.g. yes.",
+				"hidden": "no"
+			},
+			"Hide Capturing": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Hide capture / not capture information, e.g. yes.",
 				"hidden": "no"
 			},
 			"Link Base": {

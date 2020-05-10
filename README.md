@@ -7,6 +7,12 @@ To see a preview of the site here, check out [https://wxcapture.github.io/wxcapt
 There are thousands of satellites currently in orbit, with many satellites passing in the sky overhead at any given moment.
 You can receive some of them yourself with a cheap SDR and antenna, and with weather satellites, you can receive beautiful images of the Earth as seen from space taken by satellites in orbit, decoded in near real time.
 
+# Installation
+This is currently a manual process, with the instructions for installing the pi and server code currently being documented in the following spreadsheet:
+https://github.com/wxcapture/wxcapture/blob/master/WxCapture.xlsx
+
+In time an installer will be created...
+
 # Webpage notes:
 - ```index.html``` and ```satellites.html``` are static
 - Predictions page (```satpass.html```) comes from ```schedule_passess.py```

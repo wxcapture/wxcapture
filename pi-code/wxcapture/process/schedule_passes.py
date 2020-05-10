@@ -452,16 +452,10 @@ def process_overlaps():
         # otherwise second pass will not be captured as the SDR is already in use
         io_sdr_buffer = 1
         io_result = False
-        io_early = ''
         if ((io_sat_a_end + io_sdr_buffer) > io_sat_b_start) and (io_sat_a_start < io_sat_b_start):
             MY_LOGGER.debug('Sat A overlaps with the start of sat B')
             io_result = True
-            io_early = 'A'
-        elif ((io_sat_b_end + io_sdr_buffer) > io_sat_a_start) and (io_sat_b_start < io_sat_a_start):
-            MY_LOGGER.debug('Sat B overlaps with the start of sat A')
-            io_result = True
-            io_early = 'B'
-        return io_result, io_early
+        return io_result
 
     MY_LOGGER.debug('=' * 50)
     pass_adjust = int(CONFIG_INFO['Pass overlap threshold'])
@@ -472,8 +466,7 @@ def process_overlaps():
             # if not, there can't be a collision
             if sat_a['sdr'] == sat_b['sdr'] and sat_a['scheduler'] != '' and sat_b['scheduler'] != '':
                 # potential overlap?
-                overlapping, early = is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'], sat_b['time'], sat_b['time'] + sat_b['duration'])
-                if overlapping:
+                if is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'], sat_b['time'], sat_b['time'] + sat_b['duration']):
                     MY_LOGGER.debug('Overlap to process between %s and %s', sat_a['satellite'], sat_b['satellite'])
                     MY_LOGGER.debug('Sat A %s start = %s, duration = %s, max ele = %s, priority = %s',
                                     sat_a['satellite'], str(sat_a['time']), str(sat_a['duration']),
@@ -501,97 +494,48 @@ def process_overlaps():
 
                     if adjust == 'A': # Trying to adjust A to avoid overlap
                         MY_LOGGER.debug('Trying to adjust A to avoid overlap')
-                        if early == 'A': # A is early, try adjust A end time
-                            overlapping_adj, early_adj = is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
-                                                                    sat_b['time'], sat_b['time'] + sat_b['duration'])
-                            if not overlapping_adj:
-                                MY_LOGGER.debug('Reduce end time for A will avoid overlap')
+                        # A is early, try adjust A end time
+                        if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
+                                          sat_b['time'], sat_b['time'] + sat_b['duration']):
+                            MY_LOGGER.debug('Reduce end time for A will avoid overlap')
+                            sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
+                            sat_a['duration'] = sat_a['duration'] - pass_adjust
+                        else: # try adjust A end time and B start time
+                            if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
+                                              sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
+                                MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
                                 sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
                                 sat_a['duration'] = sat_a['duration'] - pass_adjust
-                            else: # try adjust A end time and B start time
-                                overlapping_adj, early_adj = is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
-                                                                        sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust)
-                                if not overlapping_adj:
-                                    MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
-                                    sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
-                                    sat_a['duration'] = sat_a['duration'] - pass_adjust
-                                    sat_a['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
-                                    sat_b['time'] = sat_b['time'] + pass_adjust
-                                    sat_b['duration'] = sat_b['duration'] - pass_adjust
-                                else:
-                                    MY_LOGGER.debug('Not able to avoid overlap, remove A')
-                                    sat_a['scheduler'] = ''
-                                    sat_a['capture reason'] = 'Overlapping passes - not adjustable within threshold2'
-
-                        else: # B is early, try adjust A start time
-                            overlapping_adj, early_adj = is_overlap(sat_a['time'] + pass_adjust, sat_a['time'] + sat_a['duration'] - pass_adjust,
-                                                                    sat_b['time'], sat_b['time'] + sat_b['duration'])
-                            if not overlapping_adj:
-                                MY_LOGGER.debug('Reduce start time for A will avoid overlap')
                                 sat_a['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
-                                sat_a['time'] = sat_a['time'] + pass_adjust
-                                sat_a['duration'] = sat_a['duration'] - pass_adjust
-                            else: # B is early, try adjust A start time and B end time
-                                overlapping_adj, early_adj = is_overlap(sat_a['time'] + pass_adjust, sat_a['time'] + sat_a['duration'] - pass_adjust,
-                                                                        sat_b['time'], sat_b['time'] + sat_b['duration'] - pass_adjust)
-                                if not overlapping_adj:
-                                    MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
-                                    sat_a['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
-                                    sat_a['time'] = sat_a['time'] + pass_adjust
-                                    sat_a['duration'] = sat_a['duration'] - pass_adjust
-                                    sat_b['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
-                                    sat_b['duration'] = sat_b['duration'] - pass_adjust
-                                else:
-                                    MY_LOGGER.debug('Not able to avoid overlap, remove A')
-                                    sat_a['scheduler'] = ''
-                                    sat_a['capture reason'] = 'Overlapping passes - not adjustable within threshold'
+                                sat_b['time'] = sat_b['time'] + pass_adjust
+                                sat_b['duration'] = sat_b['duration'] - pass_adjust
+                            else:
+                                MY_LOGGER.debug('Not able to avoid overlap, remove A')
+                                sat_a['scheduler'] = ''
+                                sat_a['capture reason'] = 'Overlapping passes - not adjustable within threshold'
 
                     else: # Trying to adjust B to avoid overlap
 
                         MY_LOGGER.debug('Trying to adjust B to avoid overlap')
-                        if early == 'A': # A is early, try adjust B start time
-                            overlapping_adj, early_adj = is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'],
-                                                                    sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust)
-                            if not overlapping_adj:
-                                MY_LOGGER.debug('Increase start time for B will avoid overlap')
+                        # A is early, try adjust B start time
+                        if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'],
+                                          sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
+                            MY_LOGGER.debug('Increase start time for B will avoid overlap')
+                            sat_b['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
+                            sat_b['time'] = sat_b['time'] + pass_adjust
+                            sat_b['duration'] = sat_b['duration'] - pass_adjust
+                        else: # try adjust A end time and B start time
+                            if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
+                                              sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
+                                MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
+                                sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
                                 sat_b['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
                                 sat_b['time'] = sat_b['time'] + pass_adjust
                                 sat_b['duration'] = sat_b['duration'] - pass_adjust
-                            else: # try adjust A end time and B start time
-                                overlapping_adj, early_adj = is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
-                                                                        sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust)
-                                if not overlapping_adj:
-                                    MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
-                                    sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
-                                    sat_b['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
-                                    sat_b['time'] = sat_b['time'] + pass_adjust
-                                    sat_b['duration'] = sat_b['duration'] - pass_adjust
-                                else:
-                                    MY_LOGGER.debug('Not able to avoid overlap, remove A')
-                                    sat_a['scheduler'] = ''
-                                    sat_a['capture reason'] = 'Overlapping passes - not adjustable within threshold'
-
-                        else: # B is early, try adjust B end time
-                            overlapping_adj, early_adj = is_overlap(sat_a['time'] + pass_adjust, sat_a['time'] + sat_a['duration'] - pass_adjust,
-                                                                    sat_b['time'], sat_b['time'] + sat_b['duration'])
-                            if not overlapping_adj:
-                                MY_LOGGER.debug('Reduce end time for B will avoid overlap')
-                                sat_b['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
-                                sat_b['duration'] = sat_b['duration'] - pass_adjust
-                            else: # B is early, try adjust A start time and B end time
-                                overlapping_adj, early_adj = is_overlap(sat_a['time'] + pass_adjust, sat_a['time'] + sat_a['duration'] - pass_adjust,
-                                                                        sat_b['time'], sat_b['time'] + sat_b['duration'] - pass_adjust)
-                                if not overlapping_adj:
-                                    MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
-                                    sat_a['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
-                                    sat_a['time'] = sat_a['time'] + pass_adjust
-                                    sat_a['duration'] = sat_a['duration'] - pass_adjust
-                                    sat_b['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
-                                    sat_b['duration'] = sat_b['duration'] - pass_adjust
-                                else:
-                                    MY_LOGGER.debug('Not able to avoid overlap, remove A')
-                                    sat_a['scheduler'] = ''
-                                    sat_a['capture reason'] = 'Overlapping passes - not adjustable within threshold'
+                            else:
+                                MY_LOGGER.debug('Not able to avoid overlap, remove A')
+                                sat_b['scheduler'] = ''
+                                sat_b['capture reason'] = 'Overlapping passes - not adjustable within threshold'
                     # reschedule
                     sat_a['scheduler'] = scheduler_command(sat_a['receive code'], sat_a['satellite'],
                                                            sat_a['time'], sat_a['duration'],

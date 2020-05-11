@@ -61,7 +61,7 @@
 			"filename": "contrast",
 			"scale": "no"
 		},
-		"999": {
+		"998": {
 			"description": "Histogram equalisation image",
 			"options": "-e histeq",
 			"active": "no",
@@ -117,21 +117,21 @@
 			"filename": "za",
 			"scale": "yes"
 		},
-		"999": {
+		"997": {
 			"description": "Hurricane enhanced image",
 			"options": "-e BD",
 			"active": "no",
 			"filename": "bd",
 			"scale": "yes"
 		},
-		"999": {
+		"996": {
 			"description": "Warm season enhanced image",
 			"options": "-e MD",
 			"active": "no",
 			"filename": "md",
 			"scale": "yes"
 		},
-		"999": {
+		"995": {
 			"description": "Thunderstorm enhanced image",
 			"options": "-e MB",
 			"active": "no",
@@ -145,7 +145,7 @@
 			"filename": "no",
 			"scale": "no"
 		},
-		"999": {
+		"994": {
 			"description": "Sea surface / cold cloud enhanced image",
 			"options": "-e JF",
 			"active": "no",
@@ -173,7 +173,7 @@
 			"filename": "hvct-precip",
 			"scale": "no"
 		},
-		"999": {
+		"993": {
 			"description": "Multispecteral analysis enhanced image highlighting precipitation",
 			"options": "-e MSA-precip",
 			"active": "no",

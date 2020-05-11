@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""create monthly page for meteor images"""
+"""create monthly page for noaa images"""
 
 
 # import libraries
@@ -19,7 +19,7 @@ LOG_PATH = APP_PATH + 'logs/'
 CONFIG_PATH = APP_PATH + 'config/'
 
 # start logging
-MODULE = 'meteor_pages'
+MODULE = 'noaa_pages'
 MY_LOGGER = wxcutils.get_logger(MODULE, LOG_PATH, MODULE + '.log')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
 MY_LOGGER.debug('Execution start')
@@ -46,22 +46,22 @@ try:
     INDEX = []
     for filename in fix_pass_pages_lib.find_files(TARGET, 'captures.html'):
         if filename != TARGET + 'captures.html':
-            meteor_filename = filename.replace('captures.html', 'meteor.html').replace(TARGET, '')
-            bits = meteor_filename.split('/')
+            noaa_filename = filename.replace('captures.html', 'noaa.html').replace(TARGET, '')
+            bits = noaa_filename.split('/')
             year = bits[0]
             month = bits[1]
-            MY_LOGGER.debug('Filename = %s, meteor_filename = %s, month = %s, year = %s', filename, meteor_filename, month, year)
+            MY_LOGGER.debug('Filename = %s, noaa_filename = %s, month = %s, year = %s', filename, noaa_filename, month, year)
             images_found = 0
 
             # now create captures page
-            with open(TARGET + meteor_filename, 'w') as cp_html:
+            with open(TARGET + noaa_filename, 'w') as cp_html:
                 # html header
-                cp_label = 'Meteor Captures ' + calendar.month_name[int(month)] + ' - ' + year
+                cp_label = 'NOAA Captures ' + calendar.month_name[int(month)] + ' - ' + year
                 cp_html.write('<!DOCTYPE html>')
                 cp_html.write('<html lang=\"en\"><head>'
                               '<meta charset=\"UTF-8\">'
                               '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                              '<meta name=\"description\" content=\"Monthly Meteor images page\">'
+                              '<meta name=\"description\" content=\"Monthly captures page for NOAA satellites\">'
                               '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
                               '<meta name=\"author\" content=\"WxCapture\">'
                               '<title>' + cp_label + '</title>'
@@ -77,7 +77,7 @@ try:
 
                 cp_html.write('<h2 class=\"section-header\">' + cp_label + '</h2>')
 
-                for filename_row in fix_pass_pages_lib.find_files(TARGET + year + '/' + month + '/', '*-cc-rectified-tn.jpg'):
+                for filename_row in fix_pass_pages_lib.find_files(TARGET + year + '/' + month + '/', '*-norm-tn.jpg'):
                     if os.path.getsize(filename_row) > 3000:
                         images_found += 1
                         web_filename = filename_row.split(TARGET)[1]
@@ -86,7 +86,7 @@ try:
                                         web_filename, path_part, file_part)
                         cp_html.write('<a href=\"' + CONFIG_INFO['Link Base'] + web_filename.replace('-tn', '') + '\">' + '<img src=\"' + CONFIG_INFO['Link Base'] + web_filename + '\"></a>')
                 if images_found > 0:
-                    INDEX.append({'month': month, 'year': year, 'date': year + month, 'page': meteor_filename})
+                    INDEX.append({'month': month, 'year': year, 'date': year + month, 'page': noaa_filename})
                 cp_html.write('</section>')
 
                 cp_html.write('<footer class=\"main-footer\">')
@@ -106,14 +106,14 @@ try:
     INDEX = sorted(INDEX, key=lambda k: k['date'])
 
     # now create captures page
-    with open(TARGET + 'meteor_index.html', 'w') as cp_html:
+    with open(TARGET + 'noaa_index.html', 'w') as cp_html:
         # html header
-        CP_LABEL = 'Meteor Captures Index'
+        CP_LABEL = 'NOAA Captures Index'
         cp_html.write('<!DOCTYPE html>')
         cp_html.write('<html lang=\"en\"><head>'
                       '<meta charset=\"UTF-8\">'
                       '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                      '<meta name=\"description\" content=\"Monthly Meteor images page\">'
+                      '<meta name=\"description\" content=\"Monthly captures page for NOAA satellites\">'
                       '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                       '<meta name=\"author\" content=\"WxCapture\">'
                       '<title>' + CP_LABEL + '</title>'

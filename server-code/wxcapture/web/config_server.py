@@ -18,16 +18,6 @@ def parse(line):
     return result.decode('utf-8').replace(' ', '').replace('<td>', '').replace('</td>', '').rstrip()
 
 
-def migrate_files():
-    """migrate files to server"""
-    MY_LOGGER.debug('migrating files')
-    files_to_copy = []
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': 'config.html', 'destination path': '', 'copied': 'no'})
-    MY_LOGGER.debug('Files to copy = %s', files_to_copy)
-    wxcutils.migrate_files(files_to_copy)
-    MY_LOGGER.debug('Completed migrating files')
-
-
 def valid_json_file(vjf_file):
     """validate if a json file is a valid json file"""
     MY_LOGGER.debug('valid_json_file for %s', vjf_file)
@@ -225,7 +215,7 @@ def drive_validation(dv_config):
             dv_space = dv_line.split()[4].split('%')[0]
     MY_LOGGER.debug('dv_space  = %s', dv_space)
 
-    dv_results = '<h3>Pi Drive Space Used = '
+    dv_results = '<h3>Server Drive Space Used = '
     if dv_space == 'unknown':
         dv_errors_found = True
         dv_results += 'not determined</h3>'
@@ -244,33 +234,28 @@ def drive_validation(dv_config):
 
 
 # setup paths to directories
-HOME = os.environ['HOME']
-APP_PATH = HOME + '/wxcapture/'
-CODE_PATH = APP_PATH + 'process/'
-LOG_PATH = CODE_PATH + 'logs/'
-OUTPUT_PATH = APP_PATH + 'output/'
-IMAGE_PATH = OUTPUT_PATH + 'images/'
-WORKING_PATH = CODE_PATH + 'working/'
-CONFIG_PATH = CODE_PATH + 'config/'
+HOME = '/home/mike'
+APP_PATH = HOME + '/wxcapture/web/'
+LOG_PATH = APP_PATH + 'logs/'
+CONFIG_PATH = APP_PATH + 'config/'
 
 # start logging
-MODULE = 'config'
+MODULE = 'config_server'
 MY_LOGGER = wxcutils.get_logger(MODULE, LOG_PATH, MODULE + '.log')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
 MY_LOGGER.debug('Execution start')
 
 MY_LOGGER.debug('APP_PATH = %s', APP_PATH)
-MY_LOGGER.debug('CODE_PATH = %s', CODE_PATH)
 MY_LOGGER.debug('LOG_PATH = %s', LOG_PATH)
-MY_LOGGER.debug('OUTPUT_PATH = %s', OUTPUT_PATH)
-MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
-MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 
 try:
     # load config
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
+    TARGET = CONFIG_INFO['web doc root location']
+    MY_LOGGER.debug('TARGET = %s', TARGET)
 
     # config validation
     CONFIG_ERRORS, CONFIG_HTML = config_validation()
@@ -280,7 +265,7 @@ try:
 
     # output as html
     MY_LOGGER.debug('Build webpage')
-    with open(OUTPUT_PATH + 'config.html', 'w') as html:
+    with open(TARGET + 'config_server.html', 'w') as html:
         # html header
         html.write('<!DOCTYPE html>')
         html.write('<html lang=\"en\"><head>'
@@ -325,9 +310,6 @@ try:
 
         html.write('</body></html>')
 
-    # migrate files to destination
-    MY_LOGGER.debug('migrate files')
-    migrate_files()
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

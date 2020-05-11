@@ -98,6 +98,16 @@ def get_sdr_data(sdr_name):
     sdr_active, serial_number, bias_t
 
 
+def scheduler_command(sc_receive_code, sc_sat_name, sc_start_epoch,
+                      sc_duration, sc_max_elevation):
+    """create the command for the at scheduler"""
+    MY_LOGGER.debug('^^^ sc_start_epoch = %s', sc_start_epoch)
+
+    return 'echo \"' + sc_receive_code + ' ' + sc_sat_name + ' ' + \
+                    str(sc_start_epoch) + ' ' + str(sc_duration) + ' ' + str(sc_max_elevation) + \
+                    ' N \" |  at ' + EMAIL_OUTPUT + \
+                    datetime.fromtimestamp(int(sc_start_epoch) - 60).strftime('%H:%M %D')
+
 def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     """parse output from predict"""
     def date_value(row):
@@ -279,47 +289,41 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
         # schedule pass
         # only schedule for today
         scheduler = ''
+        receive_code = '???'
         if (when == 'today') and (capture == 'yes'):
             capture_reason = 'Capture criteria met'
             if sat['type'] == 'NOAA':
-                scheduler = 'echo \"' + CODE_PATH + 'receive_noaa.py ' + sat['name'] + ' ' + \
-                    str(start_epoch) + ' ' + str(duration) + ' ' + str(max_elevation) + \
-                    ' N \" |  at ' + EMAIL_OUTPUT + \
-                    datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
+                receive_code = CODE_PATH + 'receive_noaa.py'
+                scheduler = scheduler_command(receive_code, sat['name'],
+                                              start_epoch, duration,
+                                              max_elevation)
             # for Meteor, always record daylight passes, conditionally record night passes
             elif sat['type'] == 'METEOR':
+                receive_code = CODE_PATH + 'receive_meteor.py'
                 if is_daylight(float(start_epoch), float(end_epoch)) == 'Y':
                     MY_LOGGER.debug('Daylight pass - %s', str(start_epoch))
-                    scheduler = 'echo \"' + CODE_PATH + 'receive_meteor.py ' + \
-                    sat['name'] + ' ' + str(start_epoch) + ' ' + \
-                    str(duration) + ' ' + str(max_elevation) + \
-                    ' N \" |  at ' + EMAIL_OUTPUT + \
-                    datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
+                    scheduler = scheduler_command(receive_code, sat['name'],
+                                                  start_epoch, duration,
+                                                  max_elevation)
                 elif sat['night'] == 'yes':
                     MY_LOGGER.debug('Night pass - %s', str(start_epoch))
-                    scheduler = 'echo \"' + CODE_PATH + 'receive_meteor.py ' + \
-                    sat['name'] + ' ' + str(start_epoch) + ' ' + \
-                    str(duration) + ' ' + str(max_elevation) + \
-                    ' N \" |  at ' + EMAIL_OUTPUT + \
-                    datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
+                    scheduler = scheduler_command(receive_code, sat['name'],
+                                                  start_epoch, duration,
+                                                  max_elevation)
                 else:
                     MY_LOGGER.debug('Not scheduled as sensor turned off')
                     MY_LOGGER.debug('Darkness pass - %s', str(start_epoch))
                     capture_reason = 'Darkness and using visible light sensor'
             elif sat['type'] == 'SSTV':
-                scheduler = 'echo \"' + CODE_PATH + 'receive_sstv.py ' + \
-                sat['name'].replace('(', '').replace(')', '') + ' ' + \
-                str(start_epoch) + ' ' + \
-                str(duration) + ' ' + str(max_elevation) + \
-                ' N \" |  at ' + EMAIL_OUTPUT + \
-                datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
+                receive_code = CODE_PATH + 'receive_sstv.py'
+                scheduler = scheduler_command(receive_code, sat['name'],
+                                              start_epoch, duration,
+                                              max_elevation)
             elif sat['type'] == 'AMSAT':
-                scheduler = 'echo \"' + CODE_PATH + 'receive_amsat.py ' + \
-                sat['name'].replace('(', '').replace(')', '').replace(' ', '_') + ' ' + \
-                str(start_epoch) + ' ' + \
-                str(duration) + ' ' + str(max_elevation) + \
-                ' N \" |  at ' + EMAIL_OUTPUT + \
-                datetime.fromtimestamp(start_epoch - 60).strftime('%H:%M %D')
+                receive_code = CODE_PATH + 'receive_amsat.py'
+                scheduler = scheduler_command(receive_code, sat['name'],
+                                              start_epoch, duration,
+                                              max_elevation)
             else:
                 MY_LOGGER.debug('No processsing code for %s of type %s', sat['name'], sat['type'])
 
@@ -344,6 +348,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                          'visible': visible,
                          'max_elevation_direction': max_elevation_direction,
                          'scheduler': scheduler, 'capture': sat['capture'],
+                         'receive code': receive_code,
                          'capture reason': capture_reason,
                          'theta': theta, 'radius': radius,
                          'plot_labels': plot_labels,
@@ -440,57 +445,105 @@ def process_overlaps():
     # * both on same SDR
     # * end time of first is after start time of second
     # * start time of the first is before the start time of second
+
+    def is_overlap(io_sat_a_start, io_sat_a_end, io_sat_b_start, io_sat_b_end):
+        """test if there is an overlap between the two satellites"""
+        # sdr buffer is to provide a buffer for the claim / release of the SDR between overlapping jobs
+        # otherwise second pass will not be captured as the SDR is already in use
+        io_sdr_buffer = 1
+        io_result = False
+        if ((io_sat_a_end + io_sdr_buffer) > io_sat_b_start) and (io_sat_a_start < io_sat_b_start):
+            MY_LOGGER.debug('Sat A overlaps with the start of sat B')
+            io_result = True
+        return io_result
+
     MY_LOGGER.debug('=' * 50)
+    pass_adjust = int(CONFIG_INFO['Pass overlap threshold'])
+    MY_LOGGER.debug('pass_adjust = %d', pass_adjust)
     for sat_a in SAT_DATA:
         for sat_b in SAT_DATA:
-            if ((sat_a['time'] + sat_a['duration']) > sat_b['time']) \
-                and (sat_a['time'] < sat_b['time']) and \
-                sat_a['sdr'] == sat_b['sdr']:
-                MY_LOGGER.debug('Potential overlap to process........')
-                MY_LOGGER.debug(sat_a['satellite'] + ' ' + sat_b['satellite'])
-                MY_LOGGER.debug('>>>' + ' ' + sat_a['satellite'] + ' ' + str(sat_a['time']) + \
-                    ' ' + str(sat_a['duration']) + ' ' + str(sat_a['max_elevation']) + ' ' + \
-                    str(sat_a['priority']) + ' ' + sat_a['scheduler'])
-                MY_LOGGER.debug('>>>' + ' ' + sat_b['satellite'] + ' ' + str(sat_b['time']) + \
-                    ' ' + str(sat_b['duration']) + ' ' + str(sat_b['max_elevation']) + ' ' + \
-                        str(sat_b['priority']) + ' ' + sat_b['scheduler'])
+            # check that both are on the same SDR and both are currently scheduled
+            # if not, there can't be a collision
+            if sat_a['sdr'] == sat_b['sdr'] and sat_a['scheduler'] != '' and sat_b['scheduler'] != '':
+                # potential overlap?
+                if is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'], sat_b['time'], sat_b['time'] + sat_b['duration']):
+                    MY_LOGGER.debug('Overlap to process between %s and %s', sat_a['satellite'], sat_b['satellite'])
+                    MY_LOGGER.debug('Sat A %s start = %s, duration = %s, max ele = %s, priority = %s',
+                                    sat_a['satellite'], str(sat_a['time']), str(sat_a['duration']),
+                                    str(sat_a['max_elevation']), str(sat_a['priority']))
+                    MY_LOGGER.debug('Sat B %s start = %s, duration = %s, max ele = %s, priority = %s',
+                                    sat_b['satellite'], str(sat_b['time']), str(sat_b['duration']),
+                                    str(sat_b['max_elevation']), str(sat_b['priority']))
 
-                # if either is not scheduled, confirm
-                if sat_a['scheduler'] == '':
-                    MY_LOGGER.debug('%s is not being scheduled', sat_a['satellite'])
-                if sat_b['scheduler'] == '':
-                    MY_LOGGER.debug('%s is not being scheduled', sat_b['satellite'])
-
-                # both scheduled
-                if sat_a['scheduler'] != '' and sat_b['scheduler'] != '':
-                    # if one has the higher priority, keep that
+                    # which to try to adjust, if can't determine, adjust A as a default
+                    # priority tests
+                    adjust = 'A'
                     if sat_a['priority'] > sat_b['priority']:
-                        MY_LOGGER.debug('Removing %s since it has a lower priority',
-                                        sat_b['satellite'])
-                        sat_b['scheduler'] = ''
-                        sat_b['capture reason'] = 'Lower priority than overlapping'
+                        adjust = 'B'
+                        MY_LOGGER.debug('Priority A > B')
                     elif sat_a['priority'] < sat_b['priority']:
-                        MY_LOGGER.debug('Removing %s since it has a lower priority',
-                                        sat_a['satellite'])
-                        sat_a['scheduler'] = ''
-                        sat_a['capture reason'] = 'Lower priority than overlapping'
-                    else:
-                        # keep the one with the max elevation
-                        MY_LOGGER.debug('Overlapping %s and %s', sat_a['satellite'],
-                                        sat_b['satellite'])
-                        MY_LOGGER.debug('max_elevation A = %d', sat_a['max_elevation'])
-                        MY_LOGGER.debug('max_elevation B = %d', sat_b['max_elevation'])
+                        adjust = 'A'
+                        MY_LOGGER.debug('Priority B > A')
+                    else:  # max elevation tests
                         if sat_a['max_elevation'] > sat_b['max_elevation']:
-                            MY_LOGGER.debug('Removing %s based on maximum elevation',
-                                            sat_b['satellite'])
-                            sat_b['scheduler'] = ''
-                            sat_b['capture reason'] = 'Lower elevation than overlapping'
+                            adjust = 'B'
+                            MY_LOGGER.debug('Max elevation A > B')
                         else:
-                            MY_LOGGER.debug('Removing %s based on maximum elevation',
-                                            sat_a['satellite'])
-                            sat_a['scheduler'] = ''
-                            sat_a['capture reason'] = 'Lower elevation than overlapping'
-                MY_LOGGER.debug('')
+                            adjust = 'A'
+                            MY_LOGGER.debug('Max elevation B > A')
+
+                    if adjust == 'A': # Trying to adjust A to avoid overlap
+                        MY_LOGGER.debug('Trying to adjust A to avoid overlap')
+                        # A is early, try adjust A end time
+                        if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
+                                          sat_b['time'], sat_b['time'] + sat_b['duration']):
+                            MY_LOGGER.debug('Reduce end time for A will avoid overlap')
+                            sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
+                            sat_a['duration'] = sat_a['duration'] - pass_adjust
+                        else: # try adjust A end time and B start time
+                            if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
+                                              sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
+                                MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
+                                sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
+                                sat_a['duration'] = sat_a['duration'] - pass_adjust
+                                sat_a['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
+                                sat_b['time'] = sat_b['time'] + pass_adjust
+                                sat_b['duration'] = sat_b['duration'] - pass_adjust
+                            else:
+                                MY_LOGGER.debug('Not able to avoid overlap, remove A')
+                                sat_a['scheduler'] = ''
+                                sat_a['capture reason'] = 'Overlapping passes - not adjustable within threshold'
+
+                    else: # Trying to adjust B to avoid overlap
+
+                        MY_LOGGER.debug('Trying to adjust B to avoid overlap')
+                        # A is early, try adjust B start time
+                        if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'],
+                                          sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
+                            MY_LOGGER.debug('Increase start time for B will avoid overlap')
+                            sat_b['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
+                            sat_b['time'] = sat_b['time'] + pass_adjust
+                            sat_b['duration'] = sat_b['duration'] - pass_adjust
+                        else: # try adjust A end time and B start time
+                            if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
+                                              sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
+                                MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
+                                sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
+                                sat_b['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
+                                sat_b['time'] = sat_b['time'] + pass_adjust
+                                sat_b['duration'] = sat_b['duration'] - pass_adjust
+                            else:
+                                MY_LOGGER.debug('Not able to avoid overlap, remove A')
+                                sat_b['scheduler'] = ''
+                                sat_b['capture reason'] = 'Overlapping passes - not adjustable within threshold'
+                    # reschedule
+                    sat_a['scheduler'] = scheduler_command(sat_a['receive code'], sat_a['satellite'],
+                                                           sat_a['time'], sat_a['duration'],
+                                                           sat_a['max_elevation'])
+                    sat_b['scheduler'] = scheduler_command(sat_b['receive code'], sat_b['satellite'],
+                                                           sat_b['time'], sat_b['duration'],
+                                                           sat_b['max_elevation'])
+                    MY_LOGGER.debug('')
     MY_LOGGER.debug('=' * 50)
 
 
@@ -703,7 +756,7 @@ try:
                    '</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
                    '<link rel=\"stylesheet\" href=\"lightbox/css/lightbox.min.css\">'
-                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
+                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>')
         html.write('</head>')
         html.write('<body onload=\"defaulthide()\">')
         html.write(wxcutils.load_file(CONFIG_PATH,
@@ -731,20 +784,20 @@ try:
         html.write('</ul>')
         html.write('</div>')
         html.write('<table>')
-        if CONFIG_INFO['Hide Detail'] == 'yes':
-            html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
-                       '<th>Polar Plot</th><th>Pass'
-                       'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
-                       LOCAL_TIME_ZONE + ')</th><th>Pass Duration (min:sec)</th>'
-                       '<th>Visible to the Eye? (min:sec)?</th><th>Capturing?</th></tr>\n')
-        else:
-            html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
-                       '<th>Polar Plot</th><th>Pass'
-                       'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
-                       LOCAL_TIME_ZONE + ')</th><th>Pass Start (UTC)</th><th>'
-                       'Pass End (UTC)</th><th>Pass Duration (min:sec)</th><th>'
-                       'Frequency (MHz)</th><th>Antenna</th><th>Direction</th>'
-                       '<th>Visible to the Eye? (min:sec)?</th><th>Capturing?</th></tr>\n')
+        html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
+                    '<th>Polar Plot</th><th>Pass'
+                    'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
+                    LOCAL_TIME_ZONE + ')</th>')
+        if CONFIG_INFO['Hide Detail'] != 'yes':
+            html.write('<th>Pass Start (UTC)</th><th>Pass End (UTC)</th>')
+        html.write('<th>Pass Duration (min:sec)</th>')
+        if CONFIG_INFO['Hide Detail'] != 'yes':
+            html.write('<th>Frequency (MHz)</th><th>Antenna</th><th>Direction</th>')
+        html.write('<th>Visible to the Eye? (min:sec)?</th>')
+        if CONFIG_INFO['Hide Capturing'] != 'yes':
+            html.write('<th>Capturing?</th>')
+        html.write('</tr>')
+                       
         # iterate through list
         MY_LOGGER.debug('Iterating through satellites')
         for elem in SAT_DATA:
@@ -779,10 +832,11 @@ try:
                 html.write('<td>' + str(elem['antenna']) + '</td>')
                 html.write('<td>' + elem['direction'] + '</td>')
             html.write('<td>' + elem['visible'] + '</td>')
-            if elem['scheduler'] != '':
-                html.write('<td>Yes - ' + elem['capture reason'] + '</td>')
-            else:
-                html.write('<td>No - ' + elem['capture reason'] + '</td>')
+            if CONFIG_INFO['Hide Capturing'] != 'yes':
+                if elem['scheduler'] != '':
+                    html.write('<td>Yes - ' + elem['capture reason'] + '</td>')
+                else:
+                    html.write('<td>No - ' + elem['capture reason'] + '</td>')
             html.write('</tr>')
             MY_LOGGER.debug('Row generated')
         html.write('</table>')
@@ -839,7 +893,7 @@ try:
                    time.strftime('%H:%M (' +
                                  subprocess.check_output("date").
                                  decode('utf-8').split(' ')[-2] +
-                                 ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
+                                 ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
                    '.</p>')
         html.write('</footer>')
 
@@ -871,6 +925,5 @@ try:
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

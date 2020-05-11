@@ -39,7 +39,7 @@ def build_pass_json():
     MY_LOGGER.debug('building pass json')
     json_data = []
     for filename in find_files(TARGET, '*.html'):
-        if filename.split(TARGET)[1][:2] == '20' and 'captures' not in filename and 'meteor' not in filename:
+        if filename.split(TARGET)[1][:2] == '20' and 'captures' not in filename and 'meteor' not in filename and 'noaa' not in filename:
             # MY_LOGGER.debug('found pass page - filename = %s', filename)
             bpj_file_path, html_file = os.path.split(filename)
             base_filename, base_extension = os.path.splitext(html_file)
@@ -53,14 +53,14 @@ def build_pass_json():
                     result = entry.replace('.jpg', '').replace(bpj_file_path + '/images/', '').replace(base_filename, '')
                     image_enhancements.append(result[1:])
 
-            json_data.append({'path': filename_root.replace(OUTPUT_PATH, ''),
+            json_data.append({'path': filename_root.replace(TARGET, ''),
                               'enhancement': image_enhancements
                              })
             # build data for catures pages
             # MY_LOGGER.debug('filename_root = %s', filename_root.replace(TARGET, '')[11:30])
             local_sort = wxcutils.epoch_to_local(wxcutils.utc_to_epoch(filename_root.replace(TARGET, '')[11:30], '%Y-%m-%d-%H-%M-%S'), '%Y-%m-%d-%H-%M-%S')
             # MY_LOGGER.debug('local = %s', local)
-            ALL_PASSES.append({'path': filename_root.replace(OUTPUT_PATH, ''),
+            ALL_PASSES.append({'path': filename_root.replace(TARGET, ''),
                                'local sort': local_sort,
                                'local year': local_sort[:4],
                                'local month': local_sort[5:7],
@@ -156,7 +156,7 @@ def move_output_files():
         MY_LOGGER.debug('Modal move check')
         MY_LOGGER.debug(pass_files)
         for file_name in pass_files:
-            if 'config.html' not in file_name and 'satpass.html' not in file_name and 'meteor_index.html' not in file_name and 'satellitestatus' not in file_name:
+            if 'config.html' not in file_name and 'satpass.html' not in file_name and 'meteor_index.html' not in file_name and 'noaa_index.html' not in file_name and 'satellitestatus' not in file_name:
                 MY_LOGGER.debug('Applying modal fixes to pass files just copied')
                 MY_LOGGER.debug('file_name = %s', file_name.split('.LOCK.')[0])
                 file_bits = file_name.split('.LOCK.')[0].split('-')
@@ -295,12 +295,12 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                     cp_html.write('</li><ul>')
 
                 satellite = '???'
-                MY_LOGGER.debug('finding satellite name for %s', filename_row['filename'])
+                # MY_LOGGER.debug('finding satellite name for %s', filename_row['filename'])
                 for sat_test in SAT_DATA:
                     if sat_test['code'] in filename_row['filename']:
                         satellite = sat_test['name']
 
-                cp_html.write('<li><a href="' + filename_row['filename']
+                cp_html.write('<li><a href="' + CONFIG_INFO['Link Base'] + filename_row['filename']
                               + '" rel=\"modal:open\">'  + filename_row['time'].replace('-', ':') + ' - '
                               + satellite + '</a></li>')
 
@@ -308,6 +308,7 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
 
     MY_LOGGER.debug('build_month_page for %s %s %s %s %s', bpm_file_path, bpm_file_name,
                     bpm_month, bpm_month_name, bpm_year)
+
     # now create captures page
     with open(bpm_file_path + bpm_file_name, 'w') as cp_html:
         # html header
@@ -316,12 +317,12 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
         cp_html.write('<html lang=\"en\"><head>'
                       '<meta charset=\"UTF-8\">'
                       '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                      '<meta name=\"description\" content=\"xyzzy\">'
+                      '<meta name=\"description\" content=\"Monthly satellites passes page for ' + cp_label + '\">'
                       '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                       '<meta name=\"author\" content=\"WxCapture\">'
                       '<title>Captures ' + cp_label + '</title>'
                       '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'
-                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>'
+                      '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>'
                       '<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>'
                       '<script src=\"../../js/jquery.modal.min.js\"></script>'
                       '<link rel=\"stylesheet\" href=\"../../css/jquery.modal.min.css\" />')
@@ -357,7 +358,7 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
 
         cp_html.write('<section class=\"content-section container\">')
         cp_html.write('<h2 class=\"section-header\">' + cp_label + '</h2>')
-        write_month(OUTPUT_PATH, '/wxcapture/' + bpm_year + '/' + bpm_month + '/',
+        write_month(TARGET, CONFIG_INFO['Link Base'] + bpm_year + '/' + bpm_month + '/',
                     bpm_month_name + ' ' + bpm_year, bpm_passes, bpm_year, bpm_month)
         cp_html.write('</ul></section>')
         cp_html.write('<footer class=\"main-footer\">')
@@ -365,7 +366,7 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                       time.strftime('%H:%M (' +
                                     subprocess.check_output("date").
                                     decode('utf-8').split(' ')[-2] +
-                                    ')</span> on the <span class=\"time\">%d/%m/%Y</span>') +
+                                    ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
                       '.</p>')
         cp_html.write('</footer>')
 
@@ -427,14 +428,14 @@ def build_capture_pages():
     hours = int(time.strftime('%H'))
     minutes = int(time.strftime('%M'))
 
-    if (hours == 1) and (minutes in (0, 1)):
+    if ((hours == 1) and (minutes in (0, 1))) or REBUILD == 'rebuild':
         # rebuilding all pages overnight
         MY_LOGGER.debug('Building pages for all mmonths / years overnight')
         for d_t in rrule.rrule(rrule.MONTHLY, dtstart=date_start, until=date_now):
             month = d_t.strftime('%m')
             month_name = d_t.strftime('%B')
             year = d_t.strftime('%Y')
-            file_path = OUTPUT_PATH + '/wxcapture/' + year + '/' + month + '/'
+            file_path = TARGET + CONFIG_INFO['Link Base'] + year + '/' + month + '/'
             MY_LOGGER.debug('Building captures page = %s for %s %s', file_path, month_name, year)
             build_month_page(passes, file_path, CAPTURES_PAGE, month, month_name, year, historic_links)
 
@@ -445,14 +446,14 @@ def build_capture_pages():
     month_name = date_now.strftime('%B')
     year = date_now.strftime('%Y')
     MY_LOGGER.debug('Local date = %s %s (%s) %s', day, month, month_name, year)
-    file_path = OUTPUT_PATH + '/wxcapture/' + year + '/' + month + '/'
+    file_path = TARGET + CONFIG_INFO['Link Base'] + year + '/' + month + '/'
     MY_LOGGER.debug('Building captures page = %s for %s %s (current month)',
                     file_path, month_name, year)
     build_month_page(passes, file_path, CAPTURES_PAGE, month, month_name, year, historic_links)
 
     # build current page which redirects to current month page
     # MY_LOGGER.debug('Page data = %s', PAGE_DATA)
-    current_link = '/wxcapture/' + year + '/' + month + '/' + CAPTURES_PAGE
+    current_link = CONFIG_INFO['Link Base'] + year + '/' + month + '/' + CAPTURES_PAGE
     with open(TARGET + CAPTURES_PAGE, 'w') as html:
         # html header
         label = month_name + ' ' + year
@@ -465,7 +466,7 @@ def build_capture_pages():
                    '<meta name=\"author\" content=\"WxCapture\">'
                    '<title>Captures</title>'
                    '<link rel=\"stylesheet\" href=\"css/styles.css\">'
-                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"/wxcapture/favicon.png\"/>')
+                   '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>')
         html.write('<meta http-equiv = \"refresh\" content=\"0; url=\'' + current_link + '\'\" />')
         html.write('</head>')
         html.write('<body>')
@@ -494,19 +495,25 @@ MY_LOGGER.debug('APP_PATH = %s', APP_PATH)
 MY_LOGGER.debug('LOG_PATH = %s', LOG_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
+# load config
+CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
 # set up paths
 MY_PATH = '/home/mike/wxcapture/output/'
-TARGET = '/media/storage/html/wxcapture/'
-OUTPUT_PATH = '/media/storage/html'
+TARGET = CONFIG_INFO['web doc root location']
 CAPTURES_PAGE = 'captures.html'
 
 try:
+    # see if args passed
+    try:
+        REBUILD = sys.argv[1]
+    except:
+        REBUILD = ''
     # get local time zone
     LOCAL_TIME_ZONE = subprocess.check_output("date").decode('utf-8').split(' ')[-2]
 
     # load config
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
-
 
     # load satellites
     SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')
@@ -520,7 +527,7 @@ try:
     FILES_MOVED = move_output_files()
     MY_LOGGER.debug('Finished file moving')
 
-    if FILES_MOVED:
+    if FILES_MOVED or REBUILD == 'rebuild':
         MY_LOGGER.debug('Build json passes file')
         ALL_PASSES = []
         build_pass_json()
@@ -529,7 +536,7 @@ try:
         MY_LOGGER.debug('Starting capture page building')
         build_capture_pages()
         MY_LOGGER.debug('Finished capture page building')
-    elif int(time.strftime('%H')) == 1 and int(time.strftime('%M')) in (0, 1):
+    elif int(time.strftime('%H')) == 1 and int(time.strftime('%M')) in (0, 1) or REBUILD == 'rebuild':
         MY_LOGGER.debug('Starting capture page building - overnight run')
         build_capture_pages()
         MY_LOGGER.debug('Finished capture page building - overnight run')

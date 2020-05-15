@@ -529,7 +529,8 @@ try:
                                     FILE_SAME_COUNT += 1
                                 else:
                                     MY_LOGGER.debug('Can not find transparent projection file - %s', FILE_NAME)
-                        if FILE_SAME_COUNT != 1:
+                        if FILE_SAME_COUNT > 1:
+                            MY_LOGGER.debug('Files for projection = %d', FILE_SAME_COUNT)
                             FILE_SAME_DESC += '</ul>'
                             MY_LOGGER.debug(FILE_SAME_DESC)
                             MY_LOGGER.debug('Files in projection = %d', FILE_SAME_COUNT)
@@ -577,6 +578,8 @@ try:
                             html.write('</td></tr>')
                         else:
                             MY_LOGGER.debug('Not enough files (%s) to make a valid projection', FILE_SAME_COUNT)
+                    else:
+                        MY_LOGGER.debug('Projections not enabled for %s', ENHANCEMENTS[key]['projection'])
 
                 except Exception as err:
                     MY_LOGGER.debug('Unexpected error creating projections : %s %s %s',

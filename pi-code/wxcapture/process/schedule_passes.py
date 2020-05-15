@@ -334,6 +334,11 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
             symbol_rate = 'n/a'
             mode = 'n/a'
 
+        MY_LOGGER.debug('start_date_local = %s', start_date_local)
+        pass_meridian = 'am'
+        if int(start_date_local.split(' ')[4].split(':')[0]) > 11:
+            pass_meridian = 'pm'
+
         filename_base = wxcutils.epoch_to_utc(start_epoch, '%Y-%m-%d-%H-%M-%S') + \
             '-' + sat['name'].replace(' ', '_').replace('(', '').replace(')', '')
 
@@ -366,7 +371,9 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                          'modules': modules,
                          'sdr active': sdr_active,
                          'serial number': serial_number,
-                         'bias t': bias_t
+                         'bias t': bias_t,
+                         'pass meridian': pass_meridian,
+                         'sat type': sat['type']
                          })
 
     # return new start time for next pass search to start
@@ -727,6 +734,7 @@ try:
                 MY_LOGGER.debug('%s removed - active but not being recorded', elem['satellite'])
         except ValueError:
             MY_LOGGER.debug('when must be at a time in the future, never in the past - can ignore')
+    wxcutils.save_json(WORKING_PATH, 'passes_today.json', SAT_DATA)
 
     # find satellite pass for next few days
     MY_LOGGER.debug('Passes for the next few days')

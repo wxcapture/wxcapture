@@ -392,6 +392,24 @@
 				"valid values": "-pattern-",
 				"description": "Discord post colour bar which uses rrggbb for the colour as a hexidecimal value, e.g. ff0000",
 				"hidden": "no"
+			},
+			"projection type": {
+				"required": "yes",
+				"valid values": "mercator|cylindrical|cyl-area|eckert4|eckert6|mollweide|miller|lambert|stereographic|azimuth|leac|orthographic",
+				"description": "Projection type to use, e.g. eckert4",
+				"hidden": "no"
+			},
+			"projection N/S type": {
+				"required": "yes",
+				"valid values": "N|S",
+				"description": "Hemisphere for the projection, e.g. S",
+				"hidden": "no"
+			},
+			"projection bounding box": {
+				"required": "yes",
+				"valid values": "-any-",
+				"description": "Bounding box for the projection, e.g. 0,-80,140,-150",
+				"hidden": "no"
 			}
 		}
 	},

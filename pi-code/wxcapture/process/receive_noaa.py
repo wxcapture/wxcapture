@@ -175,11 +175,11 @@ try:
     START_TIME = int(START_EPOCH) + (int(DURATION) * 0.5)
     MY_LOGGER.debug('wxmap start time = %d (seconds since unix epoch) duration = %s (seconds)',
                     START_TIME, str(DURATION))
-    wxcutils.run_cmd('/usr/local/bin/wxmap -T \"' + SATELLITE + '\" -H \"'
-                     + WORKING_PATH + 'weather.tle\" -p ' +
-                     str(IMAGE_OPTIONS['Population']) + ' -l 0 -o \"' +
-                     str(START_TIME) + '\" \"' + IMAGE_PATH + FILENAME_BASE +
-                     '-map.png\"')
+    wxcutils.run_cmd('/usr/local/bin/wxmap -T \"' + SATELLITE + '\" -H '
+                     + WORKING_PATH + 'weather.tle -p ' +
+                     str(IMAGE_OPTIONS['Population']) + ' -l 0 -o -M 1 ' +
+                     str(START_TIME) + ' ' + IMAGE_PATH + FILENAME_BASE +
+                     '-map.png')
 
     KEEP_PAGE = True
     # build web page for pass

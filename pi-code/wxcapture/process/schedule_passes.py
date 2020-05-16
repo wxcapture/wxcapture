@@ -101,12 +101,13 @@ def get_sdr_data(sdr_name):
 def scheduler_command(sc_receive_code, sc_sat_name, sc_start_epoch,
                       sc_duration, sc_max_elevation):
     """create the command for the at scheduler"""
-    MY_LOGGER.debug('^^^ sc_start_epoch = %s', sc_start_epoch)
+    MY_LOGGER.debug('sc_start_epoch = %s', sc_start_epoch)
 
     return 'echo \"' + sc_receive_code + ' ' + sc_sat_name + ' ' + \
                     str(sc_start_epoch) + ' ' + str(sc_duration) + ' ' + str(sc_max_elevation) + \
                     ' N \" |  at ' + EMAIL_OUTPUT + \
                     datetime.fromtimestamp(int(sc_start_epoch) - 60).strftime('%H:%M %D')
+
 
 def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     """parse output from predict"""
@@ -250,7 +251,6 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
         theta.append(-2 * math.pi * (float(elements[5]) - 90) / 360)
         radius.append((90 - float(elements[4])) / 90)
         plot_labels.append(wxcutils.epoch_to_local(elements[0], '%H:%M:%S'))
-
 
     MY_LOGGER.debug('max_elevation = %s', str(max_elevation))
     MY_LOGGER.debug('azimuthmax_elevation = %s', str(azimuthmax_elevation))
@@ -453,16 +453,20 @@ def process_overlaps():
     # * end time of first is after start time of second
     # * start time of the first is before the start time of second
 
+
     def is_overlap(io_sat_a_start, io_sat_a_end, io_sat_b_start, io_sat_b_end):
         """test if there is an overlap between the two satellites"""
         # sdr buffer is to provide a buffer for the claim / release of the SDR between overlapping jobs
         # otherwise second pass will not be captured as the SDR is already in use
+        # only testing where the start for sat B is between the start / end of sat A
+        # otherwise would double process each overlap
         io_sdr_buffer = 1
         io_result = False
-        if ((io_sat_a_end + io_sdr_buffer) > io_sat_b_start) and (io_sat_a_start < io_sat_b_start):
-            MY_LOGGER.debug('Sat A overlaps with the start of sat B')
+        if io_sat_a_start < io_sat_b_start < (io_sat_a_end + io_sdr_buffer):
+            MY_LOGGER.debug('Sat B starts between the start and end of the pass for Sat A')
             io_result = True
         return io_result
+
 
     MY_LOGGER.debug('=' * 50)
     pass_adjust = int(CONFIG_INFO['Pass overlap threshold'])
@@ -505,21 +509,21 @@ def process_overlaps():
                         if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
                                           sat_b['time'], sat_b['time'] + sat_b['duration']):
                             MY_LOGGER.debug('Reduce end time for A will avoid overlap')
-                            sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
+                            sat_a['capture reason'] = 'Capture criteria met with reduced end time to avoid overlap'
                             sat_a['duration'] = sat_a['duration'] - pass_adjust
                         else: # try adjust A end time and B start time
                             if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
                                               sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
                                 MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
-                                sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
+                                sat_a['capture reason'] = 'Capture criteria met with reduced end time to avoid overlap'
                                 sat_a['duration'] = sat_a['duration'] - pass_adjust
-                                sat_a['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
+                                sat_a['capture reason'] = 'Capture criteria met with delayed start time to avoid overlap'
                                 sat_b['time'] = sat_b['time'] + pass_adjust
                                 sat_b['duration'] = sat_b['duration'] - pass_adjust
                             else:
                                 MY_LOGGER.debug('Not able to avoid overlap, remove A')
                                 sat_a['scheduler'] = ''
-                                sat_a['capture reason'] = 'Overlapping passes - not adjustable within threshold'
+                                sat_a['capture reason'] = 'Overlapping passes not adjustable within threshold'
 
                     else: # Trying to adjust B to avoid overlap
 
@@ -528,28 +532,30 @@ def process_overlaps():
                         if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'],
                                           sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
                             MY_LOGGER.debug('Increase start time for B will avoid overlap')
-                            sat_b['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
+                            sat_b['capture reason'] = 'Capture criteria met with delayed start time to avoid overlap'
                             sat_b['time'] = sat_b['time'] + pass_adjust
                             sat_b['duration'] = sat_b['duration'] - pass_adjust
                         else: # try adjust A end time and B start time
                             if not is_overlap(sat_a['time'], sat_a['time'] + sat_a['duration'] - pass_adjust,
                                               sat_b['time'] + pass_adjust, sat_b['time'] + sat_b['duration'] - pass_adjust):
                                 MY_LOGGER.debug('Reduce end time for A and start time for B will avoid overlap')
-                                sat_a['capture reason'] = 'Capture criteria met - reduced end time to avoid overlap'
-                                sat_b['capture reason'] = 'Capture criteria met - delayed start time to avoid overlap'
+                                sat_a['capture reason'] = 'Capture criteria met with reduced end time to avoid overlap'
+                                sat_b['capture reason'] = 'Capture criteria met with delayed start time to avoid overlap'
                                 sat_b['time'] = sat_b['time'] + pass_adjust
                                 sat_b['duration'] = sat_b['duration'] - pass_adjust
                             else:
-                                MY_LOGGER.debug('Not able to avoid overlap, remove A')
+                                MY_LOGGER.debug('Not able to avoid overlap, remove B')
                                 sat_b['scheduler'] = ''
                                 sat_b['capture reason'] = 'Overlapping passes - not adjustable within threshold'
                     # reschedule
-                    sat_a['scheduler'] = scheduler_command(sat_a['receive code'], sat_a['satellite'],
-                                                           sat_a['time'], sat_a['duration'],
-                                                           sat_a['max_elevation'])
-                    sat_b['scheduler'] = scheduler_command(sat_b['receive code'], sat_b['satellite'],
-                                                           sat_b['time'], sat_b['duration'],
-                                                           sat_b['max_elevation'])
+                    if sat_a['scheduler'] != '':
+                        sat_a['scheduler'] = scheduler_command(sat_a['receive code'], sat_a['satellite'],
+                                                               sat_a['time'], sat_a['duration'],
+                                                               sat_a['max_elevation'])
+                    if sat_b['scheduler'] != '':
+                        sat_b['scheduler'] = scheduler_command(sat_b['receive code'], sat_b['satellite'],
+                                                               sat_b['time'], sat_b['duration'],
+                                                               sat_b['max_elevation'])
                     MY_LOGGER.debug('')
     MY_LOGGER.debug('=' * 50)
 
@@ -793,9 +799,9 @@ try:
         html.write('</div>')
         html.write('<table>')
         html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
-                    '<th>Polar Plot</th><th>Pass'
-                    'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
-                    LOCAL_TIME_ZONE + ')</th>')
+                   '<th>Polar Plot</th><th>Pass'
+                   'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
+                   LOCAL_TIME_ZONE + ')</th>')
         if CONFIG_INFO['Hide Detail'] != 'yes':
             html.write('<th>Pass Start (UTC)</th><th>Pass End (UTC)</th>')
         html.write('<th>Pass Duration (min:sec)</th>')
@@ -805,7 +811,7 @@ try:
         if CONFIG_INFO['Hide Capturing'] != 'yes':
             html.write('<th>Capturing?</th>')
         html.write('</tr>')
-                       
+
         # iterate through list
         MY_LOGGER.debug('Iterating through satellites')
         for elem in SAT_DATA:

@@ -324,6 +324,11 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                 scheduler = scheduler_command(receive_code, sat['name'],
                                               start_epoch, duration,
                                               max_elevation)
+            elif sat['type'] == 'MORSE':
+                receive_code = CODE_PATH + 'receive_morse.py'
+                scheduler = scheduler_command(receive_code, sat['name'],
+                                              start_epoch, duration,
+                                              max_elevation)
             else:
                 MY_LOGGER.debug('No processsing code for %s of type %s', sat['name'], sat['type'])
 

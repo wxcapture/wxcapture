@@ -150,7 +150,7 @@ try:
         wxcutils_pi.sleep_until_start(float(START_EPOCH))
 
         MY_LOGGER.debug('Starting audio capture')
-        wxcutils.run_cmd('timeout ' + DURATION + ' /usr/local/bin/rtl_fm -d ' +
+        wxcutils.run_cmd('timeout ' + DURATION + ' rtl_fm -d ' +
                          str(WX_SDR) + BIAS_T + ' -M raw -f ' + str(PASS_INFO['frequency']) +
                          'M -s 768k ' + GAIN_COMMAND +
                          ' -p 0 | sox -t raw -r 768k -c 2 -b 16 -e s - -t wav \"' +

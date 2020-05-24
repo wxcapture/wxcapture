@@ -9,7 +9,6 @@ from os import path
 import sys
 import glob
 import random
-import time
 import subprocess
 from subprocess import Popen, PIPE
 import wxcutils
@@ -658,25 +657,54 @@ try:
                     MY_LOGGER.critical('Tweet exception handler: %s %s %s',
                                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
                 MY_LOGGER.debug('Tweeted!')
+    else:
+        MY_LOGGER.debug('Tweeting not enabled')
 
-                # send to Discord webhooks, if configured
-                # can only do this if tweeting as using the tweet's public image URL
-                if IMAGE_OPTIONS['discord webhooks'] == 'yes':
-                    # sleep to allow Twitter to process the tweet!
-                    MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
-                    time.sleep(30)
-                    MY_LOGGER.debug('Sleep over, try the webhook API')
+    # send to Discord webhooks, if configured
+    if IMAGE_OPTIONS['discord webhooks'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):
+        MY_LOGGER.debug('try the webhook API')
+
+        DISCORD_GROUPS = IMAGE_OPTIONS['discord groups']
+        MY_LOGGER.debug('removing options where there is no file')
+        for discord_group in DISCORD_GROUPS:
+            for discord_option in discord_group:
+                for row in discord_group[discord_option]:
+                    if not path.exists(IMAGE_PATH + FILENAME_BASE + '-' + row['type'] + '.jpg'):
+                        discord_group[discord_option].remove(row)
+
+        MY_LOGGER.debug('Discord pass(s)')
+        for discord_group in DISCORD_GROUPS:
+            for discord_option in discord_group:
+                random_pick = random.randint(1, len(discord_group[discord_option])) - 1
+                enhancement = discord_group[discord_option][random_pick]['type']
+                pass_description = ''
+                enhancement_filename = ''
+                for enhancement_group in IMAGE_OPTIONS['enhancements']:
+                    if IMAGE_OPTIONS['enhancements'][enhancement_group]['filename'] == enhancement:
+                        pass_description = IMAGE_OPTIONS['enhancements'][enhancement_group]['description']
+                        enhancement_filename = IMAGE_OPTIONS['enhancements'][enhancement_group]['filename']
+                MY_LOGGER.debug('enahancement = %s', enhancement)
+                MY_LOGGER.debug('pass_description = %s', pass_description)
+
+                filename_bits = FILENAME_BASE.split('-')
+                discord_image_url = CONFIG_INFO['website'] + '/' + filename_bits[0] + '/' + filename_bits[1] + '/' + filename_bits[2] + '/images/' +  FILENAME_BASE + '-' + enhancement_filename + '-tn.jpg'
+                MY_LOGGER.debug('discord_image_url = %s', discord_image_url)
+                MY_LOGGER.debug('PASS_INFO[start_date_local] = %s', PASS_INFO['start_date_local'])
+                try:
                     wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
-                                         wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
+                                         discord_image_url,
                                          SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
                                          MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
                                          PASS_INFO['NOAA Channel A'].replace('Channel A: ', ''),
                                          PASS_INFO['NOAA Channel B'].replace('Channel B: ', ''),
                                          pass_description)
-                else:
-                    MY_LOGGER.debug('Discord webhooks not configured')
+                except:
+                    MY_LOGGER.critical('discord exception handler: %s %s %s',
+                                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                MY_LOGGER.debug('discord webhooked!')
     else:
-        MY_LOGGER.debug('Tweeting not configured')
+        MY_LOGGER.debug('Discord webhooks not enabled')
+
 
     if KEEP_PAGE:
         # migrate files to destinations

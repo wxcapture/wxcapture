@@ -1,5 +1,5 @@
 {
-	"Branding": "Kiwi Weather",
+	"Branding": "KiwiWeather.com",
 	"Population": 100000,
 	"thumbnail size": "300 300",
 	"thumbnail quality": "75",
@@ -19,26 +19,46 @@
 			},
 			{
 				"type": "hvct-precip",
-				"text": "[SATELLITE] weather satellite pass over [LOCATION] captured on [PASS START], highlighting potential precipitation (see more at https://kiwiweather.com)"
+				"text": "[SATELLITE] weather satellite pass over [LOCATION] captured on [PASS START], highlighting potential precipitation (see more at https://kiwiweather.com)."
 			}
 		],
 		"group 2": [{
 				"type": "therm",
-				"text": "Air temperature map captured by the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START] (see more at https://kiwiweather.com)"
+				"text": "Air temperature map captured by the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START] (see more at https://kiwiweather.com)."
 			},
 			{
 				"type": "sea",
-				"text": "Sea temperature map captured by the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START]. Note that cloud may block some areas from showing the sea temperature (see more at https://kiwiweather.com)"
+				"text": "Sea temperature map captured by the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START] (see more at https://kiwiweather.com)."
 			},
 			{
 				"type": "contrasta",
-				"text": "[CHANNEL A] from the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START] (see more at https://kiwiweather.com)"
+				"text": "[CHANNEL A] from the [SATELLITE] weather satellite pass over [LOCATION], captured on [PASS START] (see more at https://kiwiweather.com)."
 			}
 		]
 	}],
 	"tweet min elevation": "20",
+	"discord min elevation": "20",
 	"discord webhooks": "yes",
 	"discord colour": "00ff00",
+	"discord groups": [{
+		"group 1": [{
+				"type": "mcir-precip"
+			},
+			{
+				"type": "hvct-precip"
+			}
+		],
+		"group 2": [{
+				"type": "therm"
+			},
+			{
+				"type": "sea"
+			},
+			{
+				"type": "contrasta"
+			}
+		]
+	}],
 	"projection type": "eckert4",
 	"projection N/S type": "S",
 	"projection bounding box": "0,-80,130,-140",

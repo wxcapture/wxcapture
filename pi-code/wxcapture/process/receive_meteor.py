@@ -454,24 +454,34 @@ try:
                     MY_LOGGER.critical('Tweet exception handler: %s %s %s',
                                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
                 MY_LOGGER.debug('Tweeted!')
-                # send to Discord webhooks, if configured
-                # can only do this if tweeting as using the tweet's public image URL
-                if IMAGE_OPTIONS['discord webhooks'] == 'yes':
-                    # sleep to allow Twitter to process the tweet!
-                    MY_LOGGER.debug('Sleeping 30 sec to let the Twitter API process')
-                    time.sleep(30)
-                    MY_LOGGER.debug('Sleep over, try the webhook API')
-                    wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
-                                         wxcutils_pi.tweet_get_image_url(CONFIG_PATH, 'config-twitter.json'),
-                                         SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
-                                         MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
-                                         '', '', 'Visible light image')
-                else:
-                    MY_LOGGER.debug('Discord webhooks not configured')
             else:
                 MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.')
         else:
-            MY_LOGGER.debug('Tweeting not configured')
+            MY_LOGGER.debug('Tweeting not enabled')
+        # discord webhook?
+        if IMAGE_OPTIONS['discord webhooks'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):
+            MY_LOGGER.debug('Webhooking pass')
+            # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
+            DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg'
+            FILENAME_BITS = FILENAME_BASE.split('-')
+            DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + '-cc-rectified-tn.jpg'
+            MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
+            # only proceed if the image exists
+            if path.exists(DISCORD_IMAGE):
+                try:
+                    wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
+                                         DISCORD_IMAGE_URL,
+                                         SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
+                                         MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                         '', '', 'Visible light image')
+                except:
+                    MY_LOGGER.critical('Discord exception handler: %s %s %s',
+                                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+            else:
+                MY_LOGGER.debug('The image, %s, does not exist so skipping webhooking it.')
+        else:
+            MY_LOGGER.debug('Webhooking not enabled')
+
     else:
         MY_LOGGER.debug('Page not created due to image size')
         MY_LOGGER.debug('Deleting any objects created')

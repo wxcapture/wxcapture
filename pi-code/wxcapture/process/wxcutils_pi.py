@@ -84,32 +84,6 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
     MY_UTIL_LOGGER.debug('Tweet sent with status = %s', tt_status)
 
 
-def tweet_get_image_url(tgiu_config_path, tgiu_config_file):
-    """get the url for the image in the last tweet"""
-    tgiu_config = wxcutils.load_json(tgiu_config_path, tgiu_config_file)
-
-    # authentication
-    MY_UTIL_LOGGER.debug('Authenticating to Twitter API')
-    tgiu_auth = tweepy.OAuthHandler(tgiu_config['consumer key'], tgiu_config['consumer secret'])
-    tgiu_auth.set_access_token(tgiu_config['access token'], tgiu_config['access token secret'])
-
-    # get api
-    tgiu_api = tweepy.API(tgiu_auth)
-
-    tgiu_twitter_handle = tgiu_config['tweet to'][1:]
-    MY_UTIL_LOGGER.debug('last tweet for %s', tgiu_twitter_handle)
-
-    tgiu_imagesfile = ''
-    for tgiu_tweet in tweepy.Cursor(tgiu_api.user_timeline, tweet_mode='extended').items():
-        if 'media' in tgiu_tweet.entities:
-            for tgiu_image in tgiu_tweet.entities['media']:
-                tgiu_imagesfile = str(tgiu_image['media_url'])
-        break
-
-    MY_UTIL_LOGGER.debug(tgiu_imagesfile)
-    return tgiu_imagesfile
-
-
 def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_satellite,
              w_location, w_colour, w_elevation, w_duration, w_pass_start,
              w_channel_a, w_channel_b, w_description):
@@ -127,6 +101,7 @@ def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_s
 
     MY_UTIL_LOGGER.debug('Iterate through webhooks')
     for w_row in w_config['webhooks']:
+        MY_UTIL_LOGGER.debug('webhook last 3 chars = %s', w_row[len(w_row) - 3:])
         w_webhook = DiscordWebhook(url=w_row)
 
         # create embed object for webhook
@@ -142,7 +117,7 @@ def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_s
         w_embed.add_embed_field(name='Satellite', value=':satellite_orbital:' + w_satellite)
         w_embed.add_embed_field(name='Max Elevation', value=(w_elevation + '°'))
         w_embed.add_embed_field(name='Duration', value=(w_duration + ' seconds'))
-        w_embed.add_embed_field(name='Pass start', value='04:33:35 April 30  2020 (NZST)')
+        w_embed.add_embed_field(name='Pass start', value=w_pass_start)
         if w_channel_a != '':
             w_embed.add_embed_field(name='Channel A', value=w_channel_a)
         if w_channel_b != '':

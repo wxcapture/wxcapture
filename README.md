@@ -1,4 +1,4 @@
-# WXcapture
+# WxCapture
 ## Weather Satellite Capture Project
 To see a preview of the site here, check out [https://wxcapture.github.io/wxcapture/server-website/wxcapture/index.html](https://wxcapture.github.io/wxcapture/server-website/wxcapture/index.html)
 <!-- You can see our website (with all the data) at [INTRANET] -->

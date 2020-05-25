@@ -16,7 +16,7 @@ In time an installer will be created...
 # Webpage notes:
 - ```index.html``` and ```satellites.html``` are static
 - Predictions page (```satpass.html```) comes from ```schedule_passess.py```
-- Captures page (```captures.html```) comes from ```move.py```
+- Captures page (```captures.html```) comes from ```move_modal.py```
 - Status page (```satellitestatus.html```) comes from ```satellite_status.py```
 
 # About this project 

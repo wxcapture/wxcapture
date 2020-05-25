@@ -34,16 +34,29 @@ def migrate_files():
     """migrate files to server"""
     MY_LOGGER.debug('migrating files')
     files_to_copy = []
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.html', 'destination path': '', 'copied': 'no'})
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.txt', 'destination path': '', 'copied': 'no'})
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.json', 'destination path': '', 'copied': 'no'})
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + 'weather.tle', 'destination path': '', 'copied': 'no'})
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.dec', 'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH,
+                          'source file': FILENAME_BASE + '.html',
+                          'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH,
+                          'source file': FILENAME_BASE + '.txt',
+                          'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH,
+                          'source file': FILENAME_BASE + '.json',
+                          'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH,
+                          'source file': FILENAME_BASE + 'weather.tle',
+                          'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH,
+                          'source file': FILENAME_BASE + '.dec',
+                          'destination path': '', 'copied': 'no'})
     if CONFIG_INFO['save .wav files'] == 'yes':
-        files_to_copy.append({'source path': AUDIO_PATH, 'source file': FILENAME_BASE + '.wav', 'destination path': 'audio/', 'copied': 'no'})
+        files_to_copy.append({'source path': AUDIO_PATH,
+                              'source file': FILENAME_BASE + '.wav',
+                              'destination path': 'audio/', 'copied': 'no'})
     for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.jpg'):
         img_path, img_filename = os.path.split(img_file)
-        files_to_copy.append({'source path': img_path, 'source file': img_filename, 'destination path': 'images/', 'copied': 'no'})
+        files_to_copy.append({'source path': img_path, 'source file': img_filename,
+                              'destination path': 'images/', 'copied': 'no'})
     MY_LOGGER.debug('Files to copy = %s', files_to_copy)
     wxcutils.migrate_files(files_to_copy)
     MY_LOGGER.debug('Completed migrating files')
@@ -137,7 +150,8 @@ try:
     WX_SDR = wxcutils_pi.get_sdr_device(PASS_INFO['serial number'])
     MY_LOGGER.debug('SDR device ID = %d', WX_SDR)
 
-    GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS, str(MAX_ELEVATION))
+    GAIN_COMMAND, GAIN_DESCRIPTION, GAIN_VALUE = wxcutils_pi.get_gain(IMAGE_OPTIONS,
+                                                                      str(MAX_ELEVATION))
 
     # capture pass to wav file
     # timeout 600 rtl_fm -M raw -f 137.9M -s 768k -g 8 -p 0 |
@@ -286,8 +300,8 @@ try:
                 wxcutils_pi.fix_image(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp',
                                       WORKING_PATH + FILENAME_BASE + '-processed.bmp', 'Y')
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE +  '-processed.bmp > ' + IMAGE_PATH +
-                                 FILENAME_BASE + '-processed.jpg')
+                                 ' ' + WORKING_PATH + FILENAME_BASE +  '-processed.bmp > ' +
+                                 IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
                 wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
                 wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
                                  '-processed-rectified.jpg\" | pnmscale -xysize ' +
@@ -403,7 +417,8 @@ try:
 
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg'):
                 MY_LOGGER.debug('Adding processed image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg'))
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-processed-rectified.jpg'))
                 html.write('<h3>Processed Image</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +
                            '-processed-rectified.jpg' + '\"><img src=\"images/' +
@@ -439,17 +454,21 @@ try:
         MY_LOGGER.debug('migrate files to destinations')
         migrate_files()
         # tweet?
-        if IMAGE_OPTIONS['tweet'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
+        if IMAGE_OPTIONS['tweet'] == 'yes' and \
+            int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
             MY_LOGGER.debug('Tweeting pass')
-            LOCATION_HASHTAGS = '#' + CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
-            TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] +' from ' + SATELLITE + \
-                ' on ' + PASS_INFO['start_date_local'] + ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
+            LOCATION_HASHTAGS = '#' + \
+                CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
+            TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] + \
+                ' from ' + SATELLITE + ' on ' + PASS_INFO['start_date_local'] + \
+                ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
             TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg'
             # only proceed if the image exists
             if path.exists(TWEET_IMAGE):
                 try:
-                    wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json', TWEET_TEXT, TWEET_IMAGE)
+                    wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json',
+                                                 TWEET_TEXT, TWEET_IMAGE)
                 except:
                     MY_LOGGER.critical('Tweet exception handler: %s %s %s',
                                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
@@ -459,19 +478,29 @@ try:
         else:
             MY_LOGGER.debug('Tweeting not enabled')
         # discord webhook?
-        if IMAGE_OPTIONS['discord webhooks'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):
+        if IMAGE_OPTIONS['discord webhooks'] == 'yes' and \
+            int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):
+            # need to sleep a few minutes to enable the images to get to the web server
+            # otherwise the image used by the webhook API will not be accessible when the
+            # API is called
+            MY_LOGGER.debug('Sleeping 3 minutes to allow the images to get to the web server')
+            time.sleep(180)
+            MY_LOGGER.debug('Sleep complete...')
             MY_LOGGER.debug('Webhooking pass')
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
             DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg'
             FILENAME_BITS = FILENAME_BASE.split('-')
-            DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + '-cc-rectified-tn.jpg'
+            DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + \
+                FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + \
+                '-cc-rectified-tn.jpg'
             MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
             # only proceed if the image exists
             if path.exists(DISCORD_IMAGE):
                 try:
                     wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
                                          DISCORD_IMAGE_URL,
-                                         SATELLITE, 'Pass over ' + CONFIG_INFO['Location'], IMAGE_OPTIONS['discord colour'],
+                                         SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
+                                         IMAGE_OPTIONS['discord colour'],
                                          MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
                                          '', '', 'Visible light image')
                 except:

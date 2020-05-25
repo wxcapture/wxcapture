@@ -1,4 +1,4 @@
-# WXcapture
+# WxCapture
 ## Weather Satellite Capture Project
 To see a preview of the site here, check out [https://wxcapture.github.io/wxcapture/server-website/wxcapture/index.html](https://wxcapture.github.io/wxcapture/server-website/wxcapture/index.html)
 <!-- You can see our website (with all the data) at [INTRANET] -->
@@ -16,7 +16,7 @@ In time an installer will be created...
 # Webpage notes:
 - ```index.html``` and ```satellites.html``` are static
 - Predictions page (```satpass.html```) comes from ```schedule_passess.py```
-- Captures page (```captures.html```) comes from ```move.py```
+- Captures page (```captures.html```) comes from ```move_modal.py```
 - Status page (```satellitestatus.html```) comes from ```satellite_status.py```
 
 # About this project 

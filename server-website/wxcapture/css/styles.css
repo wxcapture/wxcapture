@@ -148,13 +148,13 @@ tr {
 }
 
 .time {
-    color: #ffffff;
+    color: white;
     background-color: #888888;
     font-family: 'Courier New', Courier, monospace
 }
 
 #footer-text {
-    color: #ffffff;
+    color: white;
 }
 
 .main-footer {
@@ -207,7 +207,7 @@ tr {
 }
 
 .hint:hover {
-    color: #ffffff;
+    color: white;
     background-color: #cccccc;
 }
 
@@ -221,7 +221,7 @@ tr {
 }
 
 b {
-    color: #ffffff;
+    color: white;
     font-size: large;
     font-weight: bold;
 }
@@ -249,7 +249,7 @@ b {
 
 del {
     color: #cccccc;
-    background-color: #ffffff;
+    background-color: white;
 }
 
 .example-image {

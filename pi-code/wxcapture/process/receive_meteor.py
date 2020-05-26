@@ -483,8 +483,8 @@ try:
             # need to sleep a few minutes to enable the images to get to the web server
             # otherwise the image used by the webhook API will not be accessible when the
             # API is called
-            MY_LOGGER.debug('Sleeping 3 minutes to allow the images to get to the web server')
-            time.sleep(180)
+            MY_LOGGER.debug('Sleeping 5 minutes to allow the images to get to the web server')
+            time.sleep(300)
             MY_LOGGER.debug('Sleep complete...')
             MY_LOGGER.debug('Webhooking pass')
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds

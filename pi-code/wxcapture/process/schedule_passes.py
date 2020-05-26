@@ -256,8 +256,10 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     MY_LOGGER.debug('azimuthmax_elevation = %s', str(azimuthmax_elevation))
     if azimuthmax_elevation > 180:
         max_elevation_direction = 'W'
+        max_elevation_direction_desc = 'West'
     else:
         max_elevation_direction = 'E'
+        max_elevation_direction_desc = 'East'
     MY_LOGGER.debug('max_elevation_direction = %s', max_elevation_direction)
 
     MY_LOGGER.debug('predict first line = %s', lines[0])
@@ -357,6 +359,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                          'orbit': orbit, 'direction': direction,
                          'visible': visible,
                          'max_elevation_direction': max_elevation_direction,
+                         'max_elevation_direction_desc': max_elevation_direction_desc,
                          'scheduler': scheduler, 'capture': sat['capture'],
                          'receive code': receive_code,
                          'capture reason': capture_reason,
@@ -648,6 +651,12 @@ def get_time_element(gte_datetime):
     return gte_datetime.split(' ')[4]
 
 
+def get_non_year_element(gte_datetime):
+    """strip out non-time element"""
+    return gte_datetime.split(' ')[0] + ' ' + wxcutils.ordinal(int(gte_datetime.split(' ')[1])) + \
+        ' ' +  gte_datetime.split(' ')[2] + ' ' +  gte_datetime.split(' ')[4]
+
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -803,7 +812,7 @@ try:
         html.write('</ul>')
         html.write('</div>')
         html.write('<table>')
-        html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
+        html.write('<tr><th>Satellite</th><th>Max Elevation</th>'
                    '<th>Polar Plot</th><th>Pass'
                    'Start (' + LOCAL_TIME_ZONE + ')</th><th>Pass End (' +
                    LOCAL_TIME_ZONE + ')</th>')
@@ -812,7 +821,7 @@ try:
         html.write('<th>Pass Duration (min:sec)</th>')
         if CONFIG_INFO['Hide Detail'] != 'yes':
             html.write('<th>Frequency (MHz)</th><th>Antenna</th><th>Direction</th>')
-        html.write('<th>Visible to the Eye? (min:sec)?</th>')
+        html.write('<th>Visible to the Eye? (min:sec)</th>')
         if CONFIG_INFO['Hide Capturing'] != 'yes':
             html.write('<th>Capturing?</th>')
         html.write('</tr>')
@@ -837,8 +846,8 @@ try:
                 html.write('<tr>')
             html.write('<td>' + font_effect_start + elem['satellite'] +
                        font_effect_end + '</td>')
-            html.write('<td>' + str(elem['max_elevation']) + \
-                elem['max_elevation_direction'] + '</td>')
+            html.write('<td>' + str(elem['max_elevation']) + '&deg; ' + \
+                elem['max_elevation_direction_desc'] + '</td>')
             html.write('<td>' + plot_link + '</td>')
             html.write('<td>' + get_time_element(elem['start_date_local']) + '</td>')
             html.write('<td>' + get_time_element(elem['end_date_local']) + '</td>')
@@ -866,11 +875,11 @@ try:
                    ' Days Over ' + CONFIG_INFO['Location'] + '</h2>')
         html.write('<table>')
         if CONFIG_INFO['Hide Detail'] == 'yes':
-            html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
+            html.write('<tr><th>Satellite</th><th>Max Elevation</th>'
                        '<th>Pass Start (' + LOCAL_TIME_ZONE +
                        ')</th><th>Pass End (' + LOCAL_TIME_ZONE +
                        ')</th><th>Pass Duration (min:sec)</th>'
-                       '<th>Visible to the Eye? (min:sec)?</th></tr>\n')
+                       '<th>Visible to the Eye? (min:sec)</th></tr>\n')
         else:
             html.write('<tr><th>Satellite</th><th>Max Elevation (&deg;)</th>'
                        '<th>Pass Start (' + LOCAL_TIME_ZONE +
@@ -878,7 +887,7 @@ try:
                        ')</th><th>Pass Start (UTC)</th><th>Pass '
                        'End (UTC)</th><th>Pass Duration (min:sec)</th>'
                        '<th>Frequency (MHz)</th><th>Antenna</th>'
-                       '<th>Direction</th><th>Visible to the Eye? (min:sec)?</th></tr>\n')
+                       '<th>Direction</th><th>Visible to the Eye? (min:sec)</th></tr>\n')
         # iterate through list
         for elem in SAT_DATA_NEXT:
             rowColour = ''
@@ -889,10 +898,10 @@ try:
             else:
                 html.write('<tr>')
             html.write('<td>' + elem['satellite'] + '</td>')
-            html.write('<td>' + str(elem['max_elevation']) +
-                       elem['max_elevation_direction'] + '</td>')
-            html.write('<td>' + elem['start_date_local'] + '</td>')
-            html.write('<td>' + elem['end_date_local'] + '</td>')
+            html.write('<td>' + str(elem['max_elevation']) + '&deg; ' +
+                       elem['max_elevation_direction_desc'] + '</td>')
+            html.write('<td>' + get_non_year_element(elem['start_date_local']) + '</td>')
+            html.write('<td>' + get_non_year_element(elem['end_date_local']) + '</td>')
             if CONFIG_INFO['Hide Detail'] != 'yes':
                 html.write('<td>' + elem['startDate'] + '</td>')
                 html.write('<td>' + elem['endDate'] + '</td>')

@@ -10,7 +10,7 @@
 	"Pass List Days": "3",
 	"Pass overlap threshold": "100",
 	"Hide Detail": "yes",
-	"Hide Capturing": "no",
+	"Hide Capturing": "yes",
 	"Link Base": "/",
 	"save .wav files": "yes",
 	"email receive output": "no",

@@ -132,7 +132,7 @@ def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_s
         MY_UTIL_LOGGER.debug('response = %s', w_response)
 
 
-def fix_image(fi_source, fi_destination, fi_equalize):
+def fix_image(fi_source, fi_destination, fi_image_fix, fi_equalize):
     """remove noise from image"""
 
 
@@ -190,68 +190,69 @@ def fix_image(fi_source, fi_destination, fi_equalize):
     image, image_height, image_width = load_image(fi_source)
     MY_UTIL_LOGGER.debug('Load image end')
 
-    MY_UTIL_LOGGER.debug('Find thick lines start')
-    image_mid_width = int(image_width / 2)
-    y_iterator = 0
-    black_run_length = 0
-    black_run_start = 0
-    while y_iterator < image_height:
-        # MY_UTIL_LOGGER.debug('y_iterator = %d', y_iterator)
-        red, green, blue = image.getpixel((image_mid_width, y_iterator))
-        if red == 0 and green == 0 and blue == 0:
-            black_run_start = y_iterator
-            black_run_length += 1
-            # MY_UTIL_LOGGER.debug('BLACK y_iterator = %d, run = %d', y_iterator, black_run_length)
-        else:
-            if black_run_length > 1 and black_run_length >= min_pixel_thick_length:
-                # MY_UTIL_LOGGER.debug('Thick black run total length = %d between lines %d and %d', black_run_length, black_run_start, black_run_start + black_run_length)
-                fix_thick_line(black_run_start - black_run_length, black_run_start)
-            black_run_length = 0
-
-        y_iterator += 1
-    MY_UTIL_LOGGER.debug('Find thick lines end')
-
-
-    MY_UTIL_LOGGER.debug('Image line removal start')
-    y_iterator = 0
-    try_count_max = 5
-    while y_iterator < image_height:
-        if y_iterator%500 == 0:
-            MY_UTIL_LOGGER.debug(y_iterator)
-        x_iterator = 0
-        while x_iterator < image_width:
-            red, green, blue = image.getpixel((x_iterator, y_iterator))
-            # MY_UTIL_LOGGER.debug('Pixel %d,%d = R%d G%d B%d', x_iterator, y_iterator, red, green, blue)
-            # see if black is faulty
+    if fi_image_fix == 'Y':
+        MY_UTIL_LOGGER.debug('Find thick lines start')
+        image_mid_width = int(image_width / 2)
+        y_iterator = 0
+        black_run_length = 0
+        black_run_start = 0
+        while y_iterator < image_height:
+            # MY_UTIL_LOGGER.debug('y_iterator = %d', y_iterator)
+            red, green, blue = image.getpixel((image_mid_width, y_iterator))
             if red == 0 and green == 0 and blue == 0:
-                # MY_UTIL_LOGGER.debug('bad black')
-                fix_pixel(x_iterator, y_iterator)
-            # see if cyan is faulty
-            elif red == 0 and green != 0 and blue != 0:
-                # MY_UTIL_LOGGER.debug('bad cyan')
-                fix_pixel(x_iterator, y_iterator)
-             # see if magenta is faulty
-            elif red != 0 and green == 0 and blue != 0:
-                # MY_UTIL_LOGGER.debug('bad magenta')
-                fix_pixel(x_iterator, y_iterator)
-            # see if yellow is faulty
-            elif red != 0 and green != 0 and blue == 0:
-                # MY_UTIL_LOGGER.debug('bad yellow')
-                fix_pixel(x_iterator, y_iterator)
-            elif red != 0 and green == 0 and blue == 0:
-                # MY_UTIL_LOGGER.debug('bad red')
-                fix_pixel(x_iterator, y_iterator)
-            elif red == 0 and green != 0 and blue == 0:
-                # MY_UTIL_LOGGER.debug('bad green')
-                fix_pixel(x_iterator, y_iterator)
-            elif red == 0 and green == 0 and blue != 0:
-                # MY_UTIL_LOGGER.debug('bad blue')
-                fix_pixel(x_iterator, y_iterator)
+                black_run_start = y_iterator
+                black_run_length += 1
+                # MY_UTIL_LOGGER.debug('BLACK y_iterator = %d, run = %d', y_iterator, black_run_length)
+            else:
+                if black_run_length > 1 and black_run_length >= min_pixel_thick_length:
+                    # MY_UTIL_LOGGER.debug('Thick black run total length = %d between lines %d and %d', black_run_length, black_run_start, black_run_start + black_run_length)
+                    fix_thick_line(black_run_start - black_run_length, black_run_start)
+                black_run_length = 0
 
-            x_iterator += 1
-        y_iterator += 1
+            y_iterator += 1
+        MY_UTIL_LOGGER.debug('Find thick lines end')
 
-    MY_UTIL_LOGGER.debug('Image line removal finished')
+
+        MY_UTIL_LOGGER.debug('Image line removal start')
+        y_iterator = 0
+        try_count_max = 5
+        while y_iterator < image_height:
+            if y_iterator%500 == 0:
+                MY_UTIL_LOGGER.debug(y_iterator)
+            x_iterator = 0
+            while x_iterator < image_width:
+                red, green, blue = image.getpixel((x_iterator, y_iterator))
+                # MY_UTIL_LOGGER.debug('Pixel %d,%d = R%d G%d B%d', x_iterator, y_iterator, red, green, blue)
+                # see if black is faulty
+                if red == 0 and green == 0 and blue == 0:
+                    # MY_UTIL_LOGGER.debug('bad black')
+                    fix_pixel(x_iterator, y_iterator)
+                # see if cyan is faulty
+                elif red == 0 and green != 0 and blue != 0:
+                    # MY_UTIL_LOGGER.debug('bad cyan')
+                    fix_pixel(x_iterator, y_iterator)
+                # see if magenta is faulty
+                elif red != 0 and green == 0 and blue != 0:
+                    # MY_UTIL_LOGGER.debug('bad magenta')
+                    fix_pixel(x_iterator, y_iterator)
+                # see if yellow is faulty
+                elif red != 0 and green != 0 and blue == 0:
+                    # MY_UTIL_LOGGER.debug('bad yellow')
+                    fix_pixel(x_iterator, y_iterator)
+                elif red != 0 and green == 0 and blue == 0:
+                    # MY_UTIL_LOGGER.debug('bad red')
+                    fix_pixel(x_iterator, y_iterator)
+                elif red == 0 and green != 0 and blue == 0:
+                    # MY_UTIL_LOGGER.debug('bad green')
+                    fix_pixel(x_iterator, y_iterator)
+                elif red == 0 and green == 0 and blue != 0:
+                    # MY_UTIL_LOGGER.debug('bad blue')
+                    fix_pixel(x_iterator, y_iterator)
+
+                x_iterator += 1
+            y_iterator += 1
+
+        MY_UTIL_LOGGER.debug('Image line removal finished')
 
     if fi_equalize == 'Y':
         MY_UTIL_LOGGER.debug('Equalising image start')

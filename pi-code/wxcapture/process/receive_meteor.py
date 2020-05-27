@@ -298,10 +298,10 @@ try:
 
                 # create a processed image
                 wxcutils_pi.fix_image(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp',
-                                      WORKING_PATH + FILENAME_BASE + '-processed.bmp', 'Y')
+                                      WORKING_PATH + FILENAME_BASE + '-processed.bmp', 'N', 'Y')
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
                                  ' ' + WORKING_PATH + FILENAME_BASE +  '-processed.bmp > ' +
-                                 IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
+                                 IMAGE_PATH + FILENAME_BASE + '-processed-tn.jpg')
                 wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
                 wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
                                  '-processed-rectified.jpg\" | pnmscale -xysize ' +
@@ -463,7 +463,10 @@ try:
                 ' from ' + SATELLITE + ' on ' + PASS_INFO['start_date_local'] + \
                 ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
-            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg'
+            # change filename to select which image to webhook
+            # normal -  '-cc-rectified-tn.jpg'
+            # processes - '-processed-rectified-tn.jpg'
+            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-processed-tn.jpg'
             # only proceed if the image exists
             if path.exists(TWEET_IMAGE):
                 try:
@@ -474,7 +477,8 @@ try:
                                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
                 MY_LOGGER.debug('Tweeted!')
             else:
-                MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.')
+                MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.',
+                                TWEET_IMAGE)
         else:
             MY_LOGGER.debug('Tweeting not enabled')
         # discord webhook?
@@ -488,11 +492,14 @@ try:
             MY_LOGGER.debug('Sleep complete...')
             MY_LOGGER.debug('Webhooking pass')
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
-            DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg'
             FILENAME_BITS = FILENAME_BASE.split('-')
+            # change filename to select which image to webhook
+            # normal -  '-cc-rectified-tn.jpg'
+            # processes - '-processed-rectified-tn.jpg'
+            DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg'
             DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + \
                 FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + \
-                '-cc-rectified-tn.jpg'
+                '-processed-rectified-tn.jpg'
             MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
             # only proceed if the image exists
             if path.exists(DISCORD_IMAGE):

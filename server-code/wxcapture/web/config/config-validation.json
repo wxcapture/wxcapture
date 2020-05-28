@@ -44,6 +44,12 @@
 				"valid values": "-number-",
 				"description": "Monitored drive space location percent remaining warning threshold, e.g. 70.",
 				"hidden": "no"
+			},
+			"skip header and footer": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Skip headers and footers from generated pages, e.g. no.",
+				"hidden": "no"
 			}
 		}
 	},

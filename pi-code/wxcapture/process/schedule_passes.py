@@ -787,9 +787,10 @@ try:
                    '<link rel=\"shortcut icon\" type=\"image/png\" href=\"' + CONFIG_INFO['Link Base'] + 'favicon.png\"/>')
         html.write('</head>')
         html.write('<body onload=\"defaulthide()\">')
-        html.write(wxcutils.load_file(CONFIG_PATH,
-                                      'main-header.txt').replace('PAGE-TITLE',
-                                                                 'Satellite Pass Predictions'))
+        if CONFIG_INFO['skip header and footer'] == 'no':
+            html.write(wxcutils.load_file(CONFIG_PATH,
+                                        'main-header.txt').replace('PAGE-TITLE',
+                                                                    'Satellite Pass Predictions'))
         html.write('<section class=\"content-section container\">')
 
         MY_LOGGER.debug('Table for today')
@@ -916,14 +917,15 @@ try:
         html.write('</section>')
 
         MY_LOGGER.debug('Footer')
-        html.write('<footer class=\"main-footer\">')
-        html.write('<p id=\"footer-text\">Pass Data last updated at <span class=\"time\">' +
-                   time.strftime('%H:%M (' +
-                                 subprocess.check_output("date").
-                                 decode('utf-8').split(' ')[-2] +
-                                 ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
-                   '.</p>')
-        html.write('</footer>')
+        if CONFIG_INFO['skip header and footer'] == 'no':
+            html.write('<footer class=\"main-footer\">')
+            html.write('<p id=\"footer-text\">Pass Data last updated at <span class=\"time\">' +
+                    time.strftime('%H:%M (' +
+                                    subprocess.check_output("date").
+                                    decode('utf-8').split(' ')[-2] +
+                                    ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
+                    '.</p>')
+            html.write('</footer>')
 
         html.write('<script src=\"lightbox/js/lightbox-plus-jquery.min.js\"></script>')
         html.write('<script>')

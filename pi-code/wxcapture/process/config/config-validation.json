@@ -134,6 +134,12 @@
 				"valid values": "-pattern-",
 				"description": "A list of the keywords to be included in the header part of each dynamically created webpage, e.g. wxcapture, weather, satellite",
 				"hidden": "no"
+			},
+			"skip header and footer": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Skip headers and footers from generated pages, e.g. no.",
+				"hidden": "no"
 			}
 		}
 	},
@@ -279,6 +285,12 @@
 				"description": "Minimum elevation to tweet an image, e.g. 20",
 				"hidden": "no"
 			},
+			"discord min elevation": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Minimum elevation to webhook an image, e.g. 20",
+				"hidden": "no"
+			},
 			"discord webhooks": {
 				"required": "yes",
 				"valid values": "yes|no",
@@ -379,6 +391,12 @@
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "Minimum elevation to tweet an image, e.g. 20",
+				"hidden": "no"
+			},
+			"discord min elevation": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "Minimum elevation to webhook an image, e.g. 20",
 				"hidden": "no"
 			},
 			"discord webhooks": {

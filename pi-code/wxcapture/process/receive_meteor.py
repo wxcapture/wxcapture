@@ -301,7 +301,7 @@ try:
                                       WORKING_PATH + FILENAME_BASE + '-processed.bmp', 'N', 'Y')
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
                                  ' ' + WORKING_PATH + FILENAME_BASE +  '-processed.bmp > ' +
-                                 IMAGE_PATH + FILENAME_BASE + '-processed-tn.jpg')
+                                 IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
                 wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
                 wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
                                  '-processed-rectified.jpg\" | pnmscale -xysize ' +
@@ -466,7 +466,7 @@ try:
             # change filename to select which image to webhook
             # normal -  '-cc-rectified-tn.jpg'
             # processes - '-processed-rectified-tn.jpg'
-            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-processed-tn.jpg'
+            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg'
             # only proceed if the image exists
             if path.exists(TWEET_IMAGE):
                 try:

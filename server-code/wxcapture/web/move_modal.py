@@ -328,9 +328,10 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
                       '<link rel=\"stylesheet\" href=\"../../css/jquery.modal.min.css\" />')
         cp_html.write('</head>')
         cp_html.write('<body onload=\"defaulthide()\">')
-        cp_html.write(wxcutils.load_file(CONFIG_PATH,
-                                         'main-header-2up.txt').replace('PAGE-TITLE', \
-            'Satellite Captures'))
+        if CONFIG_INFO['skip header and footer'] == 'no':
+            cp_html.write(wxcutils.load_file(CONFIG_PATH,
+                                            'main-header-2up.txt').replace('PAGE-TITLE', \
+                'Satellite Captures'))
 
         cp_html.write('<section class=\"content-section container\">')
 
@@ -361,14 +362,16 @@ def build_month_page(bpm_passes, bpm_file_path, bpm_file_name, bpm_month, bpm_mo
         write_month(TARGET, CONFIG_INFO['Link Base'] + bpm_year + '/' + bpm_month + '/',
                     bpm_month_name + ' ' + bpm_year, bpm_passes, bpm_year, bpm_month)
         cp_html.write('</ul></section>')
-        cp_html.write('<footer class=\"main-footer\">')
-        cp_html.write('<p id=\"footer-text\">Captures last updated at <span class=\"time\">' +
-                      time.strftime('%H:%M (' +
-                                    subprocess.check_output("date").
-                                    decode('utf-8').split(' ')[-2] +
-                                    ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
-                      '.</p>')
-        cp_html.write('</footer>')
+
+        if CONFIG_INFO['skip header and footer'] == 'no':
+            cp_html.write('<footer class=\"main-footer\">')
+            cp_html.write('<p id=\"footer-text\">Captures last updated at <span class=\"time\">' +
+                        time.strftime('%H:%M (' +
+                                        subprocess.check_output("date").
+                                        decode('utf-8').split(' ')[-2] +
+                                        ')</span> on <span class=\"time\">%d/%m/%Y</span>') +
+                        '.</p>')
+            cp_html.write('</footer>')
 
         cp_html.write('<script>')
         cp_html.write('function hideshowlinks() {')

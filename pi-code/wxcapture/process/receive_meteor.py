@@ -484,12 +484,7 @@ try:
         # discord webhook?
         if IMAGE_OPTIONS['discord webhooks'] == 'yes' and \
             int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):
-            # need to sleep a few minutes to enable the images to get to the web server
-            # otherwise the image used by the webhook API will not be accessible when the
-            # API is called
-            MY_LOGGER.debug('Sleeping 5 minutes to allow the images to get to the web server')
-            time.sleep(300)
-            MY_LOGGER.debug('Sleep complete...')
+
             MY_LOGGER.debug('Webhooking pass')
             # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
             FILENAME_BITS = FILENAME_BASE.split('-')
@@ -501,8 +496,30 @@ try:
                 FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + \
                 '-processed-rectified-tn.jpg'
             MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
-            # only proceed if the image exists
-            if path.exists(DISCORD_IMAGE):
+            # need to sleep a few minutes to enable the images to get to the web server
+            # otherwise the image used by the webhook API will not be accessible when the
+            # API is called
+            MY_LOGGER.debug('Wait up to 10 minutes to allow the images to get to the web server')
+            MAX_TIME = 10*60
+            SLEEP_INTERVAL = 15
+            TIMER = 0
+            while TIMER <= MAX_TIME and not wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+                MY_LOGGER.debug('Current sleep time = %d', TIMER)
+                MY_LOGGER.debug('Sleeping %d seconds', SLEEP_INTERVAL)
+                time.sleep(SLEEP_INTERVAL)
+                TIMER += SLEEP_INTERVAL
+            MY_LOGGER.debug('Sleep complete...')
+
+            # logging if the file exists on the webserver
+            if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+                MY_LOGGER.debug('url exists on webserver')
+            else:
+                MY_LOGGER.debug('url does NOT exist on webserver')
+            if TIMER >= MAX_TIME:
+                MY_LOGGER.debug('max time delay exceeded whilst waiting for image to arrive')
+
+            # only proceed if the image exists on webserver
+            if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
                 try:
                     wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
                                          DISCORD_IMAGE_URL,

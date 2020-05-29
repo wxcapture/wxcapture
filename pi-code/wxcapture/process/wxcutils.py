@@ -9,6 +9,7 @@ from logging.handlers import TimedRotatingFileHandler
 import sys
 import json
 import shutil
+import requests
 import uuid
 from datetime import datetime
 import pytz
@@ -234,3 +235,10 @@ def migrate_files(sf_files):
     sf_lock = {'lock': sf_lock_id, 'files': sf_files}
 
     save_json(QUEUE_PATH, sf_lock_id + '.json', sf_lock)
+
+
+def web_server_file_exists(wsfe_url):
+    """see if a file exists on a webserver"""
+    wsfe_url_response = requests.head(wsfe_url)
+    MY_UTIL_LOGGER.debug('url = %s status_code = %s', wsfe_url, wsfe_url_response.status_code)
+    return wsfe_url_response.status_code == requests.codes.ok

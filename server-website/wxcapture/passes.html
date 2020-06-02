@@ -31,11 +31,22 @@
     <section class="content-section container">
         <p>Test</p>
         <p onclick="alert(0);">Click?</p>
-        <button onclick="changefilter('a')">a</button>
-        <button onclick="changefilter('b')">b</button>
-        <button onclick="changefilter('c')">c</button>
-        <button onclick="changefilter('d')">d</button>
-        <img id="display" src="images/instructions.jpg">
+        <ul>
+            <!-- // za, no, mcir-precip, mcir, therm, sea, contrasta, contrastb -->
+            <li><button onclick="changefilter('za')">Enhanced infra red image</button></li>
+            <li><button onclick="changefilter('no')">No colour infrared enhanced image</button></li>
+            <li><button onclick="changefilter('mcir-precip')">Coloured infrared image highlighting precipitation</button></li>
+            <li><button onclick="changefilter('mcir')">Coloured infrared image</button></li>
+            <li><button onclick="changefilter('therm')">Air temperature image</button></li>
+            <li><button onclick="changefilter('sea')">Sea surface temperature image</button></li>
+            <li><button onclick="changefilter('contrasta')">Contrast - Channel A image</button></li>
+            <li><button onclick="changefilter('contrastb')">Contrast - Channel B image</button></li>
+        </ul>
+        
+        <div id="infodisplay">
+            <img id="display" src="images/instructions.jpg">
+            <p id="description">Click on a filter to the left to see more.</p>
+        </div>
 
         <h2 class=" section-header ">This page</h2>
         <p>This page is currently under very active development, so you will often notice changes to it.</p>
@@ -44,8 +55,8 @@
     </section>
 
     <footer class="main-footer ">
-        <p id="footer-text ">Page last updated at <span class="time ">TESTING PHASE (NZST)</span> on <span
-                class="time ">TESTING PHASE</span></p>
+        <p id="footer-text ">Page last updated at <span class="time ">12:06 (NZST)</span> on <span
+                class="time ">02/06/2020</span></p>
     </footer>
 
     <script src="lightbox/js/lightbox-plus-jquery.min.js "></script>

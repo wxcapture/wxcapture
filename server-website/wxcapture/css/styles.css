@@ -265,3 +265,31 @@ del {
 #display {
     width: 200px;
 }
+
+#filters {
+    list-style: none;
+}
+
+#filters button {
+    height: 25px;
+    width: 400px;
+    margin: 2px;
+
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: rgb(255, 164, 17);
+
+    transition: background-color 0.2s;
+
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+#filters button:hover{
+    background-color: rgb(255, 192, 89);
+}
+
+#infodisplay{
+    /* position: relative;
+    right: 20px; */
+    /* text-align: right; */
+}

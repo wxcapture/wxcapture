@@ -266,7 +266,7 @@ del {
 
 /* Image display for captures.html */
 #display {
-    width: 200px;
+    width: 250px;
     /* width: 30%; */
     /* height: 100%; */
 }
@@ -305,6 +305,28 @@ del {
 
 #filters button:hover{
     background-color: rgb(255, 192, 89);
+}
+
+#description button {
+    height: 25px;
+    text-align: center;
+    /* width: 350px; */
+    width: 95%;
+    margin: 2px;
+
+    margin-left: 0px;
+
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: rgb(53, 255, 17);
+
+    transition: background-color 0.2s;
+
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+#description button:hover{
+    background-color: rgb(183, 255, 89);
 }
 
 #filter-select{

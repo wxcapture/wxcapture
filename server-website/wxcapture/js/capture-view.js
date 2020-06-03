@@ -1,9 +1,11 @@
 function changefilter(filter){
     var pass = "2020-06-01-21-35-48-NOAA_18";
-    var path = "images/noaa".concat(pass, "-", filter, ".jpg");
-    alert("Test! Filter\nFilter Requested: " + filter + "\nChanging image display source to:\n" + newpath);
+    var path = "images/page_for_all/" + pass + "-" + filter + ".jpg";
+    // var path = "images/page_for_all/".concat(pass, "-", filter, ".jpg");
+    // alert("Changing Filter...\nFilter Requested: " + filter + "\nChanging image display source to:\n" + path);
     document.getElementById("display").src = path;
-    document.getElementById("description").innerHTML = about_filter(filter);
+    document.getElementById("description").innerHTML = "About this filter: " + about_filter(filter) + "<br>" + path;
+    // document.getElementById("description").innerHTML = path;
 }
 
 // za, no, mcir-precip, mcir, therm, sea, contrasta, contrastb

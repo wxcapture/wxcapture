@@ -3,13 +3,16 @@ function changefilter(filter){
     var image_directory = "images/page_for_all/";
     
     var path = image_directory + pass + "-" + filter + ".jpg";
+    var tnpath = image_directory + pass + "-" + filter + "-tn.jpg";
     // var path = "images/page_for_all/".concat(pass, "-", filter, ".jpg");
     // alert("Changing Filter...\nFilter Requested: " + filter + "\nChanging image display source to:\n" + path);
     document.getElementById("display").src = path;
     document.getElementById("description").innerHTML = 
-    "This pass: <br><span class=\"param\">" + pass + "</span>" + 
+    "Pass ID: <br><span class=\"param\">" + pass + "</span>" + 
     "<hr>About this filter: <br><span class=\"param\">" + about_filter(filter) + "</span>" + 
-    "<hr>Path to filter image: <br><span class=\"param\">" + location.href.replace("/passes.html", "") + "/" + path + "</span>";
+    "<hr>Path to filter image: <br><span class=\"param\">" + location.href.replace("/passes.html", "") + "/" + path + "</span>" + 
+    "<hr>Open filter image in new tab: <br><button onclick=\"window.open('" + location.href.replace("/passes.html", "") + "/" + path + "\', \'_blank\');\">" + "Original Quality" + "</button>" +
+    "<button onclick=\"window.open('" + location.href.replace("/passes.html", "") + "/" + tnpath + "\', \'_blank\');\">" + "Reduced Quality" + "</button>";
     // document.getElementById("description").innerHTML = path;
 }
 

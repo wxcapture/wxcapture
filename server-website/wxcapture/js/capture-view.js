@@ -1,10 +1,12 @@
 function changefilter(filter){
     var pass = "2020-06-01-21-35-48-NOAA_18";
-    var path = "images/page_for_all/" + pass + "-" + filter + ".jpg";
+    var image_directory = "images/page_for_all/";
+    
+    var path = image_directory + pass + "-" + filter + ".jpg";
     // var path = "images/page_for_all/".concat(pass, "-", filter, ".jpg");
     // alert("Changing Filter...\nFilter Requested: " + filter + "\nChanging image display source to:\n" + path);
     document.getElementById("display").src = path;
-    document.getElementById("description").innerHTML = "About this filter: " + about_filter(filter) + "<br>" + path;
+    document.getElementById("description").innerHTML = "This pass: " + pass + "<hr>About this filter: " + about_filter(filter) + "<hr>Path to filter: " + location.hostname + "/" + path;
     // document.getElementById("description").innerHTML = path;
 }
 

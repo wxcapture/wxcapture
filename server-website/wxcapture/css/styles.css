@@ -347,8 +347,10 @@ del {
     background-color: lightblue;
     
     /* width: 70%; */
-
     padding: 10px;
+    
+    text-align: left;
+    word-wrap: break-word;
 }
 
 #main-stuff{

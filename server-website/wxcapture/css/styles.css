@@ -264,16 +264,31 @@ del {
 /* Image display for captures.html */
 #display {
     width: 200px;
+    /* width: 30%; */
+    /* height: 100%; */
 }
 
 #filters {
     list-style: none;
+    padding-left: 0px;
+    margin-left: 0px;
+
+    border: lightskyblue 2px solid;
+    border-radius: 5px;
+    
+    background-color: lightblue;
+
+    /* width: 50%; */
+    text-align: center;
 }
 
 #filters button {
     height: 25px;
-    width: 400px;
+    text-align: center;
+    width: 350px;
     margin: 2px;
+
+    margin-left: 0px;
 
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     background-color: rgb(255, 164, 17);
@@ -288,8 +303,53 @@ del {
     background-color: rgb(255, 192, 89);
 }
 
-#infodisplay{
+#filter-select{
+    border: #aaaaaa 2px solid;
+    border-radius: 5px;
+
+    padding: 10px;
+    
+    /* width: 40%; */
+    
+    text-align: center;
+}
+
+#info-display{
+    border: #aaaaaa 2px solid;
+    border-radius: 5px;
+    
+    padding: 10px;
+    
+    text-align: center;
     /* position: relative;
     right: 20px; */
-    /* text-align: right; */
+}
+
+#image-display{
+    /* border: #aaaaaa 2px solid; */
+    border-radius: 5px;
+    
+    padding: 10px;
+    
+    text-align: center;
+    /* position: relative;
+    right: 20px; */
+}
+
+#description{
+    border: lightskyblue 2px solid;
+    border-radius: 5px;
+    
+    background-color: lightblue;
+    
+    /* width: 70%; */
+
+    padding: 10px;
+}
+
+#main-stuff{
+    column-count: 3;
+    column-gap: 10px;
+    /* height: 1000px; */
+    /* height: 2000%; */
 }

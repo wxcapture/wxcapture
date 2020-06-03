@@ -285,7 +285,8 @@ del {
 #filters button {
     height: 25px;
     text-align: center;
-    width: 350px;
+    /* width: 350px; */
+    width: 95%;
     margin: 2px;
 
     margin-left: 0px;

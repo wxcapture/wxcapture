@@ -6,7 +6,10 @@ function changefilter(filter){
     // var path = "images/page_for_all/".concat(pass, "-", filter, ".jpg");
     // alert("Changing Filter...\nFilter Requested: " + filter + "\nChanging image display source to:\n" + path);
     document.getElementById("display").src = path;
-    document.getElementById("description").innerHTML = "This pass: " + pass + "<hr>About this filter: " + about_filter(filter) + "<hr>Path to filter: " + location.hostname + "/" + path;
+    document.getElementById("description").innerHTML = 
+    "This pass: <br><span class=\"param\">" + pass + "</span>" + 
+    "<hr>About this filter: <br><span class=\"param\">" + about_filter(filter) + "</span>" + 
+    "<hr>Path to filter image: <br><span class=\"param\">" + location.href.replace("/passes.html", "") + "/" + path + "</span>";
     // document.getElementById("description").innerHTML = path;
 }
 

@@ -70,6 +70,7 @@ try:
                               '<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>')
                 cp_html.write('</head>')
                 cp_html.write('<body>')
+                cp_html.write('\n\n<!-- test -->\n\n')
                 cp_html.write(wxcutils.load_file(CONFIG_PATH,
                                                  'main-header-2up.txt').replace('PAGE-TITLE', cp_label))
 

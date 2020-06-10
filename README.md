@@ -11,7 +11,7 @@ You can receive some of them yourself with a cheap SDR and antenna, and with wea
 This is currently a manual process, with the instructions for installing the pi and server code currently being documented in the following spreadsheet:
 https://github.com/wxcapture/wxcapture/blob/master/WxCapture.xlsx
 
-In time an installer will be created...
+  An installer will be created some time later after WxCapture is "officially" released.
 
 ## Dynamic and Static pages:
 - ```index.html``` and ```satellites.html``` are static

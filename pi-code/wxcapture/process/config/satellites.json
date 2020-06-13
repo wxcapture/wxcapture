@@ -45,9 +45,9 @@
 			"meteor symbol rate": 80000,
 			"meteor mode": "qpsk",
 			"type": "METEOR",
-			"active": "no",
+			"active": "yes",
 			"night": "yes",
-			"capture": "no",
+			"capture": "yes",
 			"priority": "20",
 			"sdr": "QFH"
 		},

@@ -181,9 +181,8 @@ try:
 
         html.write('<h2 class=\"section-header\">Meteor-M Series Status</h2>')
         html.write('<table>')
-        html.write('<tr><th>Meteor-M N1</th><th>Meteor-M N2</th><th>Meteor-M N2-2</th></tr>')
-        html.write('<tr><td>' + get_meteor_status('Meteor-M N1') + '</td>')
-        html.write('<td>' + get_meteor_status('Meteor-M N2') + '</td>')
+        html.write('<tr><th>Meteor-M N2</th><th>Meteor-M N2-2</th></tr>')
+        html.write('<tr><td>' + get_meteor_status('Meteor-M N2') + '</td>')
         html.write('<td>' + get_meteor_status('Meteor-M N2-2') + '</td></tr>')
         html.write('</table>')
         html.write('<p><a href=\"http://happysat.nl/Meteor/html/Meteor_Status.html\" target=\"_blank\" rel=\"noopener\">Data source</a></p>')

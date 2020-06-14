@@ -8,6 +8,7 @@ import sys
 import time
 import calendar
 import subprocess
+from subprocess import Popen, PIPE
 import wxcutils
 import fix_pass_pages_lib
 
@@ -44,6 +45,7 @@ try:
 
     # find the files to skip, changing only those for satellite passes
     INDEX = []
+    HEIGHTS = []
     for filename in fix_pass_pages_lib.find_files(TARGET, 'captures.html'):
         if filename != TARGET + 'captures.html':
             noaa_filename = filename.replace('captures.html', 'noaa.html').replace(TARGET, '')
@@ -82,8 +84,14 @@ try:
                         images_found += 1
                         web_filename = filename_row.split(TARGET)[1]
                         path_part, file_part = os.path.split(web_filename)
-                        MY_LOGGER.debug('Filename = %s, path = %s, file = %s',
-                                        web_filename, path_part, file_part)
+                        MY_LOGGER.debug('row = %sFilename = %s, path = %s, file = %s',
+                                        filename_row, web_filename, path_part, file_part)
+                        cmd = Popen(['identify', '-format', '\"%h\"',
+                                     filename_row.replace('-tn', '')], stdout=PIPE, stderr=PIPE)
+                        stdout, stderr = cmd.communicate()
+                        height = stdout.decode('utf-8').replace('\"', '')
+                        MY_LOGGER.debug('path = %s, file = %s, height = %s', os.path.dirname(filename_row), file_part.replace('-tn', ''), height)
+                        HEIGHTS.append({"file": file_part.replace('-tn', ''), "height": height, "url": CONFIG_INFO['Link Base'] + web_filename.replace('-tn', '')}) 
                         cp_html.write('<a href=\"' + CONFIG_INFO['Link Base'] + web_filename.replace('-tn', '') + '\">' + '<img src=\"' + CONFIG_INFO['Link Base'] + web_filename + '\"></a>')
                 if images_found > 0:
                     INDEX.append({'month': month, 'year': year, 'date': year + month, 'page': noaa_filename})
@@ -100,6 +108,11 @@ try:
 
                 cp_html.write('</body></html>')
 
+    # write out heights data
+    with open(TARGET + 'noaa_heights.csv', 'w') as csv_heights:
+        csv_heights.write('file,url,height\n')
+        for row in HEIGHTS:
+            csv_heights.write(row['file'] + ',' + row['url'] + ',' + row['height'] + '\n')
 
     # sort data
     MY_LOGGER.debug('Sort pages')

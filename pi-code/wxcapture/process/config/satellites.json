@@ -91,6 +91,19 @@
 			"sdr": "ground-plane"
 		},
 		{
+			"name": "NOAA 9",
+			"NORAD catalog number": "15427",
+			"frequency": 136.77,
+			"meteor symbol rate": 0,
+			"meteor mode": "n/a",
+			"type": "AMSAT",
+			"active": "yes",
+			"night": "no",
+			"capture": "yes",
+			"priority": "5",
+			"sdr": "QFH"
+		},
+		{
 			"name": "SAUDISAT 1C (SO-50)",
 			"NORAD catalog number": "27607",
 			"frequency": 436.795,

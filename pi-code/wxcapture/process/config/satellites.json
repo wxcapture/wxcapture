@@ -1,5 +1,18 @@
 {
 	"satellites": [{
+			"name": "NOAA 9",
+			"NORAD catalog number": "15427",
+			"frequency": 136.77,
+			"meteor symbol rate": 0,
+			"meteor mode": "n/a",
+			"type": "NOAA",
+			"active": "no",
+			"night": "no",
+			"capture": "no",
+			"priority": "5",
+			"sdr": "QFH"
+		},
+		{
 			"name": "NOAA 15",
 			"NORAD catalog number": "25338",
 			"frequency": 137.6200,

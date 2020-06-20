@@ -49,9 +49,9 @@
 			"meteor mode": "qpsk",
 			"amsat modulation": "",
 			"type": "METEOR",
-			"active": "yes",
+			"active": "no",
 			"night": "yes",
-			"capture": "yes",
+			"capture": "no",
 			"priority": "20",
 			"sdr": "QFH"
 		},

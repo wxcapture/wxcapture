@@ -102,9 +102,10 @@ try:
 
     # refresh TLE file
     TLE_INFO = []
-    refresh_tle('weather')
+    # refresh_tle('weather')
     # refresh_tle('stations')
-    refresh_tle('amateur')
+    # refresh_tle('amateur')
+    refresh_tle('active')
 
     # write out TLE file
     write_file()

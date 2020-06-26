@@ -20,9 +20,7 @@ for img_path in inputs:
     print("[" + str(round(cnt/len(inputs)*100)) + "%] Performing CLAHE on: \"" + img_path + "\"")
     cnt += 1
 
-    img = cv2.imread(img_path)
-
-    img = do_clahe(img)
+    img = clahe_img(cv2.imread(img_path))
 
     cv2.imwrite(output + img_path, out_img)
 

@@ -10,7 +10,7 @@ def do_clahe_img(img):
     b_chn, g_chn, r_chn = cv2.split(img)
     return cv2.merge((clahe(b_chn), clahe(g_chn), clahe(r_chn)))
 
-inputs = ["test_-rockface.jpg"]
+inputs = ["test_rockface.jpg"]
 
 # To over-write, leave empty
 output = "clahe_"

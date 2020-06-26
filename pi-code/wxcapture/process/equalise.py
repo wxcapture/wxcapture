@@ -14,11 +14,8 @@ inputs = [""]
 
 output = "clahe_"
 
-cnt = 0.0
-
 for img_path in inputs:
-    print("[" + str(round(cnt/len(inputs)*100)) + "%] Performing CLAHE on: \"" + img_path + "\"")
-    cnt += 1
+    print("Performing CLAHE on: \"" + img_path + "\"")
 
     img = clahe_img(cv2.imread(img_path))
 

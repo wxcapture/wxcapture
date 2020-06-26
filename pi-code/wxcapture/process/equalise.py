@@ -17,7 +17,7 @@ output = "clahe_"
 for img_path in inputs:
     print("Performing CLAHE on: \"" + img_path + "\"")
 
-    img = clahe_img(cv2.imread(img_path))
+    img = do_clahe_img(cv2.imread(img_path))
 
     cv2.imwrite(output + img_path, out_img)
 

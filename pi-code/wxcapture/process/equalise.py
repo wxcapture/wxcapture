@@ -3,9 +3,12 @@ import sys
 import numpy as np
 import cv2
 
-def do_clahe(inp):
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4,4)).apply(inp)
-    return clahe
+def clahe(in_img):
+    return cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4,4)).apply(in_img)
+
+def do_clahe_img(inp):
+    b_chn, g_chn, r_chn = cv2.split(img)
+    return cv2.merge((clahe(b_chn), clahe(g_chn), clahe(r_chn)))
 
 inputs = [""]
 
@@ -19,9 +22,7 @@ for img_path in inputs:
 
     img = cv2.imread(img_path)
 
-    b_chn, g_chn, r_chn = cv2.split(img)
-
-    out_img = cv2.merge((do_clahe(b_chn), do_clahe(g_chn), do_clahe(r_chn)))
+    img = do_clahe(img)
 
     cv2.imwrite(output + img_path, out_img)
 

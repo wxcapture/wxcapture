@@ -297,8 +297,8 @@ try:
                                  IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
 
                 # create a processed image
-                wxcutils_pi.fix_image(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp',
-                                      WORKING_PATH + FILENAME_BASE + '-processed.bmp', 'N', 'Y')
+                wxcutils_pi.clahe_process(WORKING_PATH, FILENAME_BASE + '-cc.bmp.bmp',
+                                          WORKING_PATH, FILENAME_BASE + '-processed.bmp')
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
                                  ' ' + WORKING_PATH + FILENAME_BASE +  '-processed.bmp > ' +
                                  IMAGE_PATH + FILENAME_BASE + '-processed.jpg')

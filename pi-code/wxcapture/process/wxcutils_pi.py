@@ -12,7 +12,7 @@ import random
 from rtlsdr import RtlSdr
 import tweepy
 from discord_webhook import DiscordWebhook, DiscordEmbed
-from PIL import Image, ImageOps
+import cv2
 import wxcutils
 
 
@@ -89,7 +89,8 @@ def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_s
              w_channel_a, w_channel_b, w_description):
     """send data to webhooks as configured"""
     MY_UTIL_LOGGER.debug('webhooks called with %s %s %s %s %s %s %s %s %s %s %s %s %s',
-                         w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_satellite,
+                         w_config_path, w_config_file, w_site_config_file,
+                         w_imagesfile, w_satellite,
                          w_location, w_colour, w_elevation, w_duration, w_pass_start,
                          w_channel_a, w_channel_b, w_description)
 
@@ -130,138 +131,6 @@ def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_s
 
         w_response = w_webhook.execute()
         MY_UTIL_LOGGER.debug('response = %s', w_response)
-
-
-def fix_image(fi_source, fi_destination, fi_image_fix, fi_equalize):
-    """remove noise from image"""
-
-
-    def load_image(li_filename):
-        """load an image file"""
-        li_image = Image.open(li_filename)
-        li_image_height = li_image.size[1]
-        li_image_width = li_image.size[0]
-        MY_UTIL_LOGGER.debug('Loaded image %s height = %d width = %d type = %s',
-                             li_filename, li_image_height, li_image_width, li_image.format)
-        return li_image, li_image_height, li_image_width
-
-
-    def save_image(si_filename):
-        """save an image file"""
-        MY_UTIL_LOGGER.debug('Saving %s', si_filename)
-        image.save(si_filename)
-        MY_UTIL_LOGGER.debug('Saved %s', si_filename)
-
-
-    def fix_thick_line(ftl_start, ftl_end):
-        """fix thick black lines"""
-        MY_UTIL_LOGGER.debug('Thick black line to fix between lines %d and %d of thickness %d', ftl_start, ftl_end, ftl_end - ftl_start)
-        MY_UTIL_LOGGER.debug('Needs some code adding once I figure how best to handle this!')
-
-
-    def fix_pixel(fp_x, fp_y):
-        """try to fix a pixel"""
-        try_count = try_count_max
-        fixed = False
-        while True:
-            try_count -= 1
-            x_offset = 0
-            if x_iterator <= 4:
-                x_offset = random.randint(0, 2)
-            elif x_iterator >= (image_width - 4):
-                x_offset = random.randint(-2, 0)
-            else:
-                x_offset = random.randint(-2, 2)
-            red_below, green_below, blue_below = image.getpixel((x_iterator + x_offset, y_iterator - 1))
-            if red_below != 0 and green_below != 0 and blue_below != 0:
-                image.putpixel((x_iterator, y_iterator), (red_below, green_below, blue_below))
-                fixed == True
-                break
-            if try_count == 0:
-                break
-    
-
-    image_height = 0
-    image_width = 0
-    image = Image.new('RGB', (1, 1), (0, 0, 0))
-    min_pixel_thick_length = 30
-
-    MY_UTIL_LOGGER.debug('Load image start')
-    image, image_height, image_width = load_image(fi_source)
-    MY_UTIL_LOGGER.debug('Load image end')
-
-    if fi_image_fix == 'Y':
-        MY_UTIL_LOGGER.debug('Find thick lines start')
-        image_mid_width = int(image_width / 2)
-        y_iterator = 0
-        black_run_length = 0
-        black_run_start = 0
-        while y_iterator < image_height:
-            # MY_UTIL_LOGGER.debug('y_iterator = %d', y_iterator)
-            red, green, blue = image.getpixel((image_mid_width, y_iterator))
-            if red == 0 and green == 0 and blue == 0:
-                black_run_start = y_iterator
-                black_run_length += 1
-                # MY_UTIL_LOGGER.debug('BLACK y_iterator = %d, run = %d', y_iterator, black_run_length)
-            else:
-                if black_run_length > 1 and black_run_length >= min_pixel_thick_length:
-                    # MY_UTIL_LOGGER.debug('Thick black run total length = %d between lines %d and %d', black_run_length, black_run_start, black_run_start + black_run_length)
-                    fix_thick_line(black_run_start - black_run_length, black_run_start)
-                black_run_length = 0
-
-            y_iterator += 1
-        MY_UTIL_LOGGER.debug('Find thick lines end')
-
-
-        MY_UTIL_LOGGER.debug('Image line removal start')
-        y_iterator = 0
-        try_count_max = 5
-        while y_iterator < image_height:
-            if y_iterator%500 == 0:
-                MY_UTIL_LOGGER.debug(y_iterator)
-            x_iterator = 0
-            while x_iterator < image_width:
-                red, green, blue = image.getpixel((x_iterator, y_iterator))
-                # MY_UTIL_LOGGER.debug('Pixel %d,%d = R%d G%d B%d', x_iterator, y_iterator, red, green, blue)
-                # see if black is faulty
-                if red == 0 and green == 0 and blue == 0:
-                    # MY_UTIL_LOGGER.debug('bad black')
-                    fix_pixel(x_iterator, y_iterator)
-                # see if cyan is faulty
-                elif red == 0 and green != 0 and blue != 0:
-                    # MY_UTIL_LOGGER.debug('bad cyan')
-                    fix_pixel(x_iterator, y_iterator)
-                # see if magenta is faulty
-                elif red != 0 and green == 0 and blue != 0:
-                    # MY_UTIL_LOGGER.debug('bad magenta')
-                    fix_pixel(x_iterator, y_iterator)
-                # see if yellow is faulty
-                elif red != 0 and green != 0 and blue == 0:
-                    # MY_UTIL_LOGGER.debug('bad yellow')
-                    fix_pixel(x_iterator, y_iterator)
-                elif red != 0 and green == 0 and blue == 0:
-                    # MY_UTIL_LOGGER.debug('bad red')
-                    fix_pixel(x_iterator, y_iterator)
-                elif red == 0 and green != 0 and blue == 0:
-                    # MY_UTIL_LOGGER.debug('bad green')
-                    fix_pixel(x_iterator, y_iterator)
-                elif red == 0 and green == 0 and blue != 0:
-                    # MY_UTIL_LOGGER.debug('bad blue')
-                    fix_pixel(x_iterator, y_iterator)
-
-                x_iterator += 1
-            y_iterator += 1
-
-        MY_UTIL_LOGGER.debug('Image line removal finished')
-
-    if fi_equalize == 'Y':
-        MY_UTIL_LOGGER.debug('Equalising image start')
-        image = ImageOps.equalize(image, mask=None)
-        MY_UTIL_LOGGER.debug('Equalising image end')
-
-    MY_UTIL_LOGGER.debug('Save image start')
-    save_image(fi_destination)
-    MY_UTIL_LOGGER.debug('Save image end')
 
 
 def sleep_until_start(sus_time):
@@ -311,6 +180,27 @@ def get_gain(gg_config, gg_max_elevation):
     MY_UTIL_LOGGER.debug('gain command = %s', command)
     MY_UTIL_LOGGER.debug('description = %s', description)
     return command, description, gain_value
+
+
+def clahe_process(cp_in_path, cp_in_file, cp_out_path, cp_out_file):
+    """clahe process the file using OpenCV library"""
+    def clahe(in_img):
+        """do clahe create processing on image"""
+        return cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4)).apply(in_img)
+
+    def do_clahe_img(in_img):
+        """do clahe merge processing on image"""
+        b_chn, g_chn, r_chn = cv2.split(in_img)
+        return cv2.merge((clahe(b_chn), clahe(g_chn), clahe(r_chn)))
+
+    MY_UTIL_LOGGER.debug('clahe_process %s %s %s %s', cp_in_path, cp_in_file,
+                         cp_out_path, cp_out_file)
+    MY_UTIL_LOGGER.debug('process image')
+    cp_out_img = do_clahe_img(cv2.imread(cp_in_path + cp_in_file))
+    MY_UTIL_LOGGER.debug('write new image')
+    cv2.imwrite(cp_out_path + cp_out_file, cp_out_img)
+    MY_UTIL_LOGGER.debug('write image complete')
+
 
 HOME = os.environ['HOME']
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

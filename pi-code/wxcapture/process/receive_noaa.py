@@ -370,7 +370,7 @@ try:
                 # do clahe processing if configured
                 if ENHANCEMENTS[key]['clahe'] != 'no':
                     MY_LOGGER.debug('Doing clahe enhancement to image')
-                    image_file = IMAGE_PATH + FILENAME_BASE + '-' + \
+                    image_file = FILENAME_BASE + '-' + \
                         ENHANCEMENTS[key]['filename'] + '.jpg'
                     wxcutils_pi.clahe_process(IMAGE_PATH, image_file,
                                               IMAGE_PATH, image_file)

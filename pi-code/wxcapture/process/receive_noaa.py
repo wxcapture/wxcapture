@@ -367,6 +367,14 @@ try:
                 # extract gain info and check for errors
                 lines = stdout.decode('utf-8').splitlines()
 
+                # do clahe processing if configured
+                if ENHANCEMENTS[key]['clahe'] != 'no':
+                    MY_LOGGER.debug('Doing clahe enhancement to image')
+                    image_file = IMAGE_PATH + FILENAME_BASE + '-' + \
+                        ENHANCEMENTS[key]['filename'] + '.jpg'
+                    wxcutils_pi.clahe_process(IMAGE_PATH, image_file,
+                                              IMAGE_PATH, image_file)
+
                 # add temperature scale if applicable
                 if ENHANCEMENTS[key]['scale'] != 'no':
                     MY_LOGGER.debug('Need to add temperature scale')
@@ -464,72 +472,72 @@ try:
                         MY_LOGGER.debug('Creating png to be projected - %s',
                                         ENHANCEMENTS[key]['projection'])
                         if optionsLength == 0:
-                            cmd = Popen(['/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I', '-A',
+                            cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
                                          '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                          AUDIO_PATH + FILENAME_BASE + '.wav', IMAGE_PATH
                                          + FILENAME_BASE + '-' +
                                          ENHANCEMENTS[key]['filename'] + '.png'],
                                         stdout=PIPE, stderr=PIPE)
-                            MY_LOGGER.debug('optionsLength = 0 %s %s %s %s %s %s %s  %s %s %s',
-                                            '/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I',
+                            MY_LOGGER.debug('optionsLength = 0 %s %s %s %s %s %s  %s %s %s',
+                                            '/usr/local/bin/wxtoimg', '-E', '-o', '-I',
                                             '-A', '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                             AUDIO_PATH + FILENAME_BASE + '.wav',
                                             IMAGE_PATH + FILENAME_BASE + '-' +
                                             ENHANCEMENTS[key]['filename'] + '.png')
                         elif optionsLength == 1:
-                            cmd = Popen(['/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I', '-A',
+                            cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
                                          '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                          options[0], options[1], AUDIO_PATH +
                                          FILENAME_BASE + '.wav', IMAGE_PATH +
                                          FILENAME_BASE + '-' +
                                          ENHANCEMENTS[key]['filename'] + '.png'],
                                         stdout=PIPE, stderr=PIPE)
-                            MY_LOGGER.debug('optionsLength = 1 %s %s %s %s %s %s %s %s %s %s %s ',
-                                            '/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I',
+                            MY_LOGGER.debug('optionsLength = 1 %s %s %s %s %s %s %s %s %s %s ',
+                                            '/usr/local/bin/wxtoimg', '-E', '-o', '-I',
                                             '-A', '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                             options[0], AUDIO_PATH + FILENAME_BASE + '.wav',
                                             IMAGE_PATH + FILENAME_BASE + '-' +
                                             ENHANCEMENTS[key]['filename'] + '.png')
                         elif optionsLength == 2:
-                            cmd = Popen(['/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I', '-A',
+                            cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
                                          '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                          options[0], options[1], AUDIO_PATH +
                                          FILENAME_BASE + '.wav', IMAGE_PATH +
                                          FILENAME_BASE + '-' +
                                          ENHANCEMENTS[key]['filename'] + '.png'],
                                         stdout=PIPE, stderr=PIPE)
-                            MY_LOGGER.debug('optionsLength = 2 %s %s %s %s %s %s %s %s %s %s %s %s ',
-                                            '/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I',
+                            MY_LOGGER.debug('optionsLength = 2 %s %s %s %s %s %s %s %s %s %s %s ',
+                                            '/usr/local/bin/wxtoimg', '-E', '-o', '-I',
                                             '-A', '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                             options[0], options[1],
                                             AUDIO_PATH + FILENAME_BASE + '.wav',
                                             IMAGE_PATH + FILENAME_BASE + '-' +
                                             ENHANCEMENTS[key]['filename'] + '.png')
                         elif optionsLength == 3:
-                            cmd = Popen(['/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I', '-A',
+                            cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
                                          '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                          options[0], options[1], options[2],
                                          AUDIO_PATH + FILENAME_BASE + '.wav', IMAGE_PATH +
                                          FILENAME_BASE + '-' +
                                          ENHANCEMENTS[key]['filename'] + '.png'],
                                         stdout=PIPE, stderr=PIPE)
-                            MY_LOGGER.debug('optionsLength = 3 %s %s %s %s %s %s %s %s %s %s %s %s %s ',
-                                            '/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I',
+                            MY_LOGGER.debug('optionsLength = 3 %s %s %s %s %s %s %s %s %s %s %s %s ',
+                                            '/usr/local/bin/wxtoimg', '-E', '-o', '-I',
                                             '-A', '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                             options[0], options[1], options[2],
                                             AUDIO_PATH + FILENAME_BASE + '.wav',
                                             IMAGE_PATH + FILENAME_BASE + '-' +
                                             ENHANCEMENTS[key]['filename'] + '.png')
                         elif optionsLength == 4:
-                            cmd = Popen(['/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I', '-A',
+                            cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
                                          '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                          options[0], options[1], options[2], options[3],
                                          AUDIO_PATH + FILENAME_BASE + '.wav', IMAGE_PATH +
                                          FILENAME_BASE + '-' +
                                          ENHANCEMENTS[key]['filename'] + '.png'],
                                         stdout=PIPE, stderr=PIPE)
-                            MY_LOGGER.debug('optionsLength = 4 %s %s %s %s %s %s %s %s %s %s %s %s %s %s ',
-                                            '/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I',
+                            MY_LOGGER.debug('optionsLength = 4 %s %s %s %s %s %s %s %s %s %s %s %s %s ',
+                                            '/usr/local/bin/wxtoimg', '-E', '-o', '-I',
                                             '-A', '-m', IMAGE_PATH + FILENAME_BASE + '-map.png',
                                             options[0], options[1], options[2], options[3],
                                             AUDIO_PATH + FILENAME_BASE + '.wav',
@@ -537,14 +545,14 @@ try:
                                             ENHANCEMENTS[key]['filename'] + '.png')
                         else:
                             MY_LOGGER.debug('unhandled options length - need to update code to process this')
-                            cmd = Popen(['/usr/local/bin/wxtoimg', '-c', '-E', '-o', '-I', '-A',
+                            cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
                                          '-m', IMAGE_PATH + FILENAME_BASE + '-map.png', AUDIO_PATH +
                                          FILENAME_BASE + '.wav', IMAGE_PATH + FILENAME_BASE +
                                          '-' + ENHANCEMENTS[key]['filename'] + '.jppngg'],
                                         stdout=PIPE, stderr=PIPE)
-                            MY_LOGGER.debug('optionsLength = %s %s %s %s %s %s %s %s %s %s %s ',
+                            MY_LOGGER.debug('optionsLength = %s %s %s %s %s %s %s %s %s %s ',
                                             str(optionsLength), '/usr/local/bin/wxtoimg',
-                                            '-c', '-E', '-o', '-I', '-A', '-m',
+                                            '-E', '-o', '-I', '-A', '-m',
                                             IMAGE_PATH + FILENAME_BASE + '-map.png',
                                             AUDIO_PATH + FILENAME_BASE + '.wav',
                                             IMAGE_PATH + FILENAME_BASE + '-' +

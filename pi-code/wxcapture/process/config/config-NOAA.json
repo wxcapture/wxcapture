@@ -66,6 +66,7 @@
 		"008": {
 			"description": "Contrast - channel A image",
 			"options": "-e contrast -a",
+			"clahe": "yes",
 			"active": "yes",
 			"filename": "contrasta",
 			"scale": "no",
@@ -74,6 +75,7 @@
 		"009": {
 			"description": "Contrast - channel B image",
 			"options": "-e contrast -b",
+			"clahe": "yes",
 			"active": "yes",
 			"filename": "contrastb",
 			"scale": "no",
@@ -98,6 +100,7 @@
 		"004": {
 			"description": "Coloured infrared image",
 			"options": "-e MCIR",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "mcir",
 			"scale": "no",
@@ -106,6 +109,7 @@
 		"003": {
 			"description": "Coloured infrared image highlighting precipitation",
 			"options": "-e MCIR-precip",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "mcir-precip",
 			"scale": "no",
@@ -114,6 +118,7 @@
 		"005": {
 			"description": "Normal image",
 			"options": "",
+			"clahe": "yes",
 			"active": "yes",
 			"filename": "norm",
 			"scale": "no",
@@ -122,6 +127,7 @@
 		"13": {
 			"description": "Pristine output image",
 			"options": "-e pris",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "pris",
 			"scale": "no",
@@ -130,6 +136,7 @@
 		"007": {
 			"description": "Sea surface temperature image",
 			"options": "-e sea",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "sea",
 			"scale": "yes",
@@ -138,6 +145,7 @@
 		"006": {
 			"description": "Air temperature image",
 			"options": "-e therm",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "therm",
 			"scale": "yes",
@@ -146,6 +154,7 @@
 		"001": {
 			"description": "Enhanced infra red image",
 			"options": "-e ZA",
+			"clahe": "yes",
 			"active": "yes",
 			"filename": "za",
 			"scale": "yes",
@@ -178,6 +187,7 @@
 		"002": {
 			"description": "No colour infrared enhanced image",
 			"options": "-e NO",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "no",
 			"scale": "no",
@@ -194,6 +204,7 @@
 		"010": {
 			"description": "Multispecteral analysis enhanced image",
 			"options": "-e MSA",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "msa",
 			"scale": "no",
@@ -202,6 +213,7 @@
 		"012": {
 			"description": "HVC enhanced image",
 			"options": "-e HVCT",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "hvct",
 			"scale": "no",
@@ -210,6 +222,7 @@
 		"011": {
 			"description": "HVC enhanced image highlighting precipitation",
 			"options": "-e HVCT-precip",
+			"clahe": "no",
 			"active": "yes",
 			"filename": "hvct-precip",
 			"scale": "no",

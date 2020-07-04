@@ -407,14 +407,6 @@ try:
 
             html.write('<p>Click on the image to get the full size image.</p>')
 
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'):
-                MY_LOGGER.debug('Adding image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'))
-                html.write('<h3>Colour Image</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-cc-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
-
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg'):
                 MY_LOGGER.debug('Adding processed image')
                 MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
@@ -423,6 +415,14 @@ try:
                 html.write('<a href=\"images/' + FILENAME_BASE +
                            '-processed-rectified.jpg' + '\"><img src=\"images/' +
                            FILENAME_BASE + '-processed-rectified-tn.jpg' + '\"></a>')
+
+            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'):
+                MY_LOGGER.debug('Adding image')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'))
+                html.write('<h3>Original Colour Image</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-cc-rectified.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
 
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'):
                 MY_LOGGER.debug('Adding channel 0 image')

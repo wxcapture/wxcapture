@@ -33,7 +33,6 @@ def migrate_files():
     files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.txt', 'destination path': '', 'copied': 'no'})
     files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.json', 'destination path': '', 'copied': 'no'})
     files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + 'weather.tle', 'destination path': '', 'copied': 'no'})
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': FILENAME_BASE + '.dec', 'destination path': '', 'copied': 'no'})
     files_to_copy.append({'source path': AUDIO_PATH, 'source file': FILENAME_BASE + '.wav', 'destination path': 'audio/', 'copied': 'no'})
     for img_file in glob.glob(OUTPUT_PATH + 'images/' + FILENAME_BASE + '*.png'):
         img_path, img_filename = os.path.split(img_file)
@@ -89,16 +88,14 @@ MY_LOGGER.debug('AUDIO_PATH = %s', AUDIO_PATH)
 try:
     try:
         # extract parameters
-        SATELLITE_TYPE = sys.argv[1]
-        SATELLITE_NUM = sys.argv[2]
-        SATELLITE = SATELLITE_TYPE + ' (' + SATELLITE_NUM + ')'
-        START_EPOCH = sys.argv[3]
-        DURATION = sys.argv[4]
-        MAX_ELEVATION = sys.argv[5]
-        REPROCESS = sys.argv[6]
+        SATELLITE = sys.argv[1]
+        START_EPOCH = sys.argv[2]
+        DURATION = sys.argv[3]
+        MAX_ELEVATION = sys.argv[4]
+        REPROCESS = sys.argv[5]
     except IndexError as exc:
         MY_LOGGER.critical('Exception whilst parsing command line parameters: %s %s %s',
-                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
         # re-throw it as this is fatal
         raise
 
@@ -135,13 +132,13 @@ try:
 
     # to enable REPROCESSing using the original tle file, rename it to match the FILENAME_BASE
     wxcutils.copy_file(WORKING_PATH + 'weather.tle', OUTPUT_PATH +
-                       FILENAME_BASE + 'weather.tle')
+                        FILENAME_BASE + 'weather.tle')
 
     # write out process information
     with open(OUTPUT_PATH + FILENAME_BASE + '.txt', 'w') as txt:
         txt.write('./receive_sstv.py ' + sys.argv[1] + ' ' + sys.argv[2] +
-                  ' ' + sys.argv[3] + ' ' + sys.argv[4] + ' ' + sys.argv[5] +
-                  ' ' + 'Y')
+                    ' ' + sys.argv[3] + ' ' + sys.argv[4] + ' ' + sys.argv[5] +
+                    ' ' + 'Y')
     txt.close()
 
     # determine the device index based on the serial number
@@ -161,10 +158,10 @@ try:
 
         MY_LOGGER.debug('Starting audio capture')
         wxcutils.run_cmd('timeout ' + DURATION + ' rtl_fm -d ' +
-                         str(WX_SDR) + BIAS_T + ' -M fm -f ' + str(PASS_INFO['frequency']) +
-                         'M -s 48k ' + GAIN_COMMAND +
-                         ' -p 0 | sox -t raw -r 48k -c 1 -b 16 -e s - -t wav \"' +
-                         AUDIO_PATH + FILENAME_BASE + '.wav\" rate 48k')
+                            str(WX_SDR) + BIAS_T + ' -M fm -f ' + str(PASS_INFO['frequency']) +
+                            'M -s 48k ' + GAIN_COMMAND +
+                            ' -p 0 | sox -t raw -r 48k -c 1 -b 16 -e s - -t wav \"' +
+                            AUDIO_PATH + FILENAME_BASE + '.wav\" rate 48k')
         MY_LOGGER.debug('Finished audio capture')
         if os.path.isfile(AUDIO_PATH + FILENAME_BASE + '.wav'):
             MY_LOGGER.debug('Audio file created')
@@ -183,7 +180,7 @@ try:
     MY_LOGGER.debug('start pactl to play back the recording to QSSTV')
     # e.g. paplay -d virtual-cable /home/pi/sstv/audio/2019-08-02-14-16-25-ISS_ZARYA.wav
     CMD = Popen(['/usr/bin/paplay', '-d', 'virtual-cable',
-                 AUDIO_PATH + FILENAME_BASE + '.wav'], stdout=PIPE, stderr=PIPE)
+                    AUDIO_PATH + FILENAME_BASE + '.wav'], stdout=PIPE, stderr=PIPE)
     STDOUT, STDERR = CMD.communicate()
     MY_LOGGER.debug('stdout:%s', STDOUT)
     MY_LOGGER.debug('stderr:%s', STDERR)
@@ -205,30 +202,30 @@ try:
         html.write('<!DOCTYPE html>')
         html.write('<html lang=\"en\"><head>')
         html.write('<meta charset=\"UTF-8\">'
-                   '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                   '<meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\">'
-                   '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
-                   '<meta name=\"author\" content=\"WxCapture\">')
+                    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
+                    '<meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\">'
+                    '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
+                    '<meta name=\"author\" content=\"WxCapture\">')
         html.write('<title>Satellite Pass Audio</title></head>')
         html.write('<body><h2>' + SATELLITE + '</h2>')
         html.write('<ul>')
         html.write('<li>Max pass elevation - ' + MAX_ELEVATION + '&deg; '
-                   + PASS_INFO['max_elevation_direction'] + '</li>')
+                    + PASS_INFO['max_elevation_direction'] + '</li>')
         html.write('<li>Pass direction - ' + PASS_INFO['direction'] + '</li>')
         html.write('<li>Pass start (' + PASS_INFO['timezone'] + ') - ' +
-                   PASS_INFO['start_date_local'] + '</li>')
+                    PASS_INFO['start_date_local'] + '</li>')
         html.write('<li>Pass end (' + PASS_INFO['timezone'] + ') - ' +
-                   PASS_INFO['end_date_local'] + '</li>')
+                    PASS_INFO['end_date_local'] + '</li>')
         html.write('<li>Pass start (UTC) - ' + PASS_INFO['startDate'] + '</li>')
         html.write('<li>Pass end (UTC) - ' + PASS_INFO['endDate'] + '</li>')
         html.write('<li>Pass duration - ' + str(PASS_INFO['duration']) +
-                   ' seconds' + '</li>')
+                    ' seconds' + '</li>')
         html.write('<li>Orbit - ' + PASS_INFO['orbit'] + '</li>')
         html.write('<li>SDR type - ' + PASS_INFO['sdr type'] +
-                   ' (' + PASS_INFO['chipset'] + ')</li>')
+                    ' (' + PASS_INFO['chipset'] + ')</li>')
         html.write('<li>SDR gain - ' + GAIN_VALUE + 'dB</li>')
         html.write('<li>Antenna - ' + PASS_INFO['antenna'] + ' (' +
-                   PASS_INFO['centre frequency'] + ')</li>')
+                    PASS_INFO['centre frequency'] + ')</li>')
         html.write('<li>Frequency range - ' + PASS_INFO['frequency range'] + '</li>')
         html.write('<li>Modules - ' + PASS_INFO['modules'] + '</li>')
         html.write('</ul>')
@@ -246,7 +243,7 @@ try:
             html.write('</table>')
 
         html.write('<a href=\"audio/' + FILENAME_BASE +
-                   '.wav' + '\"><h2>SSTV Audio</h2></a>')
+                    '.wav' + '\"><h2>SSTV Audio</h2></a>')
 
         html.write('<p>Click on the link to play or download the audio .wav file.</p>')
 

@@ -627,7 +627,7 @@ try:
                                     MY_PASS_MERIDIAN = sat_pass['pass meridian']
                                     MY_SATELLITE = sat_pass['satellite']
                         MY_LOGGER.debug('MY_PASS_MERIDIAN = %s', MY_PASS_MERIDIAN)
-                        MY_LOGGER.debug('MY_TIME = %d', MY_TIME)
+                        MY_LOGGER.debug('MY_TIME = %s', str(MY_TIME))
                         MY_LOGGER.debug('MY_SATELLITE = %s', MY_SATELLITE)
 
                         MY_LOGGER.debug('Prior passes to include - same satellite')

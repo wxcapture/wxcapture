@@ -108,7 +108,7 @@
 			"night": "yes",
 			"capture": "no",
 			"priority": "20",
-			"sdr": "ground-plane"
+			"sdr": "QFH"
 		},
 		{
 			"name": "SAUDISAT 1C (SO-50)",

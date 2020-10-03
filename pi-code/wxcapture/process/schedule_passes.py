@@ -318,7 +318,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
                     capture_reason = 'Darkness and using visible light sensor'
             elif sat['type'] == 'SSTV':
                 receive_code = CODE_PATH + 'receive_sstv.py'
-                scheduler = scheduler_command(receive_code, sat['name'],
+                scheduler = scheduler_command(receive_code, sat['name'].replace('(', '').replace(')', ''),
                                               start_epoch, duration,
                                               max_elevation)
             elif sat['type'] == 'AMSAT':

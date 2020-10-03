@@ -88,11 +88,11 @@ MY_LOGGER.debug('AUDIO_PATH = %s', AUDIO_PATH)
 try:
     try:
         # extract parameters
-        SATELLITE = sys.argv[1]
-        START_EPOCH = sys.argv[2]
-        DURATION = sys.argv[3]
-        MAX_ELEVATION = sys.argv[4]
-        REPROCESS = sys.argv[5]
+        SATELLITE = sys.argv[1] + ' ' + sys.argv[2]
+        START_EPOCH = sys.argv[3]
+        DURATION = sys.argv[4]
+        MAX_ELEVATION = sys.argv[5]
+        REPROCESS = sys.argv[6]
     except IndexError as exc:
         MY_LOGGER.critical('Exception whilst parsing command line parameters: %s %s %s',
                             sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

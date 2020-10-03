@@ -100,6 +100,106 @@ def fix_file(ff_path, ff_filename):
         return new_page
 
 
+    def fix_img_iss(fi_page, fi_path, fi_filename):
+        """fix up the img tags only, no lightbox required"""
+        MY_LOGGER.debug('starting fix_img %s %s', fi_path, fi_filename)
+        start_tag = '<img src=\"images/'
+        end_tag = '\">'
+        parse_pos = 0
+        new_page = ''
+
+        img_pos = fi_path.find('/wxcapture/')
+        img_path = fi_path[img_pos:] + 'images/'
+        MY_LOGGER.debug('img_path = %s', img_path)
+
+        while parse_pos >= 0:
+            if fi_page.find(start_tag, parse_pos) > 0:
+
+                MY_LOGGER.debug('img tag found')
+
+                pos_left = fi_page.find(start_tag, parse_pos) + len(start_tag)
+                pos_right = fi_page.find(end_tag, pos_left)
+
+                main_img = fi_page[pos_left:pos_right]
+                bits = main_img[:10].split('-')
+
+                img_path = CONFIG_INFO['Link Base'] + bits[0] + '/' + bits[1] + '/' + bits[2] + '/images/'
+
+                MY_LOGGER.debug('%d %s %s', parse_pos, main_img, img_path)
+
+                new_bit_1 = fi_page[parse_pos:(pos_left - len(start_tag))]
+                new_bit_2 = '<img src=\"' + img_path + main_img + '\">'
+
+                MY_LOGGER.debug('-start-----------------')
+                MY_LOGGER.debug(new_page)
+                MY_LOGGER.debug('-new_bit_1-------------')
+                MY_LOGGER.debug(new_bit_1)
+                MY_LOGGER.debug('-new_bit_2-------------')
+                MY_LOGGER.debug(new_bit_2)
+                MY_LOGGER.debug('-end-------------------')
+                new_page += new_bit_1 + new_bit_2
+                parse_pos = pos_right + len(end_tag)
+            else:
+                # get the rest of the page
+                new_page += fi_page[parse_pos:]
+                parse_pos = -1
+        MY_LOGGER.debug('completed fix_img')
+
+        # # fix plot reference
+        # MY_LOGGER.debug('fix plot reference')
+        # new_page = update_page(new_page, '<img src=\"images/', '<img src=\"' + img_path)
+
+        return new_page
+
+
+    def fix_audio(fi_page, fi_path, fi_filename):
+        """fix up the audio tags only"""
+        MY_LOGGER.debug('starting fix_audio %s %s', fi_path, fi_filename)
+        start_tag = '<a href=\"audio/'
+        end_tag = '\">'
+        parse_pos = 0
+        new_page = ''
+
+        audio_pos = fi_path.find('/wxcapture/')
+        audio_path = fi_path[audio_pos:] + 'audio/'
+        MY_LOGGER.debug('audio_path = %s', audio_path)
+
+        while parse_pos >= 0:
+            if fi_page.find(start_tag, parse_pos) > 0:
+
+                MY_LOGGER.debug('audio tag found')
+
+                pos_left = fi_page.find(start_tag, parse_pos) + len(start_tag)
+                pos_right = fi_page.find(end_tag, pos_left)
+
+                main_audio = fi_page[pos_left:pos_right]
+                bits = main_audio[:10].split('-')
+
+                audio_path = CONFIG_INFO['Link Base'] + bits[0] + '/' + bits[1] + '/' + bits[2] + '/audio/'
+
+                MY_LOGGER.debug('%d %s %s', parse_pos, main_audio, audio_path)
+
+                new_bit_1 = fi_page[parse_pos:(pos_left - len(start_tag))]
+                new_bit_2 = '<a href=\"' + audio_path + main_audio + '\">'
+
+                MY_LOGGER.debug('-start-----------------')
+                MY_LOGGER.debug(new_page)
+                MY_LOGGER.debug('-new_bit_1-------------')
+                MY_LOGGER.debug(new_bit_1)
+                MY_LOGGER.debug('-new_bit_2-------------')
+                MY_LOGGER.debug(new_bit_2)
+                MY_LOGGER.debug('-end-------------------')
+                new_page += new_bit_1 + new_bit_2
+                parse_pos = pos_right + len(end_tag)
+            else:
+                # get the rest of the page
+                new_page += fi_page[parse_pos:]
+                parse_pos = -1
+        MY_LOGGER.debug('completed fix_audio')
+
+        return new_page
+
+
     MY_LOGGER.debug('fix_file %s %s', ff_path, ff_filename)
 
     # load config
@@ -139,15 +239,15 @@ def fix_file(ff_path, ff_filename):
     MY_LOGGER.debug('remove table border')
     ff_page = update_page(ff_page, '<table border = 1>', '<table>')
 
-    # fix audio link - amsat and ISS only
+    # fix audio link - amsat  only
     if 'ISS' in ff_filename or 'SSTV' in ff_filename or 'SAUDISAT' in ff_filename or 'FOX' in ff_filename:
-        audio_pos = ff_path.find('/wxcapture/')
-        audio_path = ff_path[audio_pos:] + 'audio/'
-        MY_LOGGER.debug('audio_path = %s', audio_path)
-        ff_page = update_page(ff_page, '<a href=\"audio', '<a href=\"' + audio_path)
+        ff_page = fix_audio(ff_page, ff_path, ff_filename)
 
     # update img tags to use lightbox
-    ff_page = fix_img(ff_page, ff_path, ff_filename)
+    if 'ISS' in ff_filename or 'SSTV' in ff_filename:
+        ff_page = fix_img_iss(ff_page, ff_path, ff_filename)
+    else:
+        ff_page = fix_img(ff_page, ff_path, ff_filename)
 
     # MY_LOGGER.debug('%s', ff_page)
 

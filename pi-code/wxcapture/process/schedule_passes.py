@@ -569,7 +569,7 @@ def process_overlaps():
 
 
 def create_plot(sat_element):
-    """create polar plot for satellite data"""
+    """create polar plot for satellite pass"""
     MY_LOGGER.debug('Creating plot for pass')
     return_value = ''
     try:
@@ -684,7 +684,7 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 VISIBLE_YES = '+'
 VISIBLE_NO = '_'
 
-# try block to catch any exceptions
+# global try block to catch any exceptions
 try:
     # Echo $DISPLAY value to assist with troubleshooting X display issues
     DISPLAY = os.environ['DISPLAY']
@@ -738,7 +738,7 @@ try:
     SAT_DATA = sorted(SAT_DATA, key=lambda k: k['time'])
 
     # schedule
-    MY_LOGGER.debug('at scheduling')
+    MY_LOGGER.debug('AT scheduling')
     for elem in SAT_DATA:
         try:
             if elem['scheduler'] != '':
@@ -833,7 +833,6 @@ try:
             MY_LOGGER.debug('Generating row')
             # generate plot and link
             plot_link = create_plot(elem)
-            row_colour = ''
             font_effect_start = ''
             font_effect_end = ''
             if elem['scheduler'] == '':
@@ -891,7 +890,6 @@ try:
                        '<th>Direction</th><th>Visible to the Eye? (min:sec)</th></tr>\n')
         # iterate through list
         for elem in SAT_DATA_NEXT:
-            rowColour = ''
             if (elem['max_elevation'] >= \
                 int(CONFIG_INFO['Pass Highlight Elevation'])) \
                 and (elem['scheduler'] != ''):

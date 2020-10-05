@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""animate all FD images"""
+"""Animate all FD images"""
 
 
 # import libraries
 import os
-from os import path
 import sys
 import glob
 import time

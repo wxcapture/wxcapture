@@ -447,7 +447,8 @@ def migrate_files():
     files_to_copy = []
     files_to_copy.append({'source path': OUTPUT_PATH, 'source file': 'satpass.html', 'destination path': '', 'copied': 'no'})
     for sat in SAT_DATA:
-        files_to_copy.append({'source path': IMAGE_PATH, 'source file': sat['filename_base'] + '-plot.png', 'destination path': 'images/', 'copied': 'no'})
+        files_to_copy.append({'source path': IMAGE_PATH, 'source file': sat['filename_base'] + \
+            '-plot.png', 'destination path': 'images/', 'copied': 'no'})
         files_to_copy.append({'source path': IMAGE_PATH, 'source file': sat['filename_base'] + '-plot-tn.png', 'destination path': 'images/', 'copied': 'no'})
     MY_LOGGER.debug('Files to copy = %s', files_to_copy)
     wxcutils.migrate_files(files_to_copy)
@@ -468,6 +469,7 @@ def process_overlaps():
         # otherwise second pass will not be captured as the SDR is already in use
         # only testing where the start for sat B is between the start / end of sat A
         # otherwise would double process each overlap
+        # end time for sat b is not currently used
         io_sdr_buffer = 1
         io_result = False
         if io_sat_a_start < io_sat_b_start < (io_sat_a_end + io_sdr_buffer):
@@ -508,6 +510,7 @@ def process_overlaps():
                             adjust = 'B'
                             MY_LOGGER.debug('Max elevation A > B')
                         else:
+                            # an easter egg
                             adjust = 'A'
                             MY_LOGGER.debug('Max elevation B > A')
 
@@ -833,19 +836,19 @@ try:
             MY_LOGGER.debug('Generating row')
             # generate plot and link
             plot_link = create_plot(elem)
-            font_effect_start = ''
-            font_effect_end = ''
+            FONT_EFFECT_START = ''
+            FONT_EFFECT_END = ''
             if elem['scheduler'] == '':
-                font_effect_start = '<del>'
-                font_effect_end = '</del>'
+                FONT_EFFECT_START = '<del>'
+                FONT_EFFECT_END = '</del>'
             if (elem['max_elevation'] >= \
                 int(CONFIG_INFO['Pass Highlight Elevation'])) \
                 and (elem['scheduler'] != ''):
                 html.write('<tr class=\"row-highlight\">')
             else:
                 html.write('<tr>')
-            html.write('<td>' + font_effect_start + elem['satellite'] +
-                       font_effect_end + '</td>')
+            html.write('<td>' + FONT_EFFECT_START + elem['satellite'] +
+                       FONT_EFFECT_END + '</td>')
             html.write('<td>' + str(elem['max_elevation']) + '&deg; ' + \
                 elem['max_elevation_direction_desc'] + '</td>')
             html.write('<td>' + plot_link + '</td>')

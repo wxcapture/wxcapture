@@ -9,9 +9,9 @@ from logging.handlers import TimedRotatingFileHandler
 import sys
 import json
 import shutil
-import requests
 import uuid
 from datetime import datetime
+import requests
 import pytz
 from tzlocal import get_localzone
 

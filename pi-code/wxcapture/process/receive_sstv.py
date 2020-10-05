@@ -194,6 +194,8 @@ try:
     # find any images created
     IMAGE_FILES = []
     IMAGE_COUNT = find_files()
+    MY_LOGGER.debug('IMAGE_FILES = ...')
+    MY_LOGGER.debug(IMAGE_FILES)
 
     MY_LOGGER.debug('-' * 30)
 
@@ -233,12 +235,15 @@ try:
         html.write('<h2>Decoded Images</h2>')
 
         if IMAGE_COUNT == 0:
+            MY_LOGGER.debug('No image files found')
             html.write('<p>No images could be automatically decoded.</p>')
         else:
             html.write('<table>')
+            MY_LOGGER.debug('1+ image files found')
             for row in IMAGE_FILES:
+                MY_LOGGER.debug('row = %s', row)
                 html.write('<tr><td>')
-                html.write('<img src=\"images/' + row + '\">')
+                html.write('<img src=\"images/' + row + '\"><br>')
                 html.write('</td></tr>')
             html.write('</table>')
 

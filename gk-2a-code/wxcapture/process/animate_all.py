@@ -43,7 +43,7 @@ def crawl_images(ci_directory):
             bits = os.path.split(file)
             l_filename, l_extenstion = os.path.splitext(bits[1])
             sub_bits = l_filename.split('_')
-            # Sample file name: IMG_FD_014_IR105_20200808_022006
+            # IMG_FD_014_IR105_20200808_022006
             # only add the FD images to the index
             if len(sub_bits) == 6:
                 MY_LOGGER.debug('dir = %s, file = %s, ext = %s, date = %s, time = %s', bits[0], l_filename, l_extenstion, sub_bits[4], sub_bits[5])

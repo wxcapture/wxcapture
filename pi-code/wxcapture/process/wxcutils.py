@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""wxcapture utility code"""
+"""wxcapture utility code library"""
 
 
 # import libraries

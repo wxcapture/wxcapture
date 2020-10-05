@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Schedule satellite data collection
-Also produce pass data for today plus the next few days"""
+Also produce pass data for today plus the next few days
+using configuration data"""
 
 # import libraries
 import os

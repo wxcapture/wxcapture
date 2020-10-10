@@ -18,10 +18,6 @@ import matplotlib.pyplot as pyplot
 import wxcutils
 
 
-# required to avoid display errors for pyplotlib
-matplotlib.use('Agg')
-
-
 def is_daylight(id_pass_start, id_pass_end):
     """check if it is daylight at the time"""
     def get_timestamp(tmp_dt):
@@ -506,12 +502,11 @@ def process_overlaps():
                     elif sat_a['priority'] < sat_b['priority']:
                         adjust = 'A'
                         MY_LOGGER.debug('Priority B > A')
-                    else:  # max elevation tests
+                    else:  # max elevation tests, since both equal priority
                         if sat_a['max_elevation'] > sat_b['max_elevation']:
                             adjust = 'B'
                             MY_LOGGER.debug('Max elevation A > B')
                         else:
-                            # an easter egg
                             adjust = 'A'
                             MY_LOGGER.debug('Max elevation B > A')
 
@@ -690,10 +685,6 @@ VISIBLE_NO = '_'
 
 # global try block to catch any exceptions
 try:
-    # Echo $DISPLAY value to assist with troubleshooting X display issues
-    DISPLAY = os.environ['DISPLAY']
-    MY_LOGGER.debug('DISPLAY = %s', DISPLAY)
-
     # load config
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
 

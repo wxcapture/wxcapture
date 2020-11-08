@@ -59,6 +59,22 @@ def find_latest_file_contains(directory, contains):
     return latest_filename
 
 
+def find_latest_filename_contains(directory, contains):
+    """find latest file matching a pattern in directory based on the filename"""
+    # example filename
+    # 20201107090002-pacsfc24_latestBW.gif
+    latest_dt = 0
+    latest_filename = ''
+    for filename in os.listdir(directory):
+        if contains in filename:
+            file_dt = (int)(filename.split('-')[0])
+            if file_dt > latest_dt:
+                latest_dt = file_dt
+                latest_filename = filename
+    MY_LOGGER.debug('latest_filename = %s, latest_dt = %f', latest_filename, latest_dt)
+    return latest_filename
+
+
 def get_local_date_time():
     """get the local date time"""
     return wxcutils.epoch_to_local(time.time(), '%a %d %b %H:%M')
@@ -207,6 +223,76 @@ def process_himawari(sat_num):
 
     MY_LOGGER.debug('---------------------------------------------')
 
+
+def process_nws():
+    """process nws files"""
+
+    # note that this code is a work around for an issue with goestools
+    # https://github.com/pietern/goestools/issues/100
+    # GOES nws directory / filenames are incorrect #100
+    # once fixed, this code will need to be updated
+
+    # move all nws files to the nwsall directory
+    wxcutils.run_cmd('mv ' + base_dir + 'nws/*/* ' + base_dir + 'nwsall/')
+
+    # loop through all files in the directory and rename them to
+    # remove the first, incorrect part of the filename
+    # e.g. 19700101T000000Z_20201107060000-pacsfc72_latestBW.gif
+    # to 20201107060000-pacsfc72_latestBW.gif
+    for filename in os.listdir(base_dir + 'nwsall/'):
+        MY_LOGGER.debug('filename = %s', filename)
+        bits = filename.split('_')
+        MY_LOGGER.debug('first bit = %s', bits[0])
+        new_filename = filename[len(bits[0]) + 1:]
+        MY_LOGGER.debug('new_filename = %s', new_filename)
+        wxcutils.move_file(base_dir + 'nwsall/', filename, base_dir + 'nwsfixed/', new_filename)
+    
+    # now go through all images to find the latest of each type using filename
+    graphic_types = ['EPAC_latest', 'GULF_latest', 'pac24_latestBW', 'pac48_latestBW',
+                     'pac48per_latestBW', 'pacsfc24_latestBW', 'pacsfc48_latestBW',
+                     'pacsfc72_latestBW', 'WATL_latest', 'pac48per_latestBW']
+    for gt in graphic_types:
+        MY_LOGGER.debug('type = %s', gt)
+        latest_file = find_latest_filename_contains(base_dir + 'nwsfixed/', gt)
+
+        MY_LOGGER.debug('latest_file = %s', latest_file)
+
+        filename, extenstion = os.path.splitext(latest_file) 
+        new_filename = 'nws_' + gt
+
+        # see when last saved
+        stored_timestamp = 0.0
+        try:
+            stored_timestamp = latest_timestamps[new_filename + extenstion]
+        except NameError:
+            pass
+        except KeyError:
+            pass
+
+        # date time for original file
+        latest = (int)(latest_file.split('-')[0])
+
+        MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
+
+        if stored_timestamp != int(latest):
+            # new file found which hasn't yet been copied over
+
+            # copy to output directory
+            MY_LOGGER.debug('new_filename = %s', new_filename)
+            wxcutils.copy_file(os.path.join(base_dir + 'nwsfixed/', latest_file), os.path.join(OUTPUT_PATH, new_filename + extenstion))
+
+            # create thumbnail
+            create_thumbnail(new_filename, extenstion)
+
+                # create file with date time info
+            date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+            wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', date_time)
+
+            # update latest
+            latest_timestamps[new_filename + extenstion] = int(latest)
+
+
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -251,6 +337,8 @@ process_goes('16')
 # process Himawari 8 files
 process_himawari('8')
 
+# process nws files
+process_nws()
 
 # save latest times data
 wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', latest_timestamps)

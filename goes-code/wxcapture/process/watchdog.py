@@ -25,6 +25,20 @@ def is_running(process_name):
     return False
 
 
+def is_processing(process_name, minutes):
+    """see if images are being created in last defined number of minutes"""
+    cmd = Popen(['find', '/home/pi/goes', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
+    stdout, stderr = cmd.communicate()
+    MY_LOGGER.debug('stdout:%s', stdout)
+    MY_LOGGER.debug('stderr:%s', stderr)
+
+    if len(stdout.decode('utf-8')) > 0:
+        MY_LOGGER.debug('%s is processing images', process_name)
+        return True
+    MY_LOGGER.debug('%s is NOT processing images', process_name)
+    return False
+
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -48,8 +62,8 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
-# test if goesproc is running
-if not is_running('goesproc'):
+# test if goesproc is running or processing
+if not is_running('goesproc') or not is_processing('goesproc', 10):
     # need to kick off the code
     MY_LOGGER.debug('Kicking it off')
     wxcutils.run_cmd('goesproc -c /usr/share/goestools/goesproc-goesr.conf -m packet --subscribe tcp://203.86.195.49:5004 --out /home/pi/goes &')

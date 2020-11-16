@@ -15,7 +15,7 @@ def is_running(process_name):
         cmd = subprocess.Popen(('ps', '-A'), stdout=subprocess.PIPE)
         output = subprocess.check_output(('grep', process_name), stdin=cmd.stdout)
         cmd.wait()
-        MY_LOGGER.debug('output = %s', output)
+        MY_LOGGER.debug('output = %s', output.decode('utf-8'))
         if process_name in output.decode('utf-8'):
             MY_LOGGER.debug('%s is running', process_name)
             return True
@@ -29,13 +29,17 @@ def is_processing(process_name, minutes):
     """see if images are being created in last defined number of minutes"""
     cmd = Popen(['find', '/home/pi/goes', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('stdout:%s', stdout)
-    MY_LOGGER.debug('stderr:%s', stderr)
+    MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
+    MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
 
     if len(stdout.decode('utf-8')) > 0:
         MY_LOGGER.debug('%s is processing images', process_name)
         return True
     MY_LOGGER.debug('%s is NOT processing images', process_name)
+ 
+    # need to kill off any existing goesproc processes
+    # not totally elegent, but should only be one goesproc on a server
+    wxcutils.run_cmd('pkill -f ' + process_name)
     return False
 
 

@@ -15,13 +15,31 @@ def is_running(process_name):
         cmd = subprocess.Popen(('ps', '-A'), stdout=subprocess.PIPE)
         output = subprocess.check_output(('grep', process_name), stdin=cmd.stdout)
         cmd.wait()
-        MY_LOGGER.debug('output = %s', output)
+        MY_LOGGER.debug('output = %s', output.decode('utf-8'))
         if process_name in output.decode('utf-8'):
             MY_LOGGER.debug('%s is running', process_name)
             return True
     except:
         MY_LOGGER.debug('%s is NOT running', process_name)
     MY_LOGGER.debug('%s is NOT running', process_name)
+    return False
+
+
+def is_processing(process_name, minutes):
+    """see if images are being created in last defined number of minutes"""
+    cmd = Popen(['find', '/home/pi/gk-2a/xrit-rx/received', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
+    stdout, stderr = cmd.communicate()
+    MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
+    MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
+
+    if len(stdout.decode('utf-8')) > 0:
+        MY_LOGGER.debug('%s is processing images', process_name)
+        return True
+    MY_LOGGER.debug('%s is NOT processing images', process_name)
+ 
+    # need to kill off any existing goesrecv processes
+    # not totally elegent, but should only be one goesrecv on a server
+    wxcutils.run_cmd('pkill -f ' + process_name)
     return False
 
 
@@ -48,8 +66,9 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
-# test if goesproc is running
-if not is_running('goesrecv'):
+
+# test if goesrecv is running or processing
+if not is_running('goesrecv')  or not is_processing('goesrecv', 15):
     # need to kick off the code
     MY_LOGGER.debug('Kicking it off')
     wxcutils.run_cmd('/home/pi/gk-2a/goestools/build/src/goesrecv/goesrecv -i 1 -c /home/pi/gk-2a/goesrecv.conf &')

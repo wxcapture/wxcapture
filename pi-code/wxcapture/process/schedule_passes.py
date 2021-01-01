@@ -25,39 +25,48 @@ def is_daylight(id_pass_start, id_pass_end):
         bits = part.split('-')
         return time_scale.utc(int(bits[0]), int(bits[1]), int(bits[2]), int(bits[3]), int(bits[4]))
 
-    # update planets info
-    MY_LOGGER.debug('Loading new files')
-    load = Loader(WORKING_PATH)
-    time_scale = load.timescale()
-    e_e = load('de421.bsp')
+    # if unable to load files, assume daylight is true
+    # avoids crash and at worst will capture a nighttime pass
+    try:
 
-    start_time_epoch = float(wxcutils.local_datetime_to_epoch \
-                (datetime.today().replace(hour=0).replace(minute=0) \
-                .replace(second=0)))
-    end_time_epoch = start_time_epoch + (24*60*60) - 1
-    start_dt = wxcutils.epoch_to_datetime_utc(start_time_epoch)
-    end_dt = wxcutils.epoch_to_datetime_utc(end_time_epoch)
+        # update planets info
+        MY_LOGGER.debug('Loading new files')
+        load = Loader(WORKING_PATH)
+        time_scale = load.timescale()
+        e_e = load('de421.bsp')
 
-    gps_location = api.Topos(CONFIG_INFO['GPS location NS'], CONFIG_INFO['GPS location EW'])
+        start_time_epoch = float(wxcutils.local_datetime_to_epoch \
+                    (datetime.today().replace(hour=0).replace(minute=0) \
+                    .replace(second=0)))
+        end_time_epoch = start_time_epoch + (24*60*60) - 1
+        start_dt = wxcutils.epoch_to_datetime_utc(start_time_epoch)
+        end_dt = wxcutils.epoch_to_datetime_utc(end_time_epoch)
 
-    a_t, a_y = almanac.find_discrete(get_timestamp(start_dt), get_timestamp(end_dt),
-                                     almanac.sunrise_sunset(e_e, gps_location))
-    MY_LOGGER.debug(a_t)
-    MY_LOGGER.debug(a_y)
+        gps_location = api.Topos(CONFIG_INFO['GPS location NS'], CONFIG_INFO['GPS location EW'])
 
-    daylight_start = wxcutils.utc_to_epoch(a_t[0].utc_iso().replace('T', ' ').replace('Z', ''),
-                                           '%Y-%m-%d %H:%M:%S')
-    daylight_end = wxcutils.utc_to_epoch(a_t[1].utc_iso().replace('T', ' ').replace('Z', ''),
-                                         '%Y-%m-%d %H:%M:%S')
+        a_t, a_y = almanac.find_discrete(get_timestamp(start_dt), get_timestamp(end_dt),
+                                        almanac.sunrise_sunset(e_e, gps_location))
+        MY_LOGGER.debug(a_t)
+        MY_LOGGER.debug(a_y)
 
-    # capture if either:
-    # start of pass is in daylight
-    # OR
-    # end of pass is in daylight
-    id_twighlight = float(CONFIG_INFO['twilight allowance']) * 60
-    MY_LOGGER.debug('twighlight allowance in seconds = %f', id_twighlight)
-    if (float(daylight_start) - id_twighlight) <= id_pass_start <= (float(daylight_end) + id_twighlight) or \
-        (float(daylight_start) - id_twighlight) <= id_pass_end <= (float(daylight_end) + id_twighlight):
+        daylight_start = wxcutils.utc_to_epoch(a_t[0].utc_iso().replace('T', ' ').replace('Z', ''),
+                                            '%Y-%m-%d %H:%M:%S')
+        daylight_end = wxcutils.utc_to_epoch(a_t[1].utc_iso().replace('T', ' ').replace('Z', ''),
+                                            '%Y-%m-%d %H:%M:%S')
+
+        # capture if either:
+        # start of pass is in daylight
+        # OR
+        # end of pass is in daylight
+        id_twighlight = float(CONFIG_INFO['twilight allowance']) * 60
+        MY_LOGGER.debug('twighlight allowance in seconds = %f', id_twighlight)
+        if (float(daylight_start) - id_twighlight) <= id_pass_start <= (float(daylight_end) + id_twighlight) or \
+            (float(daylight_start) - id_twighlight) <= id_pass_end <= (float(daylight_end) + id_twighlight):
+            return 'Y'
+    except:
+        MY_LOGGER.debug('Exception during is_daylight: %s %s %s',
+                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+        MY_LOGGER.debug('Assuming it is daylight so as to always capture a file in this case')
         return 'Y'
     return 'N'
 

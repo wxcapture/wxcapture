@@ -104,8 +104,8 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 LOCAL_TIME_ZONE = subprocess.check_output("date"). \
     decode('utf-8').split(' ')[-2]
 
-# base_dir = '/mnt/d/wx/output2/'
-base_dir = '/mnt/d/wx/output/'
+# base_dir = '/mnt/f/Satellites/gk-2a/output2/'
+base_dir = '/mnt/f/Satellites/gk-2a/output/'
 MY_LOGGER.debug('base_dir = %s', base_dir)
 
 # PREFIX = 'CP'
@@ -113,10 +113,10 @@ PREFIX = 'FD'
 MY_LOGGER.debug('base_dir = %s', base_dir)
 
 
-AUDIO = '/mnt/g/weather/GK-2A/audio/bensound-relaxing.mp3'
+AUDIO = '/mnt/f/Satellites/gk-2a/audio/bensound-relaxing.mp3'
 MY_LOGGER.debug('AUDIO = %s', AUDIO)
 
-CORES = 14
+CORES = 22
 MY_LOGGER.debug('CORES = %s', CORES)
 
 # data store for files list

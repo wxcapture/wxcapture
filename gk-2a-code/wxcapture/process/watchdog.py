@@ -37,9 +37,6 @@ def is_processing(process_name, minutes):
         return True
     MY_LOGGER.debug('%s is NOT processing images', process_name)
  
-    # need to kill off any existing goesrecv processes
-    # not totally elegent, but should only be one goesrecv on a server
-    wxcutils.run_cmd('pkill -f ' + process_name)
     return False
 
 
@@ -69,6 +66,10 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 # test if goesrecv is running or processing
 if not is_running('goesrecv')  or not is_processing('goesrecv', 15):
+    # need to kill off any existing goesrecv processes
+    # not totally elegent, but should only be one goesrecv on a server
+    wxcutils.run_cmd('pkill -f goesrecv')
+
     # need to kick off the code
     MY_LOGGER.debug('Kicking it off')
     wxcutils.run_cmd('/home/pi/gk-2a/goestools/build/src/goesrecv/goesrecv -i 1 -c /home/pi/gk-2a/goesrecv.conf &')

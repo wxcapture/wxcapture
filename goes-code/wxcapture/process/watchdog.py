@@ -36,7 +36,7 @@ def is_processing(process_name, minutes):
         MY_LOGGER.debug('%s is processing images', process_name)
         return True
     MY_LOGGER.debug('%s is NOT processing images', process_name)
- 
+
     # need to kill off any existing goesproc processes
     # not totally elegent, but should only be one goesproc on a server
     wxcutils.run_cmd('pkill -f ' + process_name)
@@ -70,7 +70,8 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 if not is_running('goesproc') or not is_processing('goesproc', 10):
     # need to kick off the code
     MY_LOGGER.debug('Kicking it off')
-    wxcutils.run_cmd('goesproc -c /usr/share/goestools/goesproc-goesr.conf -m packet --subscribe tcp://203.86.195.49:5004 --out /home/pi/goes &')
+    wxcutils.run_cmd('goesproc -c /usr/share/goestools/goesproc-goesr.conf -m packet ' +
+                     '--subscribe tcp://203.86.195.49:5004 --out /home/pi/goes &')
     if is_running('goesproc'):
         MY_LOGGER.debug('goesproc is now running')
     else:

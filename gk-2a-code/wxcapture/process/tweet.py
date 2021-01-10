@@ -6,7 +6,6 @@
 import os
 from os import path
 import sys
-import glob
 import tweepy
 import wxcutils
 
@@ -56,7 +55,8 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 try:
     # tweet image
     MY_LOGGER.debug('Tweeting image')
-    TWEET_TEXT = 'Latest weather satellite image from GK-2A #weather #satellite. See more at https://kiwiweather.com. Click on image to see more detail.'
+    TWEET_TEXT = 'Latest weather satellite image from GK-2A #weather #satellite. ' + \
+        'See more at https://kiwiweather.com. Click on image to see more detail.'
     # files are ~ 2MB, so can tweet full size image
     TWEET_IMAGE = OUTPUT_PATH + 'sanchez.jpg'
     # only proceed if the image exists
@@ -66,12 +66,12 @@ try:
                              TWEET_TEXT, TWEET_IMAGE)
         except:
             MY_LOGGER.critical('Tweet exception handler: %s %s %s',
-                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                               sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
         MY_LOGGER.debug('Tweeted!')
     else:
         MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.',
                         TWEET_IMAGE)
- 
+
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

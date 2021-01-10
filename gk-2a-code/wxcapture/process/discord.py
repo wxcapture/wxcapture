@@ -4,9 +4,7 @@
 
 # import libraries
 import os
-from os import path
 import sys
-import glob
 from discord_webhook import DiscordWebhook, DiscordEmbed
 import wxcutils
 
@@ -15,9 +13,9 @@ def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_s
              w_location, w_colour, w_description):
     """send data to webhooks as configured"""
     MY_LOGGER.debug('webhooks called with %s %s %s %s %s %s %s %s',
-                         w_config_path, w_config_file, w_site_config_file,
-                         w_imagesfile, w_satellite,
-                         w_location, w_colour, w_description)
+                    w_config_path, w_config_file, w_site_config_file,
+                    w_imagesfile, w_satellite,
+                    w_location, w_colour, w_description)
 
     # convert w_colour from hex string to an int
     w_colour = int(w_colour, 16)
@@ -88,7 +86,7 @@ try:
                  'IR Image CLAHE-Sanchez processed')
     except:
         MY_LOGGER.critical('Discord exception handler: %s %s %s',
-                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',

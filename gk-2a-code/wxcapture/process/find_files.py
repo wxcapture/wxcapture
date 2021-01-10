@@ -4,8 +4,6 @@
 
 # import libraries
 import os
-from os import path
-import sys
 import glob
 import time
 import subprocess
@@ -16,7 +14,7 @@ import wxcutils
 def find_latest_directory(directory):
     """find latest directory in directory"""
     latest = 0
-    for directories in os.listdir(directory): 
+    for directories in os.listdir(directory):
         if int(directories) > latest:
             latest = int(directories)
     return str(latest)
@@ -25,7 +23,7 @@ def find_latest_directory(directory):
 def find_directories(directory):
     """find directories in directory"""
     directory_set = []
-    for directories in os.listdir(directory): 
+    for directories in os.listdir(directory):
         directory_set.append(directories)
     return directory_set
 
@@ -46,8 +44,10 @@ def crawl_images(ci_directory):
             # IMG_FD_014_IR105_20200808_022006
             # only add the FD images to the index
             if len(sub_bits) == 6:
-                MY_LOGGER.debug('dir = %s, file = %s, ext = %s, date = %s, time = %s', bits[0], l_filename, l_extenstion, sub_bits[4], sub_bits[5])
-                FILES.append({'dir': bits[0], 'file': l_filename, 'ext': l_extenstion, 'datetime': sub_bits[4] + sub_bits[5]})
+                MY_LOGGER.debug('dir = %s, file = %s, ext = %s, date = %s, time = %s',
+                                bits[0], l_filename, l_extenstion, sub_bits[4], sub_bits[5])
+                FILES.append({'dir': bits[0], 'file': l_filename, 'ext': l_extenstion,
+                              'datetime': sub_bits[4] + sub_bits[5]})
 
 
 def find_latest_file(directory):
@@ -60,7 +60,8 @@ def find_latest_file(directory):
             if file_timestamp > latest_timestamp:
                 latest_filename = filename
                 latest_timestamp = file_timestamp
-    MY_LOGGER.debug('latest_filename = %s, latest_timestamp = %f', latest_filename, latest_timestamp)
+    MY_LOGGER.debug('latest_filename = %s, latest_timestamp = %f',
+                    latest_filename, latest_timestamp)
     return latest_filename
 
 
@@ -86,8 +87,9 @@ def clahe_process(cp_in_path, cp_in_file, cp_out_path, cp_out_file):
 
 def create_thumbnail(ct_directory, ct_extension):
     """create thumbnail of the image"""
-    wxcutils.run_cmd('convert \"' + OUTPUT_PATH + ct_directory + ct_extension + 
-                        '\" -resize 9999x500 ' + OUTPUT_PATH + ct_directory + '-tn' + ct_extension)
+    wxcutils.run_cmd('convert \"' + OUTPUT_PATH + ct_directory +
+                     ct_extension +  '\" -resize 9999x500 ' +
+                     OUTPUT_PATH + ct_directory + '-tn' + ct_extension)
 
 
 def get_local_date_time():
@@ -106,16 +108,19 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
         """add text"""
 
         if add_duration:
-            line = 'file \'' + at_path + '/' + at_file + '\'' + os.linesep + 'duration 0.05' + os.linesep
+            line = 'file \'' + at_path + '/' + at_file + '\'' + \
+                os.linesep + 'duration 0.05' + os.linesep
         else:
             line = 'file \'' + at_path + '/' + at_file + '\'' + os.linesep
         return line
 
-    MY_LOGGER.debug('directory = %s, filename = %s, extenstion = %s, frames = %d, suffix = %s', a_directory, a_filename, a_extenstion, a_frames, a_suffix)
+    MY_LOGGER.debug('directory = %s, filename = %s, extenstion = %s, frames = %d, suffix = %s',
+                    a_directory, a_filename, a_extenstion, a_frames, a_suffix)
     a_files = len(FILES)
     if a_frames > a_files:
         a_frames = a_files
-        MY_LOGGER.debug('Reduced frames to %d as not enough frames exist (max = %d)', a_frames, a_files)
+        MY_LOGGER.debug('Reduced frames to %d as not enough frames exist (max = %d)',
+                        a_frames, a_files)
     a_text = ''
 
     MY_LOGGER.debug('Going throught the last %d frames', a_frames)
@@ -124,15 +129,23 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
     a_counter = a_files - a_frames
     while  a_counter < a_files:
         a_text = a_text + add_txt(FILES[a_counter]['dir'], FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'], True)
-        if not os.path.exists(FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext']):
+        if not os.path.exists(FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + \
+            a_suffix + FILES[a_counter]['ext']):
             # need to generate file
             if a_suffix == '_sanchez':
                 MY_LOGGER.debug('sanchez file to create')
-                MY_LOGGER.debug('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + FILES[a_counter]['ext'] + ' -m /home/pi/sanchez/Resources/Mask.jpg -u /home/pi/sanchez/Resources/GK-2A/Underlay.jpg -o ' + FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'] + ' -t 0070BA')            
-                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + FILES[a_counter]['ext'] + ' -m /home/pi/sanchez/Resources/Mask.jpg -u /home/pi/sanchez/Resources/GK-2A/Underlay.jpg -o ' + FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'] + ' -t 0070BA')
+                MY_LOGGER.debug('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + '/' +
+                                FILES[a_counter]['file'] + FILES[a_counter]['ext'] +
+                                ' -m /home/pi/sanchez/Resources/Mask.jpg -u /home/pi/sanchez/Resources/GK-2A/Underlay.jpg -o ' + \
+                                FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + \
+                                FILES[a_counter]['ext'] + ' -t 0070BA')
+                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + \
+                    '/' + FILES[a_counter]['file'] + FILES[a_counter]['ext'] + \
+                    ' -m /home/pi/sanchez/Resources/Mask.jpg -u /home/pi/sanchez/Resources/GK-2A/Underlay.jpg -o ' + \
+                    FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'] + ' -t 0070BA')
             else:
                 MY_LOGGER.debug('%s file to create', a_suffix)
-        a_counter +=1
+        a_counter += 1
     # add last frame again, but with no duration
     a_text += add_txt(FILES[a_files - 1]['dir'], FILES[a_files - 1]['file'] + a_suffix + FILES[a_files - 1]['ext'], False)
 
@@ -142,9 +155,10 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
     # create animation
     if a_suffix == '':
         a_suffix = 'raw'
-    wxcutils.run_cmd('ffmpeg -y -safe 0 -f concat -i ' + WORKING_PATH + 'framelist.txt -c:v libx264 -pix_fmt yuv420p -vf scale=800:800 ' + OUTPUT_PATH + 'FD-' + a_suffix + '-' + str(a_frames) + '.mp4')
+    wxcutils.run_cmd('ffmpeg -y -safe 0 -f concat -i ' + WORKING_PATH +
+                     'framelist.txt -c:v libx264 -pix_fmt yuv420p -vf scale=800:800 ' + OUTPUT_PATH + 'FD-' +
+                     a_suffix + '-' + str(a_frames) + '.mp4')
 
-    
     # create file with date time info
     date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
     wxcutils.save_file(OUTPUT_PATH, 'FD-' + a_suffix + '-' + str(a_frames) + '.txt', date_time)
@@ -220,11 +234,11 @@ for directory in data_directories:
         pass
     except KeyError:
         pass
-    
+
     # REMOVE REMOVE REMOVE
     # if directory == 'FD':
     #     stored_timestamp = 0
-    
+
     MY_LOGGER.debug('stored_timestamp = %f, %f', stored_timestamp, latest)
     if stored_timestamp != int(latest):
         MY_LOGGER.debug('New %s file added', directory)

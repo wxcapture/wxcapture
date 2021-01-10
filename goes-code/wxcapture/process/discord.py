@@ -5,8 +5,34 @@
 # import libraries
 import os
 import sys
+import requests
 from discord_webhook import DiscordWebhook, DiscordEmbed
+import cv2
 import wxcutils
+
+
+def is_light(filename, threshold):
+    """see if the image is not dark"""
+    try:
+        MY_LOGGER.debug('Reading file from URL')
+        data = requests.get(URL_BASE + filename)
+        MY_LOGGER.debug('Writing file')
+        open(WORKING_PATH + filename, 'wb').write(data.content)
+
+        MY_LOGGER.debug('Reading file')
+        img = cv2.imread(WORKING_PATH + filename)
+        mean_components = img.mean(axis=0).mean(axis=0)
+        mean = (mean_components[0] + mean_components[1] + mean_components[2]) / 3
+
+        if mean > threshold:
+            MY_LOGGER.debug('Light - %f', mean)
+            return True
+    except:
+        MY_LOGGER.critical('is_light exception handler: %s %s %s',
+                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+
+    MY_LOGGER.debug('Dark')
+    return False
 
 
 def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_satellite,
@@ -48,14 +74,15 @@ def webhooks(w_config_path, w_config_file, w_site_config_file, w_imagesfile, w_s
         w_response = w_webhook.execute()
         MY_LOGGER.debug('response = %s', w_response)
 
+
 def webhook(url, sat, image_desc):
     """webhook each image"""
     try:
         # webhook
-        MY_LOGGER.debug('Webhooking pass %s %s %s', url, sat, image_desc)
+        MY_LOGGER.debug('Webhooking pass %s %s %s', URL_BASE + url, sat, image_desc)
         try:
             webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
-                     url,
+                     URL_BASE + url,
                      sat, 'Geostationary Image',
                      'ff0000',
                      image_desc)
@@ -90,19 +117,37 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
+URL_BASE = 'https://kiwiweather.com/goes/'
+MY_LOGGER.debug('URL_BASE = %s', URL_BASE)
+THRESHOLD = 5
+MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
+
 # do each webhook
 # GOES 17
-webhook('https://kiwiweather.com/goes/goes_17_fd_fc-tn.jpg', 'GOES 17', 'Full colour')
-webhook('https://kiwiweather.com/goes/goes_17_m1_fc-tn.jpg', 'GOES 17', 'Full colour Meso Area 1')
-webhook('https://kiwiweather.com/goes/goes_17_m2_fc-tn.jpg', 'GOES 17', 'Full colour Meso Area 2')
+webhook('goes_17_fd_fc-tn.jpg', 'GOES 17', 'Full colour')
+
+IMAGE = 'goes_17_m1_fc-tn.jpg'
+if is_light(IMAGE, THRESHOLD):
+    MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+    webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 1')
+else:
+    MY_LOGGER.debug('%s is dark, not firing webhook', IMAGE)
+
+IMAGE = 'goes_17_m2_fc-tn.jpg'
+if is_light(IMAGE, THRESHOLD):
+    MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+    webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 2')
+else:
+    MY_LOGGER.debug('%s is dark, not firing webhook', IMAGE)
+
 
 # GOES 16
-webhook('https://kiwiweather.com/goes/goes_16_fd_ch13_enhanced-tn.jpg', 'GOES 16',
+webhook('goes_16_fd_ch13_enhanced-tn.jpg', 'GOES 16',
         'Enhanced clean IR longwave band')
 
 # Himawari 8
-webhook('https://kiwiweather.com/goes/himawari_8_fd_IR-tn.jpg', 'Himawari 8', 'Infra red')
-webhook('https://kiwiweather.com/goes/himawari_8_fd_VS-tn.jpg', 'Himawari 8', 'Visible band')
+webhook('himawari_8_fd_IR-tn.jpg', 'Himawari 8', 'Infra red')
+webhook('himawari_8_fd_VS-tn.jpg', 'Himawari 8', 'Visible band')
 
 
 MY_LOGGER.debug('Execution end')

@@ -6,8 +6,34 @@
 import os
 from os import path
 import sys
+import requests
 import tweepy
+import cv2
 import wxcutils
+
+
+def is_light(filename, threshold):
+    """see if the image is not dark"""
+    try:
+        MY_LOGGER.debug('Reading file from URL')
+        data = requests.get(URL_BASE + filename)
+        MY_LOGGER.debug('Writing file')
+        open(WORKING_PATH + filename, 'wb').write(data.content)
+
+        MY_LOGGER.debug('Reading file')
+        img = cv2.imread(WORKING_PATH + filename)
+        mean_components = img.mean(axis=0).mean(axis=0)
+        mean = (mean_components[0] + mean_components[1] + mean_components[2]) / 3
+
+        if mean > threshold:
+            MY_LOGGER.debug('Light - %f', mean)
+            return True
+    except:
+        MY_LOGGER.critical('is_light exception handler: %s %s %s',
+                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+
+    MY_LOGGER.debug('Dark')
+    return False
 
 
 def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
@@ -77,13 +103,34 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 URL_BASE = 'https://kiwiweather.com/goes/'
 MY_LOGGER.debug('URL_BASE = %s', URL_BASE)
-
+THRESHOLD = 25
+MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 
 # do each tweet
 # GOES 17
 tweet('goes_17_fd_fc-tn.jpg',
       'Latest GOES 17 weather satellite full colour image. ' +
       'See more at https://kiwiweather.com. #weather #satellite')
+
+IMAGE = 'goes_17_m1_fc-tn.jpg'
+if is_light(IMAGE, THRESHOLD):
+    MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
+    tweet(IMAGE,
+          'Latest GOES 17 weather satellite full colour detail image (normally California). ' +
+          'See more at https://kiwiweather.com. #weather #satellite')
+else:
+    MY_LOGGER.debug('%s is dark, not tweeting', IMAGE)
+
+IMAGE = 'goes_17_m2_fc-tn.jpg'
+if is_light(IMAGE, THRESHOLD):
+    MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
+    tweet(IMAGE,
+          'Latest GOES 17 weather satellite full colour detail image (normally Alaska). ' +
+          'See more at https://kiwiweather.com. #weather #satellite')
+else:
+    MY_LOGGER.debug('%s is dark, not tweeting', IMAGE)
+
+
 
 # GOES 16
 tweet('goes_16_fd_ch13_enhanced-tn.jpg',

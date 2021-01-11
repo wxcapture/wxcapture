@@ -110,37 +110,43 @@ MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 # GOES 17
 tweet('goes_17_fd_fc-tn.jpg',
       'Latest GOES 17 weather satellite full colour image. ' +
-      'See more at https://kiwiweather.com. #weather #satellite')
+      'See more at https://kiwiweather.com. #weather #satellite #GOES17')
 
 IMAGE = 'goes_17_m1_fc-tn.jpg'
 if is_light(IMAGE, THRESHOLD):
     MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
     tweet(IMAGE,
           'Latest GOES 17 weather satellite full colour detail image (normally California). ' +
-          'See more at https://kiwiweather.com. #weather #satellite')
+          'See more at https://kiwiweather.com. #weather #satellite #GOES17')
 else:
-    MY_LOGGER.debug('%s is dark, not tweeting', IMAGE)
+    MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR shortwave', IMAGE)
+    tweet('goes_17_m1_ch07-tn.jpg',
+          'Latest GOES 17 weather satellite infra red image (normally California). ' +
+          'See more at https://kiwiweather.com. #weather #satellite #GOES17')
+
 
 IMAGE = 'goes_17_m2_fc-tn.jpg'
 if is_light(IMAGE, THRESHOLD):
     MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
     tweet(IMAGE,
           'Latest GOES 17 weather satellite full colour detail image (normally Alaska). ' +
-          'See more at https://kiwiweather.com. #weather #satellite')
+          'See more at https://kiwiweather.com. #weather #satellite #GOES17')
 else:
-    MY_LOGGER.debug('%s is dark, not tweeting', IMAGE)
-
+    MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR shortwave', IMAGE)
+    tweet('goes_17_m2_ch07-tn.jpg',
+          'Latest GOES 17 weather satellite infra red image (normally Alaska). ' +
+          'See more at https://kiwiweather.com. #weather #satellite #GOES17')
 
 
 # GOES 16
 tweet('goes_16_fd_ch13_enhanced-tn.jpg',
       'Latest GOES 16 weather satellite enhanced IR image. ' +
-      'See more at https://kiwiweather.com. #weather #satellite')
+      'See more at https://kiwiweather.com. #weather #satellite #GOES16')
 
 # Himawari 8
 tweet('himawari_8_fd_IR-tn.jpg',
       'Latest Himawari 8 weather satellite enhanced IR image. ' +
-      'See more at https://kiwiweather.com. #weather #satellite')
+      'See more at https://kiwiweather.com. #weather #satellite #Himawari8')
 
 
 MY_LOGGER.debug('Execution end')

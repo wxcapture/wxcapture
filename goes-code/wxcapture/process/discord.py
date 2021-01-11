@@ -23,6 +23,10 @@ def is_light(filename, threshold):
         img = cv2.imread(WORKING_PATH + filename)
         mean_components = img.mean(axis=0).mean(axis=0)
         mean = (mean_components[0] + mean_components[1] + mean_components[2]) / 3
+        MY_LOGGER.debug('mean = %f, threshold = %d', mean, threshold)
+
+        MY_LOGGER.debug('Deleting file')
+        wxcutils.run_cmd('rm ' + WORKING_PATH + filename)
 
         if mean > threshold:
             MY_LOGGER.debug('Light - %f', mean)
@@ -131,15 +135,22 @@ if is_light(IMAGE, THRESHOLD):
     MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
     webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 1')
 else:
-    MY_LOGGER.debug('%s is dark, not firing webhook', IMAGE)
+    MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
+    IMAGE = 'goes_17_m1_ch07-tn.jpg'
+    if is_light(IMAGE, THRESHOLD):
+        MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+        webhook(IMAGE, 'GOES 17', 'Infra red Meso 1 (normally California)')
 
 IMAGE = 'goes_17_m2_fc-tn.jpg'
 if is_light(IMAGE, THRESHOLD):
     MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
     webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 2')
 else:
-    MY_LOGGER.debug('%s is dark, not firing webhook', IMAGE)
-
+    MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
+    IMAGE = 'goes_17_m2_ch07-tn.jpg'
+    if is_light(IMAGE, THRESHOLD):
+        MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+        webhook(IMAGE, 'GOES 17', 'Infra red Meso 2 (normally Alaska)')
 
 # GOES 16
 webhook('goes_16_fd_ch13_enhanced-tn.jpg', 'GOES 16',

@@ -5,8 +5,16 @@
 # import libraries
 import os
 import time
+import glob
 import subprocess
 import wxcutils
+
+
+def mk_dir(directory):
+    """only create if it does not already exist"""
+    MY_LOGGER.debug('Make? %s', directory)
+    if not os.path.isdir(directory):
+        wxcutils.make_directory(directory)
 
 
 def find_directories(directory):
@@ -231,25 +239,33 @@ def process_himawari(sat_num):
 def process_nws():
     """process nws files"""
 
+    MY_LOGGER.debug('---------------------------------------------')
+    MY_LOGGER.debug('NWS')
+
     # note that this code is a work around for an issue with goestools
     # https://github.com/pietern/goestools/issues/100
     # GOES nws directory / filenames are incorrect #100
     # once fixed, this code will need to be updated
 
     # move all nws files to the nwsall directory
-    wxcutils.run_cmd('mv ' + BASEDIR + 'nws/*/* ' + BASEDIR + 'nwsall/')
+    MY_LOGGER.debug('move new to nwsall directory')
+    wxcutils.run_cmd('mv ' + BASEDIR + 'nws/*/ ' + BASEDIR + 'nwsall/')
 
+    MY_LOGGER.debug('correctly rename files')
     # loop through all files in the directory and rename them to
     # remove the first, incorrect part of the filename
     # e.g. 19700101T000000Z_20201107060000-pacsfc72_latestBW.gif
     # to 20201107060000-pacsfc72_latestBW.gif
     for filename in os.listdir(BASEDIR + 'nwsall/'):
-        MY_LOGGER.debug('filename = %s', filename)
-        bits = filename.split('_')
-        MY_LOGGER.debug('first bit = %s', bits[0])
-        new_filename = filename[len(bits[0]) + 1:]
-        MY_LOGGER.debug('new_filename = %s', new_filename)
-        wxcutils.move_file(BASEDIR + 'nwsall/', filename, BASEDIR + 'nwsfixed/', new_filename)
+        if '.gif' in filename:
+            MY_LOGGER.debug('filename = %s', filename)
+            bits = filename.split('_')
+            MY_LOGGER.debug('first bit = %s', bits[0])
+            new_filename = filename[len(bits[0]) + 1:]
+            MY_LOGGER.debug('new_filename = %s', new_filename)
+            wxcutils.move_file(BASEDIR + 'nwsall/', filename, BASEDIR + 'nwsfixed/', new_filename)
+        else:
+             MY_LOGGER.debug('DELETE? = %s', filename)
 
     # now go through all images to find the latest of each type using filename
     graphic_types = ['EPAC_latest', 'GULF_latest', 'pac24_latestBW', 'pac48_latestBW',
@@ -261,43 +277,61 @@ def process_nws():
 
         MY_LOGGER.debug('latest_file = %s', latest_file)
 
-        filename, extenstion = os.path.splitext(latest_file)
-        new_filename = 'nws_' + gtype
+        # process if a file was found
+        if latest_file:
+            filename, extenstion = os.path.splitext(latest_file)
+            new_filename = 'nws_' + gtype
 
-        # see when last saved
-        stored_timestamp = 0.0
-        try:
-            stored_timestamp = LATESTTIMESTAMPS[new_filename + extenstion]
-        except NameError:
-            pass
-        except KeyError:
-            pass
+            # see when last saved
+            stored_timestamp = 0.0
+            try:
+                stored_timestamp = LATESTTIMESTAMPS[new_filename + extenstion]
+            except NameError:
+                pass
+            except KeyError:
+                pass
 
-        # date time for original file
-        latest = (int)(latest_file.split('-')[0])
+            # date time for original file
+            latest = (int)(latest_file.split('-')[0])
 
-        MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
+            MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
 
-        if stored_timestamp != int(latest):
-            # new file found which hasn't yet been copied over
+            if stored_timestamp != int(latest):
+                # new file found which hasn't yet been copied over
 
-            # copy to output directory
-            MY_LOGGER.debug('new_filename = %s', new_filename)
-            wxcutils.copy_file(os.path.join(BASEDIR + 'nwsfixed/', latest_file),
-                               os.path.join(OUTPUT_PATH, new_filename + extenstion))
+                # copy to output directory
+                MY_LOGGER.debug('new_filename = %s', new_filename)
+                wxcutils.copy_file(os.path.join(BASEDIR + 'nwsfixed/', latest_file),
+                                os.path.join(OUTPUT_PATH, new_filename + extenstion))
 
-            # create thumbnail
-            create_thumbnail(new_filename, extenstion)
+                # create thumbnail
+                create_thumbnail(new_filename, extenstion)
 
-                # create file with date time info
-            date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
-                LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-            wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', date_time)
+                    # create file with date time info
+                date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
+                    LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', date_time)
 
-            # update latest
-            LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+                # update latest
+                LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+
+    MY_LOGGER.debug('copy to final folder based on filename')
+    # now copy to the correct date folder based on the filename
+    # eg filename = 20201203200046-pacsea_latestBW.gif 
+    MY_LOGGER.debug('using %s', BASEDIR + 'nwsfixed/*.gif')
+    for nws_file in glob.glob(BASEDIR + 'nwsfixed/*.gif'):
+        bits = os.path.split(nws_file)
+        MY_LOGGER.debug('dir = %s, file = %s', bits[0], bits[1])
+        if '.gif' in bits[1]:
+            MY_LOGGER.debug('nws_file = %s, file name = %s, year = %s, month = %s, day = %s', nws_file, bits[1], bits[1][:4], bits[1][4:6], bits[1][6:8])
+        # create directories, if needed
+        mk_dir(BASEDIR + 'nwsdata/' + bits[1][:4])
+        mk_dir(BASEDIR + 'nwsdata/' + bits[1][:4] + '/' + bits[1][4:6])
+        mk_dir(BASEDIR + 'nwsdata/' + bits[1][:4] + '/' + bits[1][4:6] + '/' + bits[1][6:8])
+        wxcutils.move_file(bits[0], bits[1], BASEDIR + 'nwsdata/' + bits[1][:4] + '/' + bits[1][4:6] + '/' + bits[1][6:8], bits[1])
 
 
+    MY_LOGGER.debug('---------------------------------------------')
 
 # setup paths to directories
 HOME = os.environ['HOME']

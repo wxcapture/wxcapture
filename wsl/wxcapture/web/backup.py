@@ -41,7 +41,7 @@ def do_backup_all():
     # do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')
 
     MY_LOGGER.debug('NWS')
-    # do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsfixed/', '/mnt/f/Satellites/nwsfixed/')
+    # do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')
 
     MY_LOGGER.debug('GOES 16')
     # do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')
@@ -113,8 +113,13 @@ def do_backup_new():
                  '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')
 
     # MY_LOGGER.debug('NWS')
-    # all files currently in the same directory, so just rsync for all
-    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsfixed/', '/mnt/f/Satellites/nwsfixed/')
+   # get all dates between the ranges
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y/%m/%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        do_rsync('caWv', '',
+                 'pi@192.168.100.15:/home/pi/goes/nwsdata/' + date_dir + '/',
+                 '/mnt/f/Satellites/nwsdata/' + date_dir + '/')
 
     MY_LOGGER.debug('GOES 16')
     directories = ['fd/ch13', 'fd/ch13_enhanced']

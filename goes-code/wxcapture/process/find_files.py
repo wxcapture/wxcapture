@@ -265,7 +265,7 @@ def process_nws():
             MY_LOGGER.debug('new_filename = %s', new_filename)
             wxcutils.move_file(BASEDIR + 'nwsall/', filename, BASEDIR + 'nwsfixed/', new_filename)
         else:
-             MY_LOGGER.debug('DELETE? = %s', filename)
+            MY_LOGGER.debug('DELETE? = %s', filename)
 
     # now go through all images to find the latest of each type using filename
     graphic_types = ['EPAC_latest', 'GULF_latest', 'pac24_latestBW', 'pac48_latestBW',
@@ -302,7 +302,7 @@ def process_nws():
                 # copy to output directory
                 MY_LOGGER.debug('new_filename = %s', new_filename)
                 wxcutils.copy_file(os.path.join(BASEDIR + 'nwsfixed/', latest_file),
-                                os.path.join(OUTPUT_PATH, new_filename + extenstion))
+                                   os.path.join(OUTPUT_PATH, new_filename + extenstion))
 
                 # create thumbnail
                 create_thumbnail(new_filename, extenstion)
@@ -317,7 +317,7 @@ def process_nws():
 
     MY_LOGGER.debug('copy to final folder based on filename')
     # now copy to the correct date folder based on the filename
-    # eg filename = 20201203200046-pacsea_latestBW.gif 
+    # eg filename = 20201203200046-pacsea_latestBW.gif
     MY_LOGGER.debug('using %s', BASEDIR + 'nwsfixed/*.gif')
     for nws_file in glob.glob(BASEDIR + 'nwsfixed/*.gif'):
         bits = os.path.split(nws_file)
@@ -332,6 +332,57 @@ def process_nws():
 
 
     MY_LOGGER.debug('---------------------------------------------')
+
+
+def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration):
+    """create animation from images"""
+
+    MY_LOGGER.debug('create_animation ca_directory = %s, ca_file_match = %s, ca_frames = %s, ca_duration = %s',
+                    ca_directory, ca_file_match, ca_frames, ca_duration)
+
+    # filename
+    ca_filename = ca_directory.replace('/', '-') + '-' + str(ca_frames)
+    MY_LOGGER.debug('ca_filename = %s', ca_filename)
+
+    # generate animation file
+
+    # get list of all directories, sorted by date
+    # reverse order so can get the last ca_frames
+    ca_directories = find_directories(BASEDIR + ca_directory)
+    ca_directories.sort(reverse=True)
+
+    # loop through directories until we get required
+    # number of frames or run out of directories
+    ca_text = ''
+    ca_frame_counter = 0
+    ca_duration_text = 'duration ' + str(ca_duration) + os.linesep
+    for ca_dir in ca_directories:
+        # loop through files in each directory
+        ca_frame_list = glob.glob(BASEDIR + ca_directory + '/' + ca_dir + '/' + ca_file_match)
+        ca_frame_list.sort(reverse=True)
+        # MY_LOGGER.debug('ca_frame_list = %s', ca_frame_list)
+        for ca_line in ca_frame_list:
+            ca_entry = 'file \'' + ca_line + '\'' + os.linesep
+            if ca_frame_counter == 0:
+                ca_text = ca_entry + ca_duration_text + ca_entry
+            else:
+                ca_text = ca_entry + ca_duration_text + ca_text
+            ca_frame_counter += 1
+            if ca_frame_counter >= ca_frames:
+                MY_LOGGER.debug('got enough frames - inner loop')
+                break
+        if ca_frame_counter >= ca_frames:
+            MY_LOGGER.debug('got enough frames - outer loop')
+            break
+
+    # save text to file
+    wxcutils.save_file(WORKING_PATH, ca_filename + '.txt', ca_text)
+
+    # animate the frame list
+    wxcutils.run_cmd('ffmpeg -y -safe 0 -f concat -i ' + WORKING_PATH + ca_filename + '.txt' +
+                     ' -c:v libx264 -pix_fmt yuv420p -vf scale=800:800 ' + OUTPUT_PATH +
+                     ca_filename + '.mp4')
+
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -379,6 +430,26 @@ process_himawari('8')
 
 # process nws files
 process_nws()
+
+# create animations
+# calculation = hours per day x frames per hour x number of days
+
+# GOES 16 - ch 13 enhanced - 1 frame per hour
+create_animation('goes16/fd/ch13_enhanced', '*', 24 * 1 * 2, 0.15)
+
+# GOES 17 - FD visible - 2 frames per hour
+create_animation('goes17/fd/fc', '*', 24 * 2 * 2, 0.15)
+
+# GOES 17 - M1 ch 7 IR shortwave - 4 frames per hour
+create_animation('goes17/m1/ch07', '*', 24 * 4 * 2, 0.15)
+
+# GOES 17 - M2 ch 7 IR shortwave - 4 frames per hour
+create_animation('goes17/m2/ch07', '*', 24 * 4 * 2, 0.15)
+
+# Himawari 8 - FD IR - 1 frame per hour
+create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 2, 0.15)
+
+
 
 # save latest times data
 wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', LATESTTIMESTAMPS)

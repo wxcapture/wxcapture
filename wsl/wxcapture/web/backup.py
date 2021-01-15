@@ -38,22 +38,31 @@ def do_backup_all():
     MY_LOGGER.debug('Backing up everything')
 
     MY_LOGGER.debug('GK-2A')
-    # do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')
+    do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')
 
     MY_LOGGER.debug('NWS')
-    # do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')
+    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')
 
     MY_LOGGER.debug('GOES 16')
-    # do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')
+    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')
 
     MY_LOGGER.debug('GOES 17')
-    # do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes17/', '/mnt/f/Satellites/goes17/')
+    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes17/', '/mnt/f/Satellites/goes17/')
 
     MY_LOGGER.debug('Himawari 8')
-    # do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')
+    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')
+
+    MY_LOGGER.debug('NOAA / Meteor / ISS')
+    do_rsync('caWv', '',
+            'pi@192.168.100.9:/home/pi/wxcapture/output/',
+            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/output/')
+    do_rsync('caWv', '',
+            'pi@192.168.100.9:/home/pi/wxcapture/audio/',
+            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/audio/')
+
 
     MY_LOGGER.debug('Website')
-    # do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/', '/mnt/f/kiwiweather/')
+    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/', '/mnt/f/kiwiweather/')
 
 
 def get_today():
@@ -158,6 +167,14 @@ def do_backup_new():
                 'pi@192.168.100.15:/home/pi/goes/himawari8/fd/' + date_dir + '/',
                 '/mnt/f/Satellites/himawari8/fd/' + date_dir + '/')
 
+    MY_LOGGER.debug('NOAA / Meteor / ISS')
+    # no date selectivity
+    do_rsync('caWv', '',
+            'pi@192.168.100.9:/home/pi/wxcapture/output/',
+            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/output/')
+    do_rsync('caWv', '',
+            'pi@192.168.100.9:/home/pi/wxcapture/audio/',
+            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/audio/')
 
     MY_LOGGER.debug('Website')
     # copy over the date range of directories

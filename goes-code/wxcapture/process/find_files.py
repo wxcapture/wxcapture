@@ -334,14 +334,14 @@ def process_nws():
     MY_LOGGER.debug('---------------------------------------------')
 
 
-def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration):
+def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration, ca_resolution):
     """create animation from images"""
 
-    MY_LOGGER.debug('create_animation ca_directory = %s, ca_file_match = %s, ca_frames = %s, ca_duration = %s',
-                    ca_directory, ca_file_match, ca_frames, ca_duration)
+    MY_LOGGER.debug('create_animation directory = %s, file_match = %s, frames = %s, duration = %s, resolution = %s',
+                    ca_directory, ca_file_match, ca_frames, ca_duration, ca_resolution)
 
     # filename
-    ca_filename = ca_directory.replace('/', '-') + '-' + str(ca_frames)
+    ca_filename = ca_directory.replace('/', '-') + '-' + str(ca_frames) + '-' + ca_resolution.replace(':', 'x')
     MY_LOGGER.debug('ca_filename = %s', ca_filename)
 
     # generate animation file
@@ -380,8 +380,13 @@ def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration):
 
     # animate the frame list
     wxcutils.run_cmd('ffmpeg -y -safe 0 -f concat -i ' + WORKING_PATH + ca_filename + '.txt' +
-                     ' -c:v libx264 -pix_fmt yuv420p -vf scale=800:800 ' + OUTPUT_PATH +
+                     ' -c:v libx264 -pix_fmt yuv420p -vf scale=' + ca_resolution + ' ' + OUTPUT_PATH +
                      ca_filename + '.mp4')
+
+    # create file with date time info
+    MY_LOGGER.debug('Writing out last generated date file')
+    date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+    wxcutils.save_file(OUTPUT_PATH, ca_filename + '.txt', date_time)
 
 
 # setup paths to directories
@@ -435,19 +440,19 @@ process_nws()
 # calculation = hours per day x frames per hour x number of days
 
 # GOES 16 - ch 13 enhanced - 1 frame per hour
-create_animation('goes16/fd/ch13_enhanced', '*', 24 * 1 * 2, 0.15)
+create_animation('goes16/fd/ch13_enhanced', '*', 24 * 1 * 2, 0.15, '800:800')
 
 # GOES 17 - FD visible - 2 frames per hour
-create_animation('goes17/fd/fc', '*', 24 * 2 * 2, 0.15)
+create_animation('goes17/fd/fc', '*', 24 * 2 * 2, 0.15, '800:800')
 
 # GOES 17 - M1 ch 7 IR shortwave - 4 frames per hour
-create_animation('goes17/m1/ch07', '*', 24 * 4 * 2, 0.15)
+create_animation('goes17/m1/ch07', '*', 24 * 4 * 2, 0.15, '800:800')
 
 # GOES 17 - M2 ch 7 IR shortwave - 4 frames per hour
-create_animation('goes17/m2/ch07', '*', 24 * 4 * 2, 0.15)
+create_animation('goes17/m2/ch07', '*', 24 * 4 * 2, 0.15, '800:800')
 
 # Himawari 8 - FD IR - 1 frame per hour
-create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 2, 0.15)
+create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 2, 0.15, '800:800')
 
 
 

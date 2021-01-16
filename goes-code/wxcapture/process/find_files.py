@@ -98,6 +98,15 @@ def create_thumbnail(ct_directory, ct_extension):
                      '\" -resize 9999x500 ' + OUTPUT_PATH + ct_directory + '-tn' + ct_extension)
 
 
+def do_sanchez(ds_src, ds_dest):
+    """do sanchez processing on the image file"""
+    MY_LOGGER.debug('Sanchez processing %s %s', ds_src, ds_dest)
+    cmd = '/home/pi/sanchezFC/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f'
+    MY_LOGGER.debug(cmd)
+    wxcutils.run_cmd(cmd)
+    MY_LOGGER.debug('Sanchez processing completed')
+
+
 def process_goes(sat_num):
     """process GOES xx files"""
 
@@ -160,6 +169,33 @@ def process_goes(sat_num):
 
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+
+                # generate sanchezFC image if GOES17 and fc image
+                if sat_num == '17' and channel_directory == 'fc' and type_directory == 'fd':
+                    sanchez_dir = SANCHEZ_PATH + 'goes' + sat_num + '/' + 'fd/fc/'
+                    # create directory (if needed)
+                    mk_dir(sanchez_dir + latest_directory)
+                    san_file_dir = sanchez_dir + latest_directory + '/'
+
+                    # create sanchez image
+                    do_sanchez(os.path.join(latest_dir, latest_file), san_file_dir + latest_file.replace('.jpg', '-sanchez.jpg'))
+
+                    # copy to output directory
+                    MY_LOGGER.debug('new_filename = %s', new_filename + '-sanchez')
+                    wxcutils.copy_file(san_file_dir + latest_file.replace('.jpg', '-sanchez.jpg'),
+                                       os.path.join(OUTPUT_PATH, new_filename + '-sanchez' + extenstion))
+
+                    # create thumbnail
+                    create_thumbnail(new_filename + '-sanchez', extenstion)
+
+                    # create file with date time info
+                    date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
+                        LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+                    wxcutils.save_file(OUTPUT_PATH, new_filename + '-sanchez' + '.txt', date_time)
+
+                    # update latest
+                    LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)              
+
 
     MY_LOGGER.debug('---------------------------------------------')
 
@@ -350,6 +386,7 @@ def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration, ca_res
     # reverse order so can get the last ca_frames
     ca_directories = find_directories(BASEDIR + ca_directory)
     ca_directories.sort(reverse=True)
+    # MY_LOGGER.debug('ca_directories = %s', ca_directories)
 
     # loop through directories until we get required
     # number of frames or run out of directories
@@ -358,6 +395,7 @@ def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration, ca_res
     ca_duration_text = 'duration ' + str(ca_duration) + os.linesep
     for ca_dir in ca_directories:
         # loop through files in each directory
+        MY_LOGGER.debug('looking in %s', BASEDIR + ca_directory + '/' + ca_dir + '/' + ca_file_match)
         ca_frame_list = glob.glob(BASEDIR + ca_directory + '/' + ca_dir + '/' + ca_file_match)
         ca_frame_list.sort(reverse=True)
         # MY_LOGGER.debug('ca_frame_list = %s', ca_frame_list)
@@ -421,6 +459,8 @@ LOCAL_TIME_ZONE = subprocess.check_output("date"). \
 BASEDIR = '/home/pi/goes/'
 MY_LOGGER.debug('BASEDIR = %s', BASEDIR)
 
+SANCHEZ_PATH = BASEDIR + 'sanchez/'
+
 # load latest times data
 LATESTTIMESTAMPS = wxcutils.load_json(OUTPUT_PATH, 'goes_info.json')
 
@@ -440,21 +480,22 @@ process_nws()
 # calculation = hours per day x frames per hour x number of days
 
 # GOES 16 - ch 13 enhanced - 1 frame per hour
-create_animation('goes16/fd/ch13_enhanced', '*', 24 * 1 * 2, 0.15, '800:800')
+create_animation('goes16/fd/ch13_enhanced', '*', 24 * 1 * 3, 0.15, '800:800')
 
 # GOES 17 - FD visible - 2 frames per hour
-create_animation('goes17/fd/fc', '*', 24 * 2 * 2, 0.15, '800:800')
+create_animation('goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
+
+# ps -GOES 17 - FD visible Projected - 2 frames per hour
+create_animation('sanchez/goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
 
 # GOES 17 - M1 ch 7 IR shortwave - 4 frames per hour
-create_animation('goes17/m1/ch07', '*', 24 * 4 * 2, 0.15, '800:800')
+create_animation('goes17/m1/ch07', '*', 24 * 4 * 3, 0.15, '800:800')
 
 # GOES 17 - M2 ch 7 IR shortwave - 4 frames per hour
-create_animation('goes17/m2/ch07', '*', 24 * 4 * 2, 0.15, '800:800')
+create_animation('goes17/m2/ch07', '*', 24 * 4 * 3, 0.15, '800:800')
 
 # Himawari 8 - FD IR - 1 frame per hour
-create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 2, 0.15, '800:800')
-
-
+create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800')
 
 # save latest times data
 wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', LATESTTIMESTAMPS)

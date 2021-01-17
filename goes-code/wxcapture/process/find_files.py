@@ -98,10 +98,15 @@ def create_thumbnail(ct_directory, ct_extension):
                      '\" -resize 9999x500 ' + OUTPUT_PATH + ct_directory + '-tn' + ct_extension)
 
 
-def do_sanchez(ds_src, ds_dest):
+def do_sanchez(ds_src, ds_dest, ds_channel):
     """do sanchez processing on the image file"""
     MY_LOGGER.debug('Sanchez processing %s %s', ds_src, ds_dest)
-    cmd = '/home/pi/sanchezFC/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f'
+    if ds_channel == 'fc':
+        MY_LOGGER.debug('Doing full colour sanchez')
+        cmd = '/home/pi/sanchezFC/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f'
+    else:
+        MY_LOGGER.debug('Doing IR sanchez')
+        cmd = '/home/pi/sanchez/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -La -r 4 -f'
     MY_LOGGER.debug(cmd)
     wxcutils.run_cmd(cmd)
     MY_LOGGER.debug('Sanchez processing completed')
@@ -151,7 +156,7 @@ def process_goes(sat_num):
 
             MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
 
-            if stored_timestamp != int(latest):
+            if stored_timestamp != int(latest) or 1 == 1:
                 # new file found which hasn't yet been copied over
 
                 # copy to output directory
@@ -170,15 +175,17 @@ def process_goes(sat_num):
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
 
-                # generate sanchezFC image if GOES17 and fc image
-                if sat_num == '17' and channel_directory == 'fc' and type_directory == 'fd':
-                    sanchez_dir = SANCHEZ_PATH + 'goes' + sat_num + '/' + 'fd/fc/'
+                # generate sanchezFC image if GOES17 and fd and fc/ch13 image
+                if sat_num == '17' and type_directory == 'fd' and channel_directory in ['fc', 'ch13']:
+                    sanchez_dir = SANCHEZ_PATH + 'goes' + sat_num + '/' + type_directory + '/' + channel_directory + '/'
                     # create directory (if needed)
                     mk_dir(sanchez_dir + latest_directory)
                     san_file_dir = sanchez_dir + latest_directory + '/'
 
                     # create sanchez image
-                    do_sanchez(os.path.join(latest_dir, latest_file), san_file_dir + latest_file.replace('.jpg', '-sanchez.jpg'))
+                    do_sanchez(os.path.join(latest_dir, latest_file),
+                               san_file_dir + latest_file.replace('.jpg', '-sanchez.jpg'),
+                               channel_directory)
 
                     # copy to output directory
                     MY_LOGGER.debug('new_filename = %s', new_filename + '-sanchez')
@@ -487,6 +494,9 @@ create_animation('goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
 
 # ps -GOES 17 - FD visible Projected - 2 frames per hour
 create_animation('sanchez/goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
+
+# ps -GOES 17 - ch13 visible Projected - 2 frames per hour
+create_animation('sanchez/goes17/fd/ch13', '*', 24 * 2 * 3, 0.15, '800:800')
 
 # GOES 17 - M1 ch 7 IR shortwave - 4 frames per hour
 create_animation('goes17/m1/ch07', '*', 24 * 4 * 3, 0.15, '800:800')

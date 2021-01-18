@@ -121,8 +121,8 @@ def do_backup_new():
                  'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/' + date_dir + '/',
                  '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')
 
-    # MY_LOGGER.debug('NWS')
-   # get all dates between the ranges
+    MY_LOGGER.debug('NWS')
+    # get all dates between the ranges
     for single_date in daterange(utc_date_last, utc_date_now):
         date_dir = single_date.strftime("%Y/%m/%d")
         MY_LOGGER.debug('date = %s', date_dir)
@@ -142,6 +142,21 @@ def do_backup_new():
                     'pi@192.168.100.15:/home/pi/goes/goes16/' + dir + '/' + date_dir + '/',
                     '/mnt/f/Satellites/goes16/' + dir + '/' + date_dir + '/')
 
+    MY_LOGGER.debug('GOES 16 Sanchez Data')
+    directories = ['fd/ch13']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            
+            do_rsync('caWv', '',
+                    'pi@192.168.100.15:/home/pi/goes/sanchez/goes16/' + dir + '/' + date_dir + '/',
+                    '/mnt/f/Satellites/sanchez/goes16/' + dir + '/' + date_dir + '/')
+
+
     MY_LOGGER.debug('GOES 17')
     directories = ['fd/ch02', 'fd/ch07', 'fd/ch08', 'fd/ch09', 'fd/ch13', 'fd/ch14', 'fd/ch15', 'fd/fc',
                    'm1/ch02', 'm1/ch07', 'm1/ch13', 'm1/fc',
@@ -157,6 +172,21 @@ def do_backup_new():
             do_rsync('caWv', '',
                     'pi@192.168.100.15:/home/pi/goes/goes17/' + dir + '/' + date_dir + '/',
                     '/mnt/f/Satellites/goes17/' + dir + '/' + date_dir + '/')
+
+
+    MY_LOGGER.debug('GOES 17 Sanchez Data')
+    directories = ['fd/ch13', 'fd/fc']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            
+            do_rsync('caWv', '',
+                    'pi@192.168.100.15:/home/pi/goes/sanchez/goes17/' + dir + '/' + date_dir + '/',
+                    '/mnt/f/Satellites/sanchez/goes17/' + dir + '/' + date_dir + '/')
 
     MY_LOGGER.debug('Himawari 8')
     for single_date in daterange(utc_date_last, utc_date_now):

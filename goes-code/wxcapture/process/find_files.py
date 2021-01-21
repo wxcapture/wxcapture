@@ -156,7 +156,7 @@ def process_goes(sat_num):
 
             MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
 
-            if stored_timestamp != int(latest) or 1 == 1:
+            if stored_timestamp != int(latest):
                 # new file found which hasn't yet been copied over
 
                 # copy to output directory

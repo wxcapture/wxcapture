@@ -29,7 +29,7 @@ def validate_file(vs_name, vs_path, vs_file, vs_interval):
     # see if too old
     if file_age > vs_interval:
         MY_LOGGER.debug('Too old!')
-        return False, vs_name + ' has exceeded the receiving threshold (' + str(round(vs_interval / 60)) + ' min) by ' + str(round(file_age / 60)) + ' min' + os.linesep + os.linesep
+        return False, vs_name + ' has exceeded the receiving threshold (' + str(round(vs_interval / 60)) + ' min) with age of ' + str(round(file_age / 60)) + ' min' + os.linesep + os.linesep
     MY_LOGGER.debug('Young enough')
     return True, ''
 

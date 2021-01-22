@@ -530,6 +530,9 @@ try:
     FILES_MOVED = move_output_files()
     MY_LOGGER.debug('Finished file moving')
 
+    if FILES_MOVED:
+        wxcutils.run_cmd('touch ' + TARGET + 'polar.txt')
+
     if FILES_MOVED or REBUILD == 'rebuild':
         MY_LOGGER.debug('Build json passes file')
         ALL_PASSES = []

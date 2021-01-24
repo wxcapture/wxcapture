@@ -29,40 +29,75 @@ def do_rsync(dr_params, dr_exclude, dr_source, dr_output):
     else:
         cmd = Popen(['rsync', '-' + dr_params, '--exclude', '\'' + dr_exclude + '\'', dr_source, dr_output], stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('stdout:%s', stdout)
-    MY_LOGGER.debug('stderr:%s', stderr)
+    errors = stderr.decode('utf-8')
+    MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
+    MY_LOGGER.debug('stderr:%s', errors)
+
+    # remove expected errors
+    # no such directory happens with difference between UTC and local date, so can ignore
+    if 'No such file or directory' in errors:
+        errors = ''
+
+    MY_LOGGER.debug('reported errors:%s', errors)
+    return errors
+
+
+def show_errors(se_type, se_errors):
+    """show errors from each backup type"""
+    found = False
+    MY_LOGGER.debug(se_type)
+    for error_line in se_errors:
+        # only show if errors to report
+        if error_line['errors']:
+            MY_LOGGER.debug(error_line['type'] + ' - ' + error_line['errors'])
+            found - True
+    if not found:
+        MY_LOGGER.debug('No errors found')
+        return False
+    MY_LOGGER.critical('*****************************')
+    MY_LOGGER.critical('*****************************')
+    MY_LOGGER.critical('*       ERRRORS FOUND       *')
+    MY_LOGGER.critical('*****************************')
+    MY_LOGGER.critical('*****************************')
+    return True
 
 
 def do_backup_all():
     """backup everything (slow)"""
     MY_LOGGER.debug('Backing up everything')
+    errors = []
 
     MY_LOGGER.debug('GK-2A')
-    do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')
+    errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')})
 
     MY_LOGGER.debug('NWS')
-    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')
+    errors.append({'type': 'NWS', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')})
 
     MY_LOGGER.debug('GOES 16')
-    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')
+    errors.append({'type': 'GOES 16', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')})
 
     MY_LOGGER.debug('GOES 17')
-    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes17/', '/mnt/f/Satellites/goes17/')
+    errors.append({'type': 'GOES 17', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes17/', '/mnt/f/Satellites/goes17/')})
 
     MY_LOGGER.debug('Himawari 8')
-    do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')
+    errors.append({'type': 'Himawari 8', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')})
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')
-    do_rsync('caWv', '',
-            'pi@192.168.100.9:/home/pi/wxcapture/output/',
-            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/output/')
-    do_rsync('caWv', '',
-            'pi@192.168.100.9:/home/pi/wxcapture/audio/',
-            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/audio/')
-
+    errors.append({'type': 'NOAA / Meteor / ISS - data', 'errors': do_rsync('caWv', '',
+                                                                            'pi@192.168.100.9:/home/pi/wxcapture/output/',
+                                                                            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/output/')})
+    errors.append({'type': 'NOAA / Meteor / ISS - audio', 'errors': do_rsync('caWv', '',
+                                                                             'pi@192.168.100.9:/home/pi/wxcapture/audio/',
+                                                                             '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/audio/')})
 
     MY_LOGGER.debug('Website')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/', '/mnt/f/kiwiweather/')
+    errors.append({'type': 'Website', 'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/', '/mnt/f/kiwiweather/')})
+
+    if show_errors('Full backup', errors):
+        MY_LOGGER.debug('errors detected')
+        return True
+    MY_LOGGER.debug('no errors detected')
+    return False
 
 
 def get_today():
@@ -111,24 +146,27 @@ def do_backup_new():
     # add one day so the date range loops include the last (current) day
     utc_date_now += timedelta(days=1)
     MY_LOGGER.debug('Current UTC date = %s', utc_date_now)
+    errors = []
 
     MY_LOGGER.debug('GK-2A')
     # get all dates between the ranges
     for single_date in daterange(utc_date_last, utc_date_now):
         date_dir = single_date.strftime("%Y%m%d")
         MY_LOGGER.debug('date = %s', date_dir)
-        do_rsync('caWv', '',
-                 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/' + date_dir + '/',
-                 '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')
+        errors.append({'type': 'GK-2A - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                         'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/' + date_dir + '/',
+                                         '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')})
 
     MY_LOGGER.debug('NWS')
     # get all dates between the ranges
     for single_date in daterange(utc_date_last, utc_date_now):
         date_dir = single_date.strftime("%Y/%m/%d")
         MY_LOGGER.debug('date = %s', date_dir)
-        do_rsync('caWv', '',
-                 'pi@192.168.100.15:/home/pi/goes/nwsdata/' + date_dir + '/',
-                 '/mnt/f/Satellites/nwsdata/' + date_dir + '/')
+        errors.append({'type': 'NWS - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                          'pi@192.168.100.15:/home/pi/goes/nwsdata/' + date_dir + '/',
+                                          '/mnt/f/Satellites/nwsdata/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 16')
     directories = ['fd/ch13', 'fd/ch13_enhanced']
@@ -138,9 +176,10 @@ def do_backup_new():
         for single_date in daterange(utc_date_last, utc_date_now):
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
-            do_rsync('caWv', '',
-                    'pi@192.168.100.15:/home/pi/goes/goes16/' + dir + '/' + date_dir + '/',
-                    '/mnt/f/Satellites/goes16/' + dir + '/' + date_dir + '/')
+            errors.append({'type': 'GOES 16 - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/goes16/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/goes16/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 16 Sanchez Data')
     directories = ['fd/ch13']
@@ -152,9 +191,10 @@ def do_backup_new():
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
             
-            do_rsync('caWv', '',
-                    'pi@192.168.100.15:/home/pi/goes/sanchez/goes16/' + dir + '/' + date_dir + '/',
-                    '/mnt/f/Satellites/sanchez/goes16/' + dir + '/' + date_dir + '/')
+            errors.append({'type': 'GOES 16 Sanchez - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/sanchez/goes16/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/sanchez/goes16/' + dir + '/' + date_dir + '/')})
 
 
     MY_LOGGER.debug('GOES 17')
@@ -168,10 +208,10 @@ def do_backup_new():
         for single_date in daterange(utc_date_last, utc_date_now):
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
-            
-            do_rsync('caWv', '',
-                    'pi@192.168.100.15:/home/pi/goes/goes17/' + dir + '/' + date_dir + '/',
-                    '/mnt/f/Satellites/goes17/' + dir + '/' + date_dir + '/')
+            errors.append({'type': 'GOES 17 - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/goes17/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/goes17/' + dir + '/' + date_dir + '/')})
 
 
     MY_LOGGER.debug('GOES 17 Sanchez Data')
@@ -183,57 +223,72 @@ def do_backup_new():
         for single_date in daterange(utc_date_last, utc_date_now):
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
-            
-            do_rsync('caWv', '',
-                    'pi@192.168.100.15:/home/pi/goes/sanchez/goes17/' + dir + '/' + date_dir + '/',
-                    '/mnt/f/Satellites/sanchez/goes17/' + dir + '/' + date_dir + '/')
+            errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/sanchez/goes17/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/sanchez/goes17/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('Himawari 8')
     for single_date in daterange(utc_date_last, utc_date_now):
         date_dir = single_date.strftime("%Y-%m-%d")
         MY_LOGGER.debug('date = %s', date_dir)
-        
-        do_rsync('caWv', '',
-                'pi@192.168.100.15:/home/pi/goes/himawari8/fd/' + date_dir + '/',
-                '/mnt/f/Satellites/himawari8/fd/' + date_dir + '/')
+        errors.append({'type': 'Himawari 8 - ' + dir + ' - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                          'pi@192.168.100.15:/home/pi/goes/himawari8/fd/' + date_dir + '/',
+                                          '/mnt/f/Satellites/himawari8/fd/' + date_dir + '/')})
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')
     # no date selectivity
-    do_rsync('caWv', '',
-            'pi@192.168.100.9:/home/pi/wxcapture/output/',
-            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/output/')
-    do_rsync('caWv', '',
-            'pi@192.168.100.9:/home/pi/wxcapture/audio/',
-            '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/audio/')
+    errors.append({'type': 'NOAA / Meteor / ISS - data',
+                   'errors': do_rsync('caWv', '',
+                                      'pi@192.168.100.9:/home/pi/wxcapture/output/',
+                                      '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/output/')})
+    errors.append({'type': 'NOAA / Meteor / ISS - audio',
+                   'errors': do_rsync('caWv', '',
+                                      'pi@192.168.100.9:/home/pi/wxcapture/audio/',
+                                      '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/audio/')})
 
     MY_LOGGER.debug('Website')
     # copy over the date range of directories
     for single_date in daterange(utc_date_last, utc_date_now):
         date_dir = single_date.strftime("%Y/%m/%d/")
         MY_LOGGER.debug('date = %s', date_dir)
-        do_rsync('caWv', '',
-        'mike@192.168.100.18:/home/websites/wxcapture/' + date_dir, '/mnt/f/kiwiweather/' + date_dir)
+        errors.append({'type': 'Website - polar' + date_dir,
+                        'errors': do_rsync('caWv', '',
+                                            'mike@192.168.100.18:/home/websites/wxcapture/' + date_dir, '/mnt/f/kiwiweather/' + date_dir)})
 
     # copy over elements of the website with user content
     # note that copying everything is very slow and it has a
     # significant impact on website performance
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.html', '/mnt/f/kiwiweather/*.html')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/.htaccess', '/mnt/f/kiwiweather/.htaccess')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.json', '/mnt/f/kiwiweather/*.json')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.csv', '/mnt/f/kiwiweather/*.csv')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.php', '/mnt/f/kiwiweather/*.php')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.png', '/mnt/f/kiwiweather/*.png')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.txt', '/mnt/f/kiwiweather/*.txt')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/css/', '/mnt/f/kiwiweather/css/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/gk-2a/', '/mnt/f/kiwiweather/gk-2a/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/goes/', '/mnt/f/kiwiweather/goes/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/images/', '/mnt/f/kiwiweather/images/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/js/', '/mnt/f/kiwiweather/js/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/lightbox/', '/mnt/f/kiwiweather/lightbox/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/sensors/', '/mnt/f/kiwiweather/sensors/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/.html/', '/mnt/f/kiwiweather/.html/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/.json/', '/mnt/f/kiwiweather/.json/')
-    do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/.php/', '/mnt/f/kiwiweather/.php/')
+    errors.append({'type': 'Website - html',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.html', '/mnt/f/kiwiweather/')})
+    errors.append({'type': 'Website - htaccess',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/.htaccess', '/mnt/f/kiwiweather/.htaccess')})
+    errors.append({'type': 'Website - json',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.json', '/mnt/f/kiwiweather/')})
+    errors.append({'type': 'Website - csv',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.csv', '/mnt/f/kiwiweather/')})
+    errors.append({'type': 'Website - php',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.php', '/mnt/f/kiwiweather/')})
+    errors.append({'type': 'Website - png',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.png', '/mnt/f/kiwiweather/')})
+    errors.append({'type': 'Website - txt',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/*.txt', '/mnt/f/kiwiweather/')})
+    errors.append({'type': 'Website - css',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/css/', '/mnt/f/kiwiweather/css/')})
+    errors.append({'type': 'Website - gk-2a',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/gk-2a/', '/mnt/f/kiwiweather/gk-2a/')})
+    errors.append({'type': 'Website - goes',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/goes/', '/mnt/f/kiwiweather/goes/')})
+    errors.append({'type': 'Website - images',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/images/', '/mnt/f/kiwiweather/images/')})
+    errors.append({'type': 'Website - js',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/js/', '/mnt/f/kiwiweather/js/')})
+    errors.append({'type': 'Website - lightbox',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/lightbox/', '/mnt/f/kiwiweather/lightbox/')})
+    errors.append({'type': 'Website - sensors',
+                   'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/sensors/', '/mnt/f/kiwiweather/sensors/')})
+
     
     # not backed up are:
     # wp-admin
@@ -246,6 +301,12 @@ def do_backup_new():
     # do_rsync('caWv', '2*',
     #          'mike@192.168.100.18:/home/websites/wxcapture/', '/mnt/f/kiwiweather/')
     # DO NOT USE
+
+    if show_errors('NEW backup', errors):
+        MY_LOGGER.debug('errors detected')
+        return True
+    MY_LOGGER.debug('no errors detected')
+    return False
 
 
 # setup paths to directories
@@ -285,9 +346,13 @@ except IndexError as exc:
 if BACKUP_TYPE == 'ALL':
     LAST_BACKUP_DATA = get_last_backup_data()
     TODAY = get_today()
-    do_backup_all()
+    errors_found = do_backup_all()
     LAST_BACKUP_DATA['last backup date'] = str(TODAY.year) + '-' + str(TODAY.month) + '-' + str(TODAY.day)
-    save_last_backup_data()
+    if not errors_found:
+        MY_LOGGER.debug('Updating last backup date')
+        save_last_backup_data()
+    else:
+        MY_LOGGER.debug('NOT updating last backup date due to errors')
 else:
     LAST_BACKUP_DATA = get_last_backup_data()
     TODAY = get_today()
@@ -296,9 +361,12 @@ else:
         MY_LOGGER.debug('No last backup yet performed')
         MY_LOGGER.debug('You MUST do a full backup first')
     else:
-        do_backup_new()
+        errors_found = do_backup_new()
         LAST_BACKUP_DATA['last backup date'] = str(TODAY.year) + '-' + str(TODAY.month) + '-' + str(TODAY.day)
-        save_last_backup_data()
-
+        if not errors_found:
+            MY_LOGGER.debug('Updating last backup date')
+            save_last_backup_data()
+        else:
+            MY_LOGGER.debug('NOT updating last backup date due to errors')
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

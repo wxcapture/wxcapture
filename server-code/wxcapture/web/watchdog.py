@@ -50,7 +50,7 @@ def validate_file(vs_name, vs_path, vs_file, vs_interval):
     vf_html = '<tr>' + vf_html + '<td>' + vs_name + '</td>' + \
         '<td>' + str(vs_interval) + '</td>' + \
         '<td>' + str(round(file_age / 60)) + '</td>' + \
-        '<td>' + str(round((file_age / 60) - (vs_interval / 60))) + '</td></tr>'
+        '<td>' + str(round((file_age / 60) - vs_interval)) + '</td></tr>'
 
     return vf_status, vf_text, vf_html
 
@@ -186,7 +186,7 @@ if (ISSUE_DETECTED and STATUS_INFO['last status'] == 'good') or (not ISSUE_DETEC
     # plain text
     EMAIL_TEXT = ALERT_TEXT + ' - ' + ALERT_INFO + os.linesep + os.linesep + \
         EMAIL_TEXT + os.linesep + os.linesep + \
-        'Last change of status - ' + STATUS_INFO['status change']
+        'Last status change on ' + ALERT_INFO
     MY_LOGGER.debug('EMAIL_TEXT = %s', EMAIL_TEXT)
 
     # html text
@@ -195,7 +195,7 @@ if (ISSUE_DETECTED and STATUS_INFO['last status'] == 'good') or (not ISSUE_DETEC
         '<tr><th>Status</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
          EMAIL_HTML + \
         '</table>' + \
-        '<p>Last status change at - ' + ALERT_INFO + '</p>' + \
+        '<p>Last status change on ' + ALERT_INFO + '</p>' + \
         '</body></html>'
     MY_LOGGER.debug('EMAIL_HTML = %s', EMAIL_HTML)
 

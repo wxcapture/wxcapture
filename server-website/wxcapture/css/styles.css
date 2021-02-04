@@ -168,13 +168,6 @@ tr {
     font-weight: bold;
     padding-bottom: 30px;
     text-align: center;
-
-    /* Parallax Scrolling */
-    height: 40%;
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
 }
 
 /* Hints */

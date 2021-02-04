@@ -22,12 +22,9 @@ https://github.com/wxcapture/wxcapture/blob/master/WxCapture.xlsx
 ---
 
 ## About this project 
-WxCapture is a joint project between Mike (KiwiinNZ) and Albert (Technobird22). We are looking to turn this into an open-source solution so that anyone can set up their own automatic decoding station. This site is currently under very active development, so you will often notice changes to it.
+WxCapture was created by KiwiInNZ.
 
-The intention is to turn this into an open-source solution so that anyone can set up their own automatic decoding station. This site is currently under very active development, so you will often notice changes to it.
-
-> Please report any bugs to [wxcapture@gmail.com](mailto: wxcapture@gmail.com) or submit an issue on Github.
+> Please report any bugs to contact@kiwiweather.com](mailto: contact@kiwiweather.com) or submit an issue on Github.
 
 ## Contributors
-- Main contributor: Mike (KiwiinNZ).
-- Albert (technobird22), helped write the documentation and worked on some front end info and formatting.
+- Creator and main contributor: Mike (KiwiinNZ).

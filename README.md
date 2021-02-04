@@ -24,7 +24,7 @@ https://github.com/wxcapture/wxcapture/blob/master/WxCapture.xlsx
 ## About this project 
 WxCapture was created by KiwiInNZ.
 
-> Please report any bugs to contact@kiwiweather.com](mailto: contact@kiwiweather.com) or submit an issue on Github.
+> Please report any bugs to contact@kiwiweather.com] or submit an issue on Github.
 
 ## Contributors
 - Creator and main contributor: Mike (KiwiinNZ).

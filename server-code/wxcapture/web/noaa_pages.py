@@ -64,7 +64,7 @@ try:
                               '<meta charset=\"UTF-8\">'
                               '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
                               '<meta name=\"description\" content=\"Monthly captures page for NOAA satellites\">'
-                              '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
+                              '<meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\">'
                               '<meta name=\"author\" content=\"WxCapture\">'
                               '<title>' + cp_label + '</title>'
                               '<link rel=\"stylesheet\" href=\"../../css/styles.css\">'

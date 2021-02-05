@@ -221,7 +221,7 @@ def fix_file(ff_path, ff_filename):
 
     # add stylesheets
     MY_LOGGER.debug('add stylesheets')
-    ff_page = update_page(ff_page, '</head>', '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\"><meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Albert, Technobird22, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\"><meta name=\"author\" content=\"WxCapture\"><link rel=\"stylesheet\" href=\"/css/styles.css\"><link rel=\"stylesheet\" href=\"/lightbox/css/lightbox.min.css\"></head>')
+    ff_page = update_page(ff_page, '</head>', '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\"><meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\"><meta name=\"author\" content=\"WxCapture\"><link rel=\"stylesheet\" href=\"/css/styles.css\"><link rel=\"stylesheet\" href=\"/lightbox/css/lightbox.min.css\"></head>')
 
     # add script code
     MY_LOGGER.debug('add script code')

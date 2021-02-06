@@ -67,7 +67,10 @@ def do_backup_all():
     MY_LOGGER.debug('Backing up everything')
     errors = []
 
-    MY_LOGGER.debug('GK-2A')
+    MY_LOGGER.debug('GK-2A - data')
+    errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/gk-2a/', '/mnt/f/Satellites/gk-2a/LRIT/')})
+
+    MY_LOGGER.debug('GK-2A - gamma')
     errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')})
 
     MY_LOGGER.debug('NWS')
@@ -81,6 +84,8 @@ def do_backup_all():
 
     MY_LOGGER.debug('Himawari 8')
     errors.append({'type': 'Himawari 8', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')})
+
+
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')
     errors.append({'type': 'NOAA / Meteor / ISS - data', 'errors': do_rsync('caWv', '',
@@ -148,12 +153,22 @@ def do_backup_new():
     MY_LOGGER.debug('Current UTC date = %s', utc_date_now)
     errors = []
 
-    MY_LOGGER.debug('GK-2A')
+    MY_LOGGER.debug('GK-2A - data')
     # get all dates between the ranges
     for single_date in daterange(utc_date_last, utc_date_now):
         date_dir = single_date.strftime("%Y%m%d")
         MY_LOGGER.debug('date = %s', date_dir)
-        errors.append({'type': 'GK-2A - ' + date_dir,
+        errors.append({'type': 'GK-2A - data - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                         'pi@192.168.100.15:/home/pi/goes/gk-2a/' + date_dir + '/',
+                                         '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')})
+
+    MY_LOGGER.debug('GK-2A - gamma')
+    # get all dates between the ranges
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y%m%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        errors.append({'type': 'GK-2A - gamma - ' + date_dir,
                        'errors': do_rsync('caWv', '',
                                          'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/' + date_dir + '/',
                                          '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')})

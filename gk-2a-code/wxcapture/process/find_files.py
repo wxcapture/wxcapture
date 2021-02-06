@@ -296,8 +296,10 @@ for directory in data_directories:
 # save latest times data
 wxcutils.save_json(OUTPUT_PATH, 'gk2a_info.json', latest_timestamps)
 
-# rsync files to server
+# rsync files to servers
 wxcutils.run_cmd('rsync -rt ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
+wxcutils.run_cmd('rsync -rt ' + base_dir + ' pi@192.168.100.15:/home/pi/goes/gk-2a')
+
 
 # except:
 #     MY_LOGGER.critical('Global exception handler: %s %s %s',

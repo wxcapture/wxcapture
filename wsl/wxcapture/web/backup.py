@@ -176,7 +176,7 @@ def do_backup_new():
     MY_LOGGER.debug('NWS')
     # get all dates between the ranges
     for single_date in daterange(utc_date_last, utc_date_now):
-        date_dir = single_date.strftime("%Y/%m/%d")
+        date_dir = single_date.strftime("%Y%m%d")
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'NWS - ' + date_dir,
                        'errors': do_rsync('caWv', '',

@@ -358,10 +358,19 @@ def process_nws():
     latest_dir = find_latest_directory(fixed_dir)
     MY_LOGGER.debug('latest_dir = %s', latest_dir)
 
+    # find a list of graphic types in latest directory
+    # example filename = 20201107060000-pacsfc72_latestBW.gif
+    graphic_types = []
+    for filename in os.listdir(fixed_dir + latest_dir):
+        MY_LOGGER.debug('filename = %s', filename)
+        image_type = filename.split('.')[0].split('-')[1]
+        MY_LOGGER.debug('  image_type = %s', image_type)
+        graphic_types.append(image_type)
+    # remove duplicates
+    graphic_types = list(dict.fromkeys(graphic_types))
+    MY_LOGGER.debug('gt = %s', graphic_types)
+
     # now go through all images to find the latest of each type using filename
-    graphic_types = ['EPAC_latest', 'GULF_latest', 'pac24_latestBW', 'pac48_latestBW',
-                     'pac48per_latestBW', 'pacsfc24_latestBW', 'pacsfc48_latestBW',
-                     'pacsfc72_latestBW', 'WATL_latest', 'pac48per_latestBW', 'CAR_latest']
     for gtype in graphic_types:
         MY_LOGGER.debug('type = %s', gtype)
         latest_file = find_latest_filename_contains(fixed_dir + latest_dir, gtype)

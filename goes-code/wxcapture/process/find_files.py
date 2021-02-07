@@ -84,12 +84,12 @@ def find_latest_filename_contains(directory, contains):
 
 def get_local_date_time():
     """get the local date time"""
-    return wxcutils.epoch_to_local(time.time(), '%a %d %b %H:%M')
+    return wxcutils.epoch_to_local(time.time(), '%a %d %b %Y %H:%M')
 
 
 def get_utc_date_time():
     """get the local date time"""
-    return wxcutils.epoch_to_utc(time.time(), '%a %d %b %H:%M')
+    return wxcutils.epoch_to_utc(time.time(), '%a %d %b %Y %H:%M')
 
 
 def create_thumbnail(ct_directory, ct_extension):
@@ -110,6 +110,15 @@ def do_sanchez(ds_src, ds_dest, ds_channel):
     MY_LOGGER.debug(cmd)
     wxcutils.run_cmd(cmd)
     MY_LOGGER.debug('Sanchez processing completed')
+
+
+def do_combined_sanchez(ds_dest, ds_date_time):
+    """do combined sanchez processing"""
+    MY_LOGGER.debug('Combined sanchez processing %s %s', ds_dest, ds_date_time)
+    cmd = '/home/pi/sanchez/Sanchez reproject -s ' + BASEDIR + ' -o ' + ds_dest + ' -T ' + ds_date_time + ' -a -f -d 60'
+    MY_LOGGER.debug(cmd)
+    wxcutils.run_cmd(cmd)
+    MY_LOGGER.debug('Combined sanchez processing completed')
 
 
 def process_goes(sat_num):
@@ -200,8 +209,38 @@ def process_goes(sat_num):
                         LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
                     wxcutils.save_file(OUTPUT_PATH, new_filename + '-sanchez' + '.txt', date_time)
 
+                    # if file is a GOES17 / fd / ch13, then do a stitch of all available sats
+                    # GOES 16 / 17 / Himawari 8 / GK-2A
+                    # at the current UTC time
+                    if sat_num == '17' and type_directory == 'fd' and channel_directory == 'ch13':
+                        # create directory (if needed)
+                        combined_dir = SANCHEZ_PATH + 'combined' + '/'
+                        combined_file_dir = combined_dir + 'fd/ir/' + latest_directory + '/'
+
+                        MY_LOGGER.debug('Latest file epoch = %f', latest)
+                        # example 1612641000 => 2021-02-06T19:50:00
+                        combined_date_time = wxcutils.epoch_to_utc(latest, '%Y-%m-%dT%H:%M:%S')
+                        op_filename = combined_date_time.replace(':', '-').replace('T', '-')
+                        MY_LOGGER.debug('op_filename = %s', op_filename)
+
+                        # create combined sanchez image
+                        do_combined_sanchez(combined_file_dir + op_filename + '.jpg', combined_date_time)
+
+                        # copy to output directory
+                        wxcutils.copy_file(combined_file_dir + op_filename + '.jpg',
+                                           OUTPUT_PATH + 'combined.jpg')
+
+                        # create thumbnail
+                        create_thumbnail('combined', '.jpg')
+
+                        # create file with date time info
+                        date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
+                            LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+                        wxcutils.save_file(OUTPUT_PATH, 'combined.txt', date_time)
+
                     # update latest
-                    LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)              
+                    LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+
 
 
     MY_LOGGER.debug('---------------------------------------------')
@@ -282,41 +321,50 @@ def process_himawari(sat_num):
 def process_nws():
     """process nws files"""
 
-    MY_LOGGER.debug('---------------------------------------------')
-    MY_LOGGER.debug('NWS')
-
     # note that this code is a work around for an issue with goestools
     # https://github.com/pietern/goestools/issues/100
     # GOES nws directory / filenames are incorrect #100
     # once fixed, this code will need to be updated
 
-    # move all nws files to the nwsall directory
-    MY_LOGGER.debug('move new to nwsall directory')
-    wxcutils.run_cmd('mv ' + BASEDIR + 'nws/*/ ' + BASEDIR + 'nwsall/')
+    MY_LOGGER.debug('---------------------------------------------')
+    MY_LOGGER.debug('NWS')
+    raw_dir = BASEDIR + 'nws/'
+    MY_LOGGER.debug('raw_dir = %s', raw_dir)
+    fixed_dir = BASEDIR + 'nwsdata/'
+    MY_LOGGER.debug('fixed_dir = %s', fixed_dir)
 
-    MY_LOGGER.debug('correctly rename files')
-    # loop through all files in the directory and rename them to
-    # remove the first, incorrect part of the filename
-    # e.g. 19700101T000000Z_20201107060000-pacsfc72_latestBW.gif
-    # to 20201107060000-pacsfc72_latestBW.gif
-    for filename in os.listdir(BASEDIR + 'nwsall/'):
-        if '.gif' in filename:
+    # move all nws files to the nwsdata directory
+    # fixing the filename and putting into the correct directory
+    # example filename = 19700101T000000Z_20201107060000-pacsfc72_latestBW.gif
+    # remove characters up to and including the _ as these are incorrect
+    raw_directories = find_directories(raw_dir)
+    for raw_directory in raw_directories:
+        # MY_LOGGER.debug('raw_directory = %s', raw_directory)
+        for filename in os.listdir(raw_dir + raw_directory):
             MY_LOGGER.debug('filename = %s', filename)
-            bits = filename.split('_')
-            MY_LOGGER.debug('first bit = %s', bits[0])
-            new_filename = filename[len(bits[0]) + 1:]
-            MY_LOGGER.debug('new_filename = %s', new_filename)
-            wxcutils.move_file(BASEDIR + 'nwsall/', filename, BASEDIR + 'nwsfixed/', new_filename)
-        else:
-            MY_LOGGER.debug('DELETE? = %s', filename)
+            new_file = filename[17:]
+            # MY_LOGGER.debug('  new_file = %s', new_file)
+            new_date = new_file[:8]
+            MY_LOGGER.debug('    %s', new_date)
+            # create directories (if needed)
+            mk_dir(fixed_dir + new_date)
+            wxcutils.move_file(raw_dir + raw_directory, filename,
+                               fixed_dir + new_date, new_file)
+        # directory should now be empty, if so, remove it
+        if not os.listdir(raw_dir + raw_directory):
+            MY_LOGGER.debug('deleting empty directory - %s', raw_dir + raw_directory)
+            wxcutils.run_cmd('rmdir ' + raw_dir + raw_directory)
+
+    latest_dir = find_latest_directory(fixed_dir)
+    MY_LOGGER.debug('latest_dir = %s', latest_dir)
 
     # now go through all images to find the latest of each type using filename
     graphic_types = ['EPAC_latest', 'GULF_latest', 'pac24_latestBW', 'pac48_latestBW',
                      'pac48per_latestBW', 'pacsfc24_latestBW', 'pacsfc48_latestBW',
-                     'pacsfc72_latestBW', 'WATL_latest', 'pac48per_latestBW']
+                     'pacsfc72_latestBW', 'WATL_latest', 'pac48per_latestBW', 'CAR_latest']
     for gtype in graphic_types:
         MY_LOGGER.debug('type = %s', gtype)
-        latest_file = find_latest_filename_contains(BASEDIR + 'nwsfixed/', gtype)
+        latest_file = find_latest_filename_contains(fixed_dir + latest_dir, gtype)
 
         MY_LOGGER.debug('latest_file = %s', latest_file)
 
@@ -341,37 +389,21 @@ def process_nws():
 
             if stored_timestamp != int(latest):
                 # new file found which hasn't yet been copied over
-
                 # copy to output directory
                 MY_LOGGER.debug('new_filename = %s', new_filename)
-                wxcutils.copy_file(os.path.join(BASEDIR + 'nwsfixed/', latest_file),
+                wxcutils.copy_file(os.path.join(fixed_dir + latest_dir, latest_file),
                                    os.path.join(OUTPUT_PATH, new_filename + extenstion))
 
                 # create thumbnail
                 create_thumbnail(new_filename, extenstion)
 
-                    # create file with date time info
+                # create file with date time info
                 date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
                     LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
                 wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', date_time)
 
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
-
-    MY_LOGGER.debug('copy to final folder based on filename')
-    # now copy to the correct date folder based on the filename
-    # eg filename = 20201203200046-pacsea_latestBW.gif
-    MY_LOGGER.debug('using %s', BASEDIR + 'nwsfixed/*.gif')
-    for nws_file in glob.glob(BASEDIR + 'nwsfixed/*.gif'):
-        bits = os.path.split(nws_file)
-        MY_LOGGER.debug('dir = %s, file = %s', bits[0], bits[1])
-        if '.gif' in bits[1]:
-            MY_LOGGER.debug('nws_file = %s, file name = %s, year = %s, month = %s, day = %s', nws_file, bits[1], bits[1][:4], bits[1][4:6], bits[1][6:8])
-        # create directories, if needed
-        mk_dir(BASEDIR + 'nwsdata/' + bits[1][:4])
-        mk_dir(BASEDIR + 'nwsdata/' + bits[1][:4] + '/' + bits[1][4:6])
-        mk_dir(BASEDIR + 'nwsdata/' + bits[1][:4] + '/' + bits[1][4:6] + '/' + bits[1][6:8])
-        wxcutils.move_file(bits[0], bits[1], BASEDIR + 'nwsdata/' + bits[1][:4] + '/' + bits[1][4:6] + '/' + bits[1][6:8], bits[1])
 
 
     MY_LOGGER.debug('---------------------------------------------')
@@ -506,6 +538,9 @@ create_animation('goes17/m2/ch07', '*', 24 * 4 * 3, 0.15, '800:800')
 
 # Himawari 8 - FD IR - 1 frame per hour
 create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800')
+
+# combined images - 1 frame per hour
+create_animation('sanchez/combined/fd/ir', '*', 24 * 2 * 3, 0.15, '800:800')
 
 # save latest times data
 wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', LATESTTIMESTAMPS)

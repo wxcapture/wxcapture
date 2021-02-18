@@ -173,33 +173,22 @@ for year in year_list:
                                             image_date = '20' + channel_bits[0]
                                             image_time = channel_bits[1]
                                             channel = channel_bits[2]
-                                            # only want channels 1 to 10
+                                            # only want channels 1 to 9
                                             if channel in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
                                                 MY_LOGGER.debug('Get image = %s, channel = %s, date = %s, time = %s', image, channel, image_date, image_time)
-                                                dt = datetime(int(image_date[:4]),
-                                                              int(image_date[4:6]),
-                                                              int(image_date[6:8]),
-                                                              int(image_time[:2]),
-                                                              int(image_time[2:4]),
-                                                              0)
-                                                moscow_dt = pytz.timezone('Europe/Moscow').localize(dt)
-                                                MY_LOGGER.debug('Moscow timezone = %s', moscow_dt.strftime('%Y/%m/%d, %H:%M:%S'))
-                                                utc_datetime = utc_datetime = moscow_dt.astimezone(pytz.UTC)
-                                                MY_LOGGER.debug('UTC = %s', utc_datetime.strftime('%Y/%m/%d, %H:%M:%S'))
-                                                utc_directory = utc_datetime.strftime('%Y%m%d')
-                                                utc_time = utc_datetime.strftime('%H%M')
+
                                                 # format to align with the sanchez parser
-                                                utc_filename = 'electro-l-2-' + utc_directory[2:] + '_' + utc_time + '_' + channel + '.jpg'
+                                                filename = 'electro-l-2-' + image_date[2:] + '_' + image_time + '_' + channel + '.jpg'
                                                 
-                                                MY_LOGGER.debug('utc_directory = %s utc_time = %s utc_filename - %s', utc_directory, utc_time, utc_filename)
+                                                MY_LOGGER.debug('image_date = %s image_time = %s filename - %s', image_date, image_time, filename)
 
                                                 # create directories, if it does not exist
-                                                mk_dir(FILE_BASE + utc_directory)
+                                                mk_dir(FILE_BASE + image_date)
                                                 for channel_directory in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                                                    mk_dir(FILE_BASE + utc_directory + '/' + channel_directory)
+                                                    mk_dir(FILE_BASE + image_date + '/' + channel_directory)
 
                                                 # see if file already exists
-                                                file_location = FILE_BASE + utc_directory + '/' + channel + '/' + utc_filename
+                                                file_location = FILE_BASE + image_date + '/' + channel + '/' + filename
                                                 if not os.path.exists(file_location):
                                                     # get file
                                                     MY_LOGGER.debug('Getting %s -> %s', image, file_location)

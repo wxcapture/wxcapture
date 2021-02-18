@@ -50,7 +50,7 @@ def show_errors(se_type, se_errors):
         # only show if errors to report
         if error_line['errors']:
             MY_LOGGER.debug(error_line['type'] + ' - ' + error_line['errors'])
-            found - True
+            found = True
     if not found:
         MY_LOGGER.debug('No errors found')
         return False
@@ -85,7 +85,11 @@ def do_backup_all():
     MY_LOGGER.debug('Himawari 8')
     errors.append({'type': 'Himawari 8', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')})
 
+    MY_LOGGER.debug('EWS-G1')
+    errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/EWS-G1/', '/mnt/f/Satellites/ews-g1/')})
 
+    MY_LOGGER.debug('Electro-L 2')
+    errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/electro-l-2/', '/mnt/f/Satellites/electro-l-2/')})
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')
     errors.append({'type': 'NOAA / Meteor / ISS - data', 'errors': do_rsync('caWv', '',
@@ -195,6 +199,26 @@ def do_backup_new():
                            'errors': do_rsync('caWv', '',
                                               'pi@192.168.100.15:/home/pi/goes/goes16/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/goes16/' + dir + '/' + date_dir + '/')})
+
+    MY_LOGGER.debug('EWS-G1')
+    # get all dates between the ranges
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y-%m-%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        errors.append({'type': 'EWS-G1 - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                         'pi@192.168.100.15:/home/pi/goes/EWS-G1/' + date_dir + '/',
+                                         '/mnt/f/Satellites/ews-g1/' + date_dir + '/')})
+
+    MY_LOGGER.debug('Electro-L 2')
+    # get all dates between the ranges
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y%m%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        errors.append({'type': 'Electro-L 2 - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                         'pi@192.168.100.15:/home/pi/goes/electro-l-2/' + date_dir + '/',
+                                         '/mnt/f/Satellites/electro-l-2/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 16 Sanchez Data')
     directories = ['fd/ch13']

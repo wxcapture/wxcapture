@@ -134,6 +134,120 @@ def process_nws():
     MY_LOGGER.debug('---------------------------------------------')
 
 
+def process_gk_2a():
+    """process GK-2A files"""
+    MY_LOGGER.debug('---------------------------------------------')
+    sat_dir = BASEDIR + 'gk-2a'
+    MY_LOGGER.debug('GK-2A')
+    MY_LOGGER.debug('sat_dir = %s', sat_dir)
+
+    # find directories
+    for date_directory in find_directories(sat_dir):
+        MY_LOGGER.debug('date_directory = %s', date_directory)
+        dates_directory = os.path.join(sat_dir, date_directory)
+
+        type_directories = find_directories(dates_directory)
+        for type_directory in type_directories:
+            MY_LOGGER.debug('--')
+            MY_LOGGER.debug('type_directory = %s', type_directory)
+            images_directory = os.path.join(dates_directory, type_directory)
+
+            for filename in os.listdir(images_directory):
+                # date time for the file
+                file_age = TIME_NOW - os.path.getmtime(os.path.join(images_directory, filename))
+                if file_age > MIN_AGE:
+                    MY_LOGGER.debug('DELETE - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+                    wxcutils.run_cmd('rm ' + images_directory + '/' + filename)
+                # else:
+                #     MY_LOGGER.debug('keep   - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+
+            # directory may be empty, if so, remove it
+            if not os.listdir(dates_directory + '/' + type_directory):
+                MY_LOGGER.debug('deleting empty directory - %s', dates_directory + '/' + type_directory)
+                wxcutils.run_cmd('rmdir ' + dates_directory + '/' + type_directory)
+
+        # directory may be empty, if so, remove it
+        if not os.listdir(dates_directory):
+            MY_LOGGER.debug('deleting empty directory - %s', dates_directory)
+            wxcutils.run_cmd('rmdir ' + dates_directory)
+
+
+def process_ews_g1():
+    """process EWS-G1 files"""
+    MY_LOGGER.debug('---------------------------------------------')
+    sat_dir = BASEDIR + 'EWS-G1'
+    MY_LOGGER.debug('EWS-G1')
+    MY_LOGGER.debug('sat_dir = %s', sat_dir)
+
+    # find directories
+    for date_directory in find_directories(sat_dir):
+        MY_LOGGER.debug('date_directory = %s', date_directory)
+        dates_directory = os.path.join(sat_dir, date_directory)
+
+        type_directories = find_directories(dates_directory)
+        for type_directory in type_directories:
+            MY_LOGGER.debug('--')
+            MY_LOGGER.debug('type_directory = %s', type_directory)
+            images_directory = os.path.join(dates_directory, type_directory)
+
+            for filename in os.listdir(images_directory):
+                # date time for the file
+                file_age = TIME_NOW - os.path.getmtime(os.path.join(images_directory, filename))
+                if file_age > MIN_AGE:
+                    MY_LOGGER.debug('DELETE - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+                    wxcutils.run_cmd('rm ' + images_directory + '/' + filename)
+                # else:
+                #     MY_LOGGER.debug('keep   - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+
+            # directory may be empty, if so, remove it
+            if not os.listdir(dates_directory + '/' + type_directory):
+                MY_LOGGER.debug('deleting empty directory - %s', dates_directory + '/' + type_directory)
+                wxcutils.run_cmd('rmdir ' + dates_directory + '/' + type_directory)
+
+        # directory may be empty, if so, remove it
+        if not os.listdir(dates_directory):
+            MY_LOGGER.debug('deleting empty directory - %s', dates_directory)
+            wxcutils.run_cmd('rmdir ' + dates_directory)
+
+
+def process_electro_l_2():
+    """process Electro-L-2 files"""
+    MY_LOGGER.debug('---------------------------------------------')
+    sat_dir = BASEDIR + 'electro-l-2'
+    MY_LOGGER.debug('Electro-L-2')
+    MY_LOGGER.debug('sat_dir = %s', sat_dir)
+
+    # find directories
+    for date_directory in find_directories(sat_dir):
+        MY_LOGGER.debug('date_directory = %s', date_directory)
+        dates_directory = os.path.join(sat_dir, date_directory)
+
+        type_directories = find_directories(dates_directory)
+        for type_directory in type_directories:
+            MY_LOGGER.debug('--')
+            MY_LOGGER.debug('type_directory = %s', type_directory)
+            images_directory = os.path.join(dates_directory, type_directory)
+
+            for filename in os.listdir(images_directory):
+                # date time for the file
+                file_age = TIME_NOW - os.path.getmtime(os.path.join(images_directory, filename))
+                if file_age > MIN_AGE:
+                    MY_LOGGER.debug('DELETE - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+                    # wxcutils.run_cmd('rm ' + images_directory + '/' + filename)
+                else:
+                    MY_LOGGER.debug('keep   - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+
+            # directory may be empty, if so, remove it
+            if not os.listdir(dates_directory + '/' + type_directory):
+                MY_LOGGER.debug('deleting empty directory - %s', dates_directory + '/' + type_directory)
+                wxcutils.run_cmd('rmdir ' + dates_directory + '/' + type_directory)
+
+        # directory may be empty, if so, remove it
+        if not os.listdir(dates_directory):
+            MY_LOGGER.debug('deleting empty directory - %s', dates_directory)
+            wxcutils.run_cmd('rmdir ' + dates_directory)
+
+
 def process_sanchez():
     """process Sanchez files"""
 
@@ -219,7 +333,7 @@ MY_LOGGER.debug('BASEDIR = %s', BASEDIR)
 
 SANCHEZ_PATH = BASEDIR + 'sanchez/'
 
-# minumum age for files to be deleted > 31 days
+# minumum age for files to be deleted > 42 days
 MIN_AGE = 42 * 24 * 60 * 60
 MY_LOGGER.debug('MIN_AGE = %s', MIN_AGE)
 
@@ -242,6 +356,14 @@ process_nws()
 # process sanchez files
 process_sanchez()
 
+# process GK-2A files
+process_gk_2a()
+
+# process EWS-G1 files
+process_ews_g1()
+
+# process Electro-L-2 files
+process_electro_l_2()
 
 # except:
 #     MY_LOGGER.critical('Global exception handler: %s %s %s',

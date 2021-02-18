@@ -115,7 +115,7 @@ def do_sanchez(ds_src, ds_dest, ds_channel):
 def do_combined_sanchez(ds_dest, ds_date_time):
     """do combined sanchez processing"""
     MY_LOGGER.debug('Combined sanchez processing %s %s', ds_dest, ds_date_time)
-    cmd = '/home/pi/sanchez/Sanchez reproject -s ' + BASEDIR + ' -o ' + ds_dest + ' -T ' + ds_date_time + ' -a -f -d 60'
+    cmd = '/home/pi/sanchez/Sanchez reproject -s ' + BASEDIR + ' -o ' + ds_dest + ' -T ' + ds_date_time + ' -a -f -d 90'
     MY_LOGGER.debug(cmd)
     wxcutils.run_cmd(cmd)
     MY_LOGGER.debug('Combined sanchez processing completed')

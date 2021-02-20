@@ -19,7 +19,7 @@ def listFD(url, ext=''):
 
 def mk_dir(directory):
     """only create if it does not already exist"""
-    MY_LOGGER.debug('Make? %s', directory)
+    # MY_LOGGER.debug('Make? %s', directory)
     if not os.path.isdir(directory):
         wxcutils.make_directory(directory)
 
@@ -82,33 +82,37 @@ for directory in directories:
             filename = file.split('/')[-1]
             if 'EWS-G1' in filename:
                 MY_LOGGER.debug('filename = %s', filename)
-                # see if file exists
-                if not os.path.exists(FILE_BASE + date_element + '/' + filename[7] + '/' + filename):
+                file_location = FILE_BASE + date_element + '/' + filename[7] + '/'
+                MY_LOGGER.debug('file_location = %s', file_location)
+                # see if file exists, if not, get it
+                if not os.path.exists(file_location + filename):
                     # create directories
                     mk_dir(FILE_BASE + date_element)
-                    # mk_dir(FILE_BASE + date_element + '/1')
+                    mk_dir(FILE_BASE + date_element + '/1')
                     mk_dir(FILE_BASE + date_element + '/2')
                     mk_dir(FILE_BASE + date_element + '/3')
                     mk_dir(FILE_BASE + date_element + '/4')
                     mk_dir(FILE_BASE + date_element + '/5')
                     # get file
-                    if 'EWS-G1_1' not in filename:
-                        MY_LOGGER.debug('Getting file %s', filename)
-                        data = requests.get(file)
-                        MY_LOGGER.debug('Writing file %s', filename)
-                        open(FILE_BASE + date_element + '/' + filename[7] + '/' + filename, 'wb').write(data.content)
-                        # since the images are 20832 x 18956 ~190MB each, this will be storage space intensive
-                        # convert the images to align with GOES images, which are 5424x5424, but keep the correct
-                        # aspect ratio so 5424 x 4936
-                        # currently only will work for channels 2-5 since channel 1 is too large
-                        if filename[7] != '1':
-                            cmd = 'convert ' + FILE_BASE + date_element + '/' + filename[7] + '/' + filename + ' ' + FILE_BASE + date_element + '/' + filename[7] + '/' + filename.replace('.png', '.jpg')
-                            MY_LOGGER.debug('cmd %s', cmd)
-                            wxcutils.run_cmd(cmd)
-                            # can now delete the original image to save space
-                            wxcutils.run_cmd('rm ' + FILE_BASE + date_element + '/' + filename[7] + '/' + filename)
+                    MY_LOGGER.debug('Getting file %s', filename)
+                    data = requests.get(file)
+                    MY_LOGGER.debug('Writing file %s', filename)
+                    open(file_location + filename, 'wb').write(data.content)
+                    # non-channel 1 images are ~5k x 5k pixels
+                    # channel 1 images are 20832 x 18956 ~190MB each
+                    # convert all to jpg images, aligned with GOES images size, which are 5424x5424
+                    # keeping  the correct aspect ratio so 5424 x 4936
+                    if filename[7] != '1':
+                        ratio = ' 1'
                     else:
-                        MY_LOGGER.debug('Skipping %s due to very large file size', filename)
+                        ratio = ' 0.2604'
+
+                    cmd = 'vips resize ' + file_location + filename + ' ' + file_location + filename.replace('.png', '.jpg') + ratio
+                    MY_LOGGER.debug('cmd %s', cmd)
+                    wxcutils.run_cmd(cmd)
+                    # can now delete the original image to save space
+                    wxcutils.run_cmd('rm ' + file_location + filename)
+
                 else:
                     MY_LOGGER.debug('File already exists')
 

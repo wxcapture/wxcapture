@@ -27,12 +27,27 @@ def backup_tle(filename):
 def validate_tle(filename):
     """validate TLE"""
     # make sure we got a file created, otherwise re-use the old one
-    if os.path.getsize(WORKING_PATH + filename) == 0:
-        MY_LOGGER.debug('Issue updating %s file resulting in zero length file', filename)
-        MY_LOGGER.debug('re-using old one')
+    file_exists = True
+    file_non_zero_length = True
+    if os.path.exists(WORKING_PATH + filename):
+        MY_LOGGER.debug('File exists - %s', filename)
+        if os.path.getsize(WORKING_PATH + filename) == 0:
+            MY_LOGGER.debug('File is empty - %s', filename)
+            file_non_zero_length = False
+        else:
+            MY_LOGGER.debug('File contains data - %s', filename)
+    else:
+        file_exists = False
+        MY_LOGGER.debug('File does not exist - %s', filename)
+
+    if not file_exists or not file_non_zero_length:
+        MY_LOGGER.debug('Issue creating / updating %s file', filename)
+        MY_LOGGER.debug('re-using old one (if it exists)')
         wxcutils.run_cmd('rm ' + WORKING_PATH + filename)
         wxcutils.move_file(WORKING_PATH, filename + '.old',
                            WORKING_PATH, filename)
+    else:
+        MY_LOGGER.debug('%s validated successfully', filename)
 
 
 # setup paths to directories
@@ -79,9 +94,10 @@ try:
     validate_tle('de421.bsp')
     validate_tle('deltat.data')
     validate_tle('deltat.preds')
+    validate_tle('Leap_Second.dat')
 
     MY_LOGGER.debug('Finished')
-    validate_tle('Leap_Second.dat')
+
 
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',

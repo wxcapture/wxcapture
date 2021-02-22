@@ -79,9 +79,7 @@ try:
     # backup old tle files
     MY_LOGGER.debug('Backing up old files')
     backup_tle('de421.bsp')
-    backup_tle('deltat.data')
-    backup_tle('deltat.preds')
-    backup_tle('Leap_Second.dat')
+
 
     # update planets info
     MY_LOGGER.debug('Loading new files')
@@ -92,9 +90,7 @@ try:
     # validate planets files
     MY_LOGGER.debug('Validating new files')
     validate_tle('de421.bsp')
-    validate_tle('deltat.data')
-    validate_tle('deltat.preds')
-    validate_tle('Leap_Second.dat')
+
 
     MY_LOGGER.debug('Finished')
 

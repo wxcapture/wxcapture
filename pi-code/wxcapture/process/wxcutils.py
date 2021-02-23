@@ -219,9 +219,6 @@ def validate_tle(vt_path):
     MY_UTIL_LOGGER.debug('validating tle %s', vt_path)
     validate_single_tle(vt_path, 'weather.tle')
     validate_single_tle(vt_path, 'de421.bsp')
-    validate_single_tle(vt_path, 'deltat.data')
-    validate_single_tle(vt_path, 'deltat.preds')
-    validate_single_tle(vt_path, 'Leap_Second.dat')
 
 
 def migrate_files(sf_files):

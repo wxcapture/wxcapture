@@ -44,21 +44,7 @@
   {
     "DisplayName": "Electro-L N2",
     "FilenamePrefix": "electro-l-2-",
-    "FilenameSuffix": "[1-3]",
-    "FilenameParser": "Electro",
-    "Longitude": -14.5,
-    "Brightness": 1.0,
-    "Crop": [
-      0.012703,
-      0.012703,
-      0.012703,
-      0.012703
-    ]
-  },
-  {
-    "DisplayName": "Electro-L N2",
-    "FilenamePrefix": "electro-l-2-",
-    "FilenameSuffix": "[4-9]",
+    "FilenameSuffix": "9",
     "FilenameParser": "Electro",
     "Invert": true,
     "Longitude": -14.5,
@@ -72,23 +58,9 @@
   },
 {
     "DisplayName": "EWS-G1",
-    "FilenamePrefix": "EWS-G1_[2-5]_",
+    "FilenamePrefix": "EWS-G1_4_",
     "FilenameParser": "Goesproc",
     "Invert": true,
-    "Longitude": 61.5,
-    "Brightness": 0.9,
-    "Crop": [
-      0.003166,
-      0.089925,
-      0.001166,
-      0.001010
-    ]
-  },
-  {
-    "DisplayName": "EWS-G1",
-    "FilenamePrefix": "EWS-G1_1_",
-    "FilenameParser": "Goesproc",
-    "Invert": false,
     "Longitude": 61.5,
     "Brightness": 0.9,
     "Crop": [

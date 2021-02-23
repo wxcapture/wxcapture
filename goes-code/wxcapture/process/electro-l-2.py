@@ -174,7 +174,7 @@ for year in year_list:
                                             image_time = channel_bits[1]
                                             channel = channel_bits[2]
                                             # only want channels 1 to 9
-                                            if channel in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                                            if channel in ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'RGB']:
                                                 MY_LOGGER.debug('Get image = %s, channel = %s, date = %s, time = %s', image, channel, image_date, image_time)
 
                                                 # format to align with the sanchez parser
@@ -184,7 +184,7 @@ for year in year_list:
 
                                                 # create directories, if it does not exist
                                                 mk_dir(FILE_BASE + image_date)
-                                                for channel_directory in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                                                for channel_directory in ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'RGB']:
                                                     mk_dir(FILE_BASE + image_date + '/' + channel_directory)
 
                                                 # see if file already exists

@@ -1,0 +1,66 @@
+[
+	{
+		"Display Name": "GK-2A",
+		"Location": "gk-2a",
+		"Test Image": "FD.jpg",
+		"Max Age": "30",
+		"Last Status": "good",
+		"Status Change": ""
+	},
+	{
+		"Display Name": "GOES 17",
+		"Location": "goes",
+		"Test Image": "goes_17_fd_fc.jpg",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": ""
+	},
+	{
+		"Display Name": "GOES 16",
+		"Location": "goes",
+		"Test Image": "goes_16_fd_ch13.jpg",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": ""
+	},
+	{
+		"Display Name": "Himawari 8",
+		"Location": "goes",
+		"Test Image": "himawari_8_fd_IR.jpg",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": ""
+	},
+	{
+		"Display Name": "Electro-L 2",
+		"Location": "goes",
+		"Test Image": "electro-l-2-rgb.jpg",
+		"Max Age": "60",
+		"Last Status": "good",
+		"Status Change": ""
+	},
+	{
+		"Display Name": "EWS-G1",
+		"Location": "goes",
+		"Test Image": "ews-g1-1.jpg",
+		"Max Age": "60",
+		"Last Status": "good",
+		"Status Change": ""
+	},
+	{
+		"Display Name": "Polar orbiting predictions",
+		"Location": "",
+		"Test Image": "satpass.html",
+		"Max Age": "1500",
+		"Last Status": "good",
+		"Status Change": ""
+	},
+	{
+		"Display Name": "Polar passes",
+		"Location": "",
+		"Test Image": "polar.txt",
+		"Max Age": "720",
+		"Last Status": "good",
+		"Status Change": ""
+	}
+]

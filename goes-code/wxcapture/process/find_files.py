@@ -92,6 +92,14 @@ def get_utc_date_time():
     return wxcutils.epoch_to_utc(time.time(), '%a %d %b %Y %H:%M')
 
 
+def get_last_generated_text(lgt_filename):
+    """build the last generated text"""
+    last_generated_text = 'Last generated at ' + get_local_date_time() + ' ' + \
+                            LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+    MY_LOGGER.debug('last_generated_text = %s - for file %s', last_generated_text, lgt_filename)
+    return last_generated_text
+
+
 def create_thumbnail(ct_directory, ct_extension):
     """create thumbnail of the image"""
     wxcutils.run_cmd('convert \"' + OUTPUT_PATH + ct_directory + ct_extension +
@@ -177,9 +185,7 @@ def process_goes(sat_num):
                 create_thumbnail(new_filename, extenstion)
 
                  # create file with date time info
-                date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
-                    LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', date_time)
+                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
 
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
@@ -205,9 +211,7 @@ def process_goes(sat_num):
                     create_thumbnail(new_filename + '-sanchez', extenstion)
 
                     # create file with date time info
-                    date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
-                        LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-                    wxcutils.save_file(OUTPUT_PATH, new_filename + '-sanchez' + '.txt', date_time)
+                    wxcutils.save_file(OUTPUT_PATH, new_filename + '-sanchez' + '.txt', get_last_generated_text(new_filename))
 
                     # if file is a GOES17 / fd / ch13, then do a stitch of all available sats
                     # GOES 16 / 17 / Himawari 8 / GK-2A
@@ -234,9 +238,7 @@ def process_goes(sat_num):
                         create_thumbnail('combined', '.jpg')
 
                         # create file with date time info
-                        date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
-                            LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-                        wxcutils.save_file(OUTPUT_PATH, 'combined.txt', date_time)
+                        wxcutils.save_file(OUTPUT_PATH, 'combined.txt', get_last_generated_text('combined.txt'))
 
                     # update latest
                     LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
@@ -308,9 +310,7 @@ def process_himawari(sat_num):
                 create_thumbnail(new_filename, extenstion)
 
                  # create file with date time info
-                date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
-                    LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', date_time)
+                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
 
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
@@ -407,9 +407,7 @@ def process_nws():
                 create_thumbnail(new_filename, extenstion)
 
                 # create file with date time info
-                date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
-                    LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', date_time)
+                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
 
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
@@ -471,8 +469,7 @@ def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration, ca_res
 
     # create file with date time info
     MY_LOGGER.debug('Writing out last generated date file')
-    date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-    wxcutils.save_file(OUTPUT_PATH, ca_filename + '.txt', date_time)
+    wxcutils.save_file(OUTPUT_PATH, ca_filename + '.txt', get_last_generated_text(ca_filename))
 
 
 # setup paths to directories

@@ -5,7 +5,9 @@
 # import libraries
 import os
 import sys
+import time
 import requests
+import subprocess
 from bs4 import BeautifulSoup
 import wxcutils
 
@@ -22,6 +24,24 @@ def mk_dir(directory):
     # MY_LOGGER.debug('Make? %s', directory)
     if not os.path.isdir(directory):
         wxcutils.make_directory(directory)
+
+
+def get_local_date_time():
+    """get the local date time"""
+    return wxcutils.epoch_to_local(time.time(), '%a %d %b %Y %H:%M')
+
+
+def get_utc_date_time():
+    """get the local date time"""
+    return wxcutils.epoch_to_utc(time.time(), '%a %d %b %Y %H:%M')
+
+
+def get_last_generated_text(lgt_filename):
+    """build the last generated text"""
+    last_generated_text = 'Last generated at ' + get_local_date_time() + ' ' + \
+                            LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+    MY_LOGGER.debug('last_generated_text = %s - for file %s', last_generated_text, lgt_filename)
+    return last_generated_text
 
 
 # setup paths to directories
@@ -47,6 +67,10 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
+# get local time zone
+LOCAL_TIME_ZONE = subprocess.check_output("date"). \
+    decode('utf-8').split(' ')[-2]
+MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
 URL_BASE = 'https://satellites.altillimity.com/EWS-G1/'
 MY_LOGGER.debug('URL_BASE = %s', URL_BASE)
@@ -113,6 +137,15 @@ for directory in directories:
                     # can now delete the original image to save space
                     wxcutils.run_cmd('rm ' + file_location + filename)
 
+                    # save a thumbnail of a channel 1 image to send to webserver
+                    if filename[7] == '1':
+                        cmd = 'vips resize ' + file_location + filename.replace('.png', '.jpg') + ' ' + OUTPUT_PATH + 'ews-g1-1.jpg' + ' 0.1843'
+                        MY_LOGGER.debug('cmd %s', cmd)
+                        wxcutils.run_cmd(cmd)
+                        
+                        # create file with date time info
+                        MY_LOGGER.debug('Writing out last generated date file')
+                        wxcutils.save_file(OUTPUT_PATH, 'ews-g1-1.txt', get_last_generated_text(filename.replace('.png', '.jpg')))
                 else:
                     MY_LOGGER.debug('File already exists')
 

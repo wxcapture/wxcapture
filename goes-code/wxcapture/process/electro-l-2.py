@@ -5,6 +5,8 @@
 # import libraries
 import os
 import sys
+import time
+import subprocess
 from ftplib import FTP
 from datetime import datetime, timezone
 import pytz
@@ -52,6 +54,24 @@ def month_string_to_number(string):
         raise ValueError('Not a month')
 
 
+def get_local_date_time():
+    """get the local date time"""
+    return wxcutils.epoch_to_local(time.time(), '%a %d %b %Y %H:%M')
+
+
+def get_utc_date_time():
+    """get the local date time"""
+    return wxcutils.epoch_to_utc(time.time(), '%a %d %b %Y %H:%M')
+
+
+def get_last_generated_text(lgt_filename):
+    """build the last generated text"""
+    last_generated_text = 'Last generated at ' + get_local_date_time() + ' ' + \
+                            LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+    MY_LOGGER.debug('last_generated_text = %s - for file %s', last_generated_text, lgt_filename)
+    return last_generated_text
+
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -77,6 +97,11 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 FILE_BASE = '/home/pi/goes/electro-l-2/'
 MY_LOGGER.debug('FILE_BASE = %s', FILE_BASE)
+
+# get local time zone
+LOCAL_TIME_ZONE = subprocess.check_output("date"). \
+    decode('utf-8').split(' ')[-2]
+MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
 # get the configuration information
 CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'electro.json')
@@ -155,13 +180,13 @@ for year in year_list:
                             ftp.cwd(day)
                             MY_LOGGER.debug('current directory = %s', ftp.pwd())
                             time_list = get_directory_list()
-                            for time in time_list:
-                                # MY_LOGGER.debug('time = %s', time)
+                            for time_value in time_list:
+                                # MY_LOGGER.debug('time_value = %s', time_value)
                                 # process time if in current day and >= last time processed
-                                if int(time) >= int(CONFIG_INFO['Last Time']) or day_only:
-                                    MY_LOGGER.debug('Process time = %s', time)
+                                if int(time_value) >= int(CONFIG_INFO['Last Time']) or day_only:
+                                    MY_LOGGER.debug('Process time = %s', time_value)
                                     # change directory to the time
-                                    ftp.cwd(time)
+                                    ftp.cwd(time_value)
                                     MY_LOGGER.debug('current directory = %s', ftp.pwd())
                                     # can now process files!
                                     image_list = get_directory_list()
@@ -197,11 +222,16 @@ for year in year_list:
                                                     last_year = year
                                                     last_month = month_number
                                                     last_day = day
-                                                    last_time = time
+                                                    last_time = time_value
+                                                    # save a thumbnail of a channel 1 image to send to webserver
+                                                    if channel == 'RGB':
+                                                        wxcutils.copy_file(FILE_BASE + image_date + '/' + channel + '/' + filename, OUTPUT_PATH + 'electro-l-2-rgb.jpg')
+
+                                                        # create file with date time info
+                                                        MY_LOGGER.debug('Writing out last generated date file')
+                                                        wxcutils.save_file(OUTPUT_PATH, 'electro-l-2-rgb.txt', get_last_generated_text(filename))
                                                 else:
                                                     MY_LOGGER.debug('File already downloaded')
-
-
 
                                     # end of time, go up a directory
                                     ftp.cwd('..')

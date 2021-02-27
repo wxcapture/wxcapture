@@ -176,6 +176,10 @@ for year in year_list:
                             if int(day) > int(CONFIG_INFO['Last Day']):
                                 day_only = True
                                 MY_LOGGER.debug('day only')
+                            # create directories, if it does not exist
+                            mk_dir(FILE_BASE + day)
+                            for channel_directory in ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'RGB']:
+                                mk_dir(FILE_BASE + day + '/' + channel_directory)
                             # change directory to the day
                             ftp.cwd(day)
                             MY_LOGGER.debug('current directory = %s', ftp.pwd())
@@ -206,11 +210,6 @@ for year in year_list:
                                                 filename = 'electro-l-2-' + image_date[2:] + '_' + image_time + '_' + channel + '.jpg'
                                                 
                                                 MY_LOGGER.debug('image_date = %s image_time = %s filename - %s', image_date, image_time, filename)
-
-                                                # create directories, if it does not exist
-                                                mk_dir(FILE_BASE + image_date)
-                                                for channel_directory in ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'RGB']:
-                                                    mk_dir(FILE_BASE + image_date + '/' + channel_directory)
 
                                                 # see if file already exists
                                                 file_location = FILE_BASE + image_date + '/' + channel + '/' + filename

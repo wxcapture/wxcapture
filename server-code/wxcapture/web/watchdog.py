@@ -170,17 +170,20 @@ MY_LOGGER.debug('Iterate through satellites')
 for si in SATELLITE_INFO:
     MY_LOGGER.debug('-' * 20)
     MY_LOGGER.debug('Processing - %s', si['Display Name'])
-    # do the validation
-    status, text, html = validate_file(si)
-    if status != si['Last Status']:
-        STATUS_CHANGE_DETECTED = True
-        EMAIL_REQUIRED = True
-        MY_LOGGER.debug('Status change detected - old = %s, new = %s', si['Last Status'], status)
-        si['Last Status'] = status
-        si['Status Change'] = ALERT_INFO
-
-    EMAIL_TEXT += text
-    EMAIL_HTML += html
+    if si['Active'] == 'yes':
+        MY_LOGGER.debug('Active - Validation processing')
+        # do the validation
+        status, text, html = validate_file(si)
+        if status != si['Last Status']:
+            STATUS_CHANGE_DETECTED = True
+            EMAIL_REQUIRED = True
+            MY_LOGGER.debug('Status change detected - old = %s, new = %s', si['Last Status'], status)
+            si['Last Status'] = status
+            si['Status Change'] = ALERT_INFO
+        EMAIL_TEXT += text
+        EMAIL_HTML += html
+    else:
+        MY_LOGGER.debug('Satellite is not active')
 
 MY_LOGGER.debug('-' * 20)
 

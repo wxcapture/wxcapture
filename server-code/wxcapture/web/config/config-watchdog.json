@@ -5,7 +5,8 @@
 		"Test Image": "FD.jpg",
 		"Max Age": "30",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	},
 	{
 		"Display Name": "GOES 17",
@@ -13,7 +14,8 @@
 		"Test Image": "goes_17_fd_fc.jpg",
 		"Max Age": "120",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	},
 	{
 		"Display Name": "GOES 16",
@@ -21,7 +23,8 @@
 		"Test Image": "goes_16_fd_ch13.jpg",
 		"Max Age": "120",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	},
 	{
 		"Display Name": "Himawari 8",
@@ -29,7 +32,8 @@
 		"Test Image": "himawari_8_fd_IR.jpg",
 		"Max Age": "120",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	},
 	{
 		"Display Name": "Electro-L 2",
@@ -37,7 +41,8 @@
 		"Test Image": "electro-l-2-rgb.jpg",
 		"Max Age": "90",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	},
 	{
 		"Display Name": "EWS-G1",
@@ -45,7 +50,8 @@
 		"Test Image": "ews-g1-1.jpg",
 		"Max Age": "60",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	},
 	{
 		"Display Name": "Polar orbiting predictions",
@@ -53,7 +59,8 @@
 		"Test Image": "satpass.html",
 		"Max Age": "1500",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	},
 	{
 		"Display Name": "Polar passes",
@@ -61,6 +68,7 @@
 		"Test Image": "polar.txt",
 		"Max Age": "720",
 		"Last Status": "good",
-		"Status Change": ""
+		"Status Change": "",
+		"Active": "yes"
 	}
 ]

@@ -177,9 +177,9 @@ for year in year_list:
                                 day_only = True
                                 MY_LOGGER.debug('day only')
                             # create directories, if it does not exist
-                            mk_dir(FILE_BASE + day)
+                            mk_dir(FILE_BASE + year + str(month_number).zfill(2) + day)
                             for channel_directory in ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'RGB']:
-                                mk_dir(FILE_BASE + day + '/' + channel_directory)
+                                mk_dir(FILE_BASE + year + str(month_number).zfill(2) + day + '/' + channel_directory)
                             # change directory to the day
                             ftp.cwd(day)
                             MY_LOGGER.debug('current directory = %s', ftp.pwd())

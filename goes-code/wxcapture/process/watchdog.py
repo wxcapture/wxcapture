@@ -27,7 +27,7 @@ def is_running(process_name):
 
 def is_processing(process_name, minutes):
     """see if images are being created in last defined number of minutes"""
-    cmd = Popen(['find', '/home/pi/goes', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
+    cmd = Popen(['find', '/home/pi/goes/goes17', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
     MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
     MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))

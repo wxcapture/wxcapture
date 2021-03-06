@@ -21,6 +21,7 @@ def validate_file(vf_si):
     vf_status = 'good'
     vf_text = ''
     vf_html = ''
+    vf_data = ''
 
     # see when last modified
     last_modified = os.path.getmtime(WEB_PATH + vf_si['Location'] + '/' + vf_si['Test Image'])
@@ -29,29 +30,39 @@ def validate_file(vf_si):
     file_age = CURRENT_TIME - last_modified
     MY_LOGGER.debug('file_age = %d sec (Rounded [%s min] or [%s hours])', round(file_age,0), str(round(file_age / 60, 0)), str(round(file_age / 3600, 0)))
 
+    vf_age_text = str(round(file_age / 60))
+    vf_margin_text = str(round((file_age / 60) - float(vf_si['Max Age'])))
+
     # see if too old
     if file_age > (float(vf_si['Max Age']) * 60):
         MY_LOGGER.debug('Too old!')
         vf_text = 'ERROR ' + vf_si['Display Name'] + ' has exceeded the receiving threshold (' + \
-            vf_si['Max Age'] + ' min) with age of ' + str(round(file_age / 60)) + \
-            ' min - safety margin ' + str(round((file_age / 60) - float(vf_si['Max Age']))) + ' min' + \
+            vf_si['Max Age'] + ' min) with age of ' + vf_age_text + \
+            ' min - safety margin ' + vf_margin_text + ' min' + \
             os.linesep + os.linesep
         vf_html = '<td style=\"background-color:#FF0000\">ERROR</td>'
         vf_status = 'bad'
     else:
         MY_LOGGER.debug('Young enough')
         vf_text = 'OK    ' + vf_si['Display Name'] + ' is within the receiving threshold (' + \
-            vf_si['Max Age'] + ' min) with age of ' + str(round(file_age / 60)) + \
-            ' min - safety margin ' + str(round((file_age / 60) - float(vf_si['Max Age']))) + ' min' + \
+            vf_si['Max Age'] + ' min) with age of ' + vf_age_text + \
+            ' min - safety margin ' + vf_margin_text + ' min' + \
             os.linesep + os.linesep
         vf_html = '<td style=\"background-color:#00FF00\">OK</td>'
 
     vf_html = '<tr>' + vf_html + '<td>' + vf_si['Display Name'] + '</td>' + \
         '<td>' + vf_si['Max Age'] + '</td>' + \
-        '<td>' + str(round(file_age / 60)) + '</td>' + \
-        '<td>' + str(round((file_age / 60) - float(vf_si['Max Age']))) + '</td></tr>'
+        '<td>' + vf_age_text + '</td>' + \
+        '<td>' + vf_margin_text + '</td></tr>'
 
-    return vf_status, vf_text, vf_html
+    if vf_status != vf_si['Last Status']:
+        vf_change = 'Y'
+    else:
+        vf_change = 'N'
+
+    vf_data = vf_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + vf_si['Max Age'] + ',' + vf_age_text + ',' + vf_margin_text + ',' + vf_change + ',' + vf_status + '\r\n'
+
+    return vf_status, vf_text, vf_html, vf_data
 
 
 def send_email(se_text, se_html):
@@ -114,6 +125,18 @@ def get_utc_date_time():
     return wxcutils.epoch_to_utc(time.time(), '%a %d %b %H:%M')
 
 
+def write_data():
+    """write data to csv file"""
+
+    # output data
+    MY_LOGGER.debug('Writing file update - %s%s', OUTPUT_PATH, CSV_FILENAME)
+    with open(OUTPUT_PATH + CSV_FILENAME, 'a+') as csv_file:
+        if os.stat(OUTPUT_PATH + CSV_FILENAME).st_size == 0:
+            csv_file.write('Satellite,Epoch Time (sec),Date,Max Age (min),Current Age (min),Margin Age (min),Status Change?,Status\r\n')
+        csv_file.write(CSV_DATA)
+        csv_file.close()
+
+
 # setup paths to directories
 HOME = '/home/mike'
 APP_PATH = HOME + '/wxcapture/'
@@ -140,6 +163,9 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 WEB_PATH = '/home/websites/wxcapture/'
 MY_LOGGER.debug('WEB_PATH = %s', WEB_PATH)
 
+CSV_FILENAME = 'satstatus.csv'
+MY_LOGGER.debug('CSV_FILENAME = %s', CSV_FILENAME)
+
 # get current epoch time
 CURRENT_TIME = time.time()
 MY_LOGGER.debug('CURRENT_TIME = %d', CURRENT_TIME)
@@ -149,11 +175,12 @@ LOCAL_TIME_ZONE = subprocess.check_output("date"). \
     decode('utf-8').split(' ')[-2]
 MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
-# email control info
+# email and data control info
 STATUS_CHANGE_DETECTED = False
 EMAIL_REQUIRED = False
 EMAIL_TEXT = ''
 EMAIL_HTML = ''
+CSV_DATA = ''
 
 # load satellite info
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog.json')
@@ -173,7 +200,7 @@ for si in SATELLITE_INFO:
     if si['Active'] == 'yes':
         MY_LOGGER.debug('Active - Validation processing')
         # do the validation
-        status, text, html = validate_file(si)
+        status, text, html, data = validate_file(si)
         if status != si['Last Status']:
             STATUS_CHANGE_DETECTED = True
             EMAIL_REQUIRED = True
@@ -182,11 +209,16 @@ for si in SATELLITE_INFO:
             si['Status Change'] = ALERT_INFO
         EMAIL_TEXT += text
         EMAIL_HTML += html
+        CSV_DATA += data
     else:
         MY_LOGGER.debug('Satellite is not active')
 
 MY_LOGGER.debug('-' * 20)
 
+# write data to the csv file
+write_data()
+
+MY_LOGGER.debug('-' * 20)
 if EMAIL_REQUIRED:
     MY_LOGGER.debug('Email required...')
 

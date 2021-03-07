@@ -77,15 +77,16 @@ def move_output_files():
     MY_LOGGER.debug('Non-unlock files')
 
     # move satstatus.csv
-    if os.path.isfile(MY_PATH + 'satstatus.csv'):
-        MY_LOGGER.debug('Processing satstatus.csv')
-        wxcutils.move_file(MY_PATH, 'satstatus.csv', TARGET, 'satstatus.csv')
-        MY_LOGGER.debug('zipping satstatus.csv')
-        wxcutils.run_cmd('zip ' + TARGET + 'satstatus.csv.zip ' + TARGET + 'satstatus.csv')
-        MY_LOGGER.debug('removing satstatus.csv')
-        wxcutils.run_cmd('rm ' + TARGET + 'satstatus.csv')
+    mof_file = 'satstatus.csv'
+    if os.path.isfile(MY_PATH + mof_file):
+        MY_LOGGER.debug('Processing %s', mof_file)
+        wxcutils.move_file(MY_PATH, mof_file, TARGET, mof_file)
+        MY_LOGGER.debug('zipping%s', mof_file)
+        wxcutils.run_cmd('zip ' + TARGET + mof_file + '.zip ' + TARGET + mof_file)
+        MY_LOGGER.debug('removing %s', mof_file)
+        wxcutils.run_cmd('rm ' + TARGET + mof_file)
     else:
-        MY_LOGGER.debug('No config.html to copy')
+        MY_LOGGER.debug('No %s to copy', mof_file)
 
 
     # scan for any unlock files

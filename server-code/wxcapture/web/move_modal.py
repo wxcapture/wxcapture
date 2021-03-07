@@ -73,7 +73,23 @@ def build_pass_json():
 
 def move_output_files():
     """move the files from the output directories to the correct locations"""
+    # scan for any non-unlock files
+    MY_LOGGER.debug('Non-unlock files')
+
+    # move satstatus.csv
+    if os.path.isfile(MY_PATH + 'satstatus.csv'):
+        MY_LOGGER.debug('Processing satstatus.csv')
+        wxcutils.move_file(MY_PATH, 'satstatus.csv', TARGET, 'satstatus.csv')
+        MY_LOGGER.debug('zipping satstatus.csv')
+        wxcutils.run_cmd('zip ' + TARGET + 'satstatus.csv.zip ' + TARGET + 'satstatus.csv')
+        MY_LOGGER.debug('removing satstatus.csv')
+        wxcutils.run_cmd('rm ' + TARGET + 'satstatus.csv')
+    else:
+        MY_LOGGER.debug('No config.html to copy')
+
+
     # scan for any unlock files
+    MY_LOGGER.debug('Unlock files')
     files_moved = False
     for unlock_file in glob.glob(MY_PATH + '*.UNLOCK'):
         files_moved = True
@@ -84,18 +100,21 @@ def move_output_files():
 
         # move satpass.html
         if os.path.isfile(MY_PATH + 'satpass.html' + lock_suffix):
+            MY_LOGGER.debug('Processing satpass.html')
             wxcutils.move_file(MY_PATH, 'satpass.html' + lock_suffix, TARGET, 'satpass.html')
         else:
             MY_LOGGER.debug('No satpass.html to copy')
 
         # move satellitestatus.html
         if os.path.isfile(MY_PATH + 'satellitestatus.html' + lock_suffix):
+            MY_LOGGER.debug('Processing satellitestatus.html')
             wxcutils.move_file(MY_PATH, 'satellitestatus.html' + lock_suffix, TARGET, 'satellitestatus.html')
         else:
             MY_LOGGER.debug('No satellitestatus.html to copy')
 
         # move config.html
         if os.path.isfile(MY_PATH + 'config.html' + lock_suffix):
+            MY_LOGGER.debug('Processing config.html')
             wxcutils.move_file(MY_PATH, 'config.html' + lock_suffix, TARGET, 'config.html')
         else:
             MY_LOGGER.debug('No config.html to copy')

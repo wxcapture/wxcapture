@@ -1,0 +1,11 @@
+[
+	{
+		"Display Name": "SERVER NAME",
+		"Location": "/home/LOCATION",
+		"File": "used-SERVER_NAME.txt",
+		"Max Used": "90",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	}
+]

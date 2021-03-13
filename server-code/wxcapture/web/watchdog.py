@@ -65,7 +65,49 @@ def validate_file(vf_si):
     return vf_status, vf_text, vf_html, vf_data
 
 
-def send_email(se_text, se_html):
+def validate_server(vs_si):
+    """validate server space used"""
+    MY_LOGGER.debug('vs_si = %s',vs_si)
+
+    vs_status = 'good'
+    vs_text = ''
+    vs_html = ''
+    vs_data = ''
+
+    # get the space used info from the file
+    vs_space_used = wxcutils.load_file(vs_si['Location'], vs_si['File'])
+    MY_LOGGER.debug('Space used = %s', vs_space_used)
+
+    # see if too much used
+    if int(vs_space_used) >= int(vs_si['Max Used']):
+        MY_LOGGER.debug('Too much! %s >= %s', vs_space_used, vs_si['Max Used'])
+        vs_text = 'ERROR ' + vs_si['Display Name'] + ' has exceeded the max percent used threshold (' + \
+            vs_si['Max Used'] + ' percent) with ' + vs_space_used + ' percent used'
+        vs_html = '<td style=\"background-color:#FF0000\">ERROR</td>'
+        vs_status = 'bad'
+    else:
+        MY_LOGGER.debug('Not too much %s < %s', vs_space_used, vs_si['Max Used'])
+        vs_text = 'OK    ' + vs_si['Display Name'] + ' is within the max percent used threshold (' + \
+            vs_si['Max Used'] + ' percent) with ' + vs_space_used + ' percent used'
+        vs_html = '<td style=\"background-color:#00FF00\">OK</td>'
+
+    vs_margin = str(int(vs_si['Max Used']) - int(vs_space_used))
+    vs_html = '<tr>' + vs_html + '<td>' + vs_si['Display Name'] + '</td>' + \
+        '<td>' + vs_si['Max Used'] + '</td>' + \
+        '<td>' + vs_space_used + '</td>' + \
+        '<td>' + vs_margin + '</td></tr>'
+
+    if vs_status != vs_si['Last Status']:
+        vs_change = 'Y'
+    else:
+        vs_change = 'N'
+
+    vs_data = vs_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + vs_si['Max Used'] + ',' + vs_space_used + ',' + vs_margin + ',' + vs_change + ',' + vs_status + '\r\n'
+
+    return vs_status, vs_text, vs_html, vs_data
+
+
+def send_email(se_text, se_html, se_text2, se_html2):
     """send the email"""
 
     # load email config
@@ -85,7 +127,8 @@ def send_email(se_text, se_html):
     # plain text
     se_text = 'Status change - ' + ALERT_INFO + os.linesep + os.linesep + \
         se_text + os.linesep + os.linesep + \
-        'Last status change on ' + ALERT_INFO
+        se_text2 + os.linesep + os.linesep + \
+        'Last status change on ' + ALERT_INFO 
     MY_LOGGER.debug('se_text = %s', se_text)
 
     # html text
@@ -93,9 +136,15 @@ def send_email(se_text, se_html):
         '<html><head>' + \
         '<title>Watchdog - Status Change</title></head>' + \
         '<body><h2>' + 'Status Change - ' + ALERT_INFO + '</h2>' + \
+        '<h3>Satellites</h3>' + \
         '<table border="1">' + \
         '<tr><th>Status</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
         se_html + \
+        '</table>' + \
+        '<h3>Servers</h3>' + \
+        '<table border="1">' + \
+        '<tr><th>Status</th><th>Server</th><th>Max Used (percent)</th><th>Used (percent)</th><th>Delta (percent)</th></tr>' + \
+        se_html2 + \
         '</table>' + \
         '<p>Last status change on ' + ALERT_INFO + '</p>' + \
         '</body></html>'
@@ -126,14 +175,22 @@ def get_utc_date_time():
 
 
 def write_data():
-    """write data to csv file"""
+    """write data to csv files"""
 
-    # output data
-    MY_LOGGER.debug('Writing file update - %s%s', OUTPUT_PATH, CSV_FILENAME)
+    # output data - sats
+    MY_LOGGER.debug('Writing file update for sats - %s%s', OUTPUT_PATH, CSV_FILENAME)
     with open(OUTPUT_PATH + CSV_FILENAME, 'a+') as csv_file:
         if os.stat(OUTPUT_PATH + CSV_FILENAME).st_size == 0:
             csv_file.write('Satellite,Epoch Time (sec),Date,Max Age (min),Current Age (min),Margin Age (min),Status Change?,Status\r\n')
         csv_file.write(CSV_DATA)
+        csv_file.close()
+
+    # output data - servers
+    MY_LOGGER.debug('Writing file update for servers - %s%s', OUTPUT_PATH, CSV_FILENAME2)
+    with open(OUTPUT_PATH + CSV_FILENAME2, 'a+') as csv_file:
+        if os.stat(OUTPUT_PATH + CSV_FILENAME2).st_size == 0:
+            csv_file.write('Server,Epoch Time (sec),Date,Max Used (percent),Used (percent),Margin (percent),Status Change?,Status\r\n')
+        csv_file.write(CSV_DATA2)
         csv_file.close()
 
 
@@ -165,6 +222,8 @@ MY_LOGGER.debug('WEB_PATH = %s', WEB_PATH)
 
 CSV_FILENAME = 'satstatus.csv'
 MY_LOGGER.debug('CSV_FILENAME = %s', CSV_FILENAME)
+CSV_FILENAME2 = 'serverstatus.csv'
+MY_LOGGER.debug('CSV_FILENAMEs = %s', CSV_FILENAME2)
 
 # get current epoch time
 CURRENT_TIME = time.time()
@@ -180,7 +239,10 @@ STATUS_CHANGE_DETECTED = False
 EMAIL_REQUIRED = False
 EMAIL_TEXT = ''
 EMAIL_HTML = ''
+EMAIL_TEXT2 = ''
+EMAIL_HTML2 = ''
 CSV_DATA = ''
+CSV_DATA2 = ''
 
 # load satellite info
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog.json')
@@ -215,7 +277,37 @@ for si in SATELLITE_INFO:
 
 MY_LOGGER.debug('-' * 20)
 
-# write data to the csv file
+
+# validate space left on servers
+SERVER_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog-servers.json')
+MY_LOGGER.debug('current SERVER_INFO = %s', SERVER_INFO)
+
+# iterate through servers
+MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('Iterate through servers')
+for si in SERVER_INFO:
+    MY_LOGGER.debug('-' * 20)
+    MY_LOGGER.debug('Processing - %s', si['Display Name'])
+    if si['Active'] == 'yes':
+        MY_LOGGER.debug('Active - Validation processing')
+        # do the validation
+        status, text, html, data = validate_server(si)
+        if status != si['Last Status']:
+            STATUS_CHANGE_DETECTED = True
+            EMAIL_REQUIRED = True
+            MY_LOGGER.debug('Status change detected - old = %s, new = %s', si['Last Status'], status)
+            si['Last Status'] = status
+            si['Status Change'] = ALERT_INFO
+        EMAIL_TEXT2 += text
+        EMAIL_HTML2 += html
+        CSV_DATA2 += data
+    else:
+        MY_LOGGER.debug('Server is not active')
+
+MY_LOGGER.debug('-' * 20)
+
+
+# write data to the csv files
 write_data()
 
 MY_LOGGER.debug('-' * 20)
@@ -224,10 +316,13 @@ if EMAIL_REQUIRED:
 
     MY_LOGGER.debug('Saving updated config')
     MY_LOGGER.debug('Sending Email')
-    send_email(EMAIL_TEXT, EMAIL_HTML)
+    send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2)
 
     # save the new sat info
     wxcutils.save_json(CONFIG_PATH, 'config-watchdog.json', SATELLITE_INFO) 
+    # save the new server info
+    wxcutils.save_json(CONFIG_PATH, 'config-watchdog-servers.json', SERVER_INFO) 
+    
 else:
     MY_LOGGER.debug('No status changes so email not required...')
 

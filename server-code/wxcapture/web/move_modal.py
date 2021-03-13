@@ -88,6 +88,17 @@ def move_output_files():
     else:
         MY_LOGGER.debug('No %s to copy', mof_file)
 
+    # move serverstatus.csv
+    mof_file = 'serverstatus.csv'
+    if os.path.isfile(MY_PATH + mof_file):
+        MY_LOGGER.debug('Processing %s', mof_file)
+        wxcutils.move_file(MY_PATH, mof_file, TARGET, mof_file)
+        MY_LOGGER.debug('zipping%s', mof_file)
+        wxcutils.run_cmd('zip ' + TARGET + mof_file + '.zip ' + TARGET + mof_file)
+        MY_LOGGER.debug('removing %s', mof_file)
+        wxcutils.run_cmd('rm ' + TARGET + mof_file)
+    else:
+        MY_LOGGER.debug('No %s to copy', mof_file)
 
     # scan for any unlock files
     MY_LOGGER.debug('Unlock files')

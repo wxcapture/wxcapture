@@ -7,7 +7,9 @@ import os
 import time
 import subprocess
 import smtplib
+import platform
 import ssl
+from subprocess import Popen, PIPE
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import wxcutils
@@ -164,6 +166,23 @@ def send_email(se_text, se_html, se_text2, se_html2):
         server.sendmail(EMAIL_INFO['from'], EMAIL_INFO['notify'].split(','), message.as_string())
 
 
+def drive_validation():
+    """validate drive space utilisation"""
+    dv_errors_found = False
+    dv_space = 'unknown'
+
+    dv_cmd = Popen(['df'], stdout=PIPE, stderr=PIPE)
+    dv_stdout, dv_stderr = dv_cmd.communicate()
+    MY_LOGGER.debug('stdout:%s', dv_stdout)
+    MY_LOGGER.debug('stderr:%s', dv_stderr)
+    dv_results = dv_stdout.decode('utf-8').splitlines()
+    for dv_line in dv_results:
+        if '/dev/sda1' in dv_line:
+            dv_space = dv_line.split()[4].split('%')[0]
+    MY_LOGGER.debug('dv_space  = %s used on %s', dv_space, platform.node())
+    wxcutils.save_file(WORKING_PATH, 'used-' + platform.node() + '.txt', dv_space)
+
+
 def get_local_date_time():
     """get the local date time"""
     return wxcutils.epoch_to_local(time.time(), '%a %d %b %H:%M')
@@ -281,6 +300,9 @@ MY_LOGGER.debug('-' * 20)
 # validate space left on servers
 SERVER_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog-servers.json')
 MY_LOGGER.debug('current SERVER_INFO = %s', SERVER_INFO)
+
+# create file for this server
+drive_validation()
 
 # iterate through servers
 MY_LOGGER.debug('-' * 20)

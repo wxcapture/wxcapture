@@ -4,6 +4,7 @@
 
 # import libraries
 import subprocess
+import platform
 from subprocess import Popen, PIPE
 import wxcutils
 
@@ -38,6 +39,23 @@ def is_processing(process_name, minutes):
     MY_LOGGER.debug('%s is NOT processing images', process_name)
 
     return False
+
+
+def drive_validation():
+    """validate drive space utilisation"""
+    dv_errors_found = False
+    dv_space = 'unknown'
+
+    dv_cmd = Popen(['df'], stdout=PIPE, stderr=PIPE)
+    dv_stdout, dv_stderr = dv_cmd.communicate()
+    MY_LOGGER.debug('stdout:%s', dv_stdout)
+    MY_LOGGER.debug('stderr:%s', dv_stderr)
+    dv_results = dv_stdout.decode('utf-8').splitlines()
+    for dv_line in dv_results:
+        if '/dev/root' in dv_line:
+            dv_space = dv_line.split()[4].split('%')[0]
+    MY_LOGGER.debug('dv_space  = %s used on %s', dv_space, platform.node())
+    wxcutils.save_file(OUTPUT_PATH, 'used-' + platform.node() + '.txt', dv_space)
 
 
 # setup paths to directories
@@ -78,6 +96,9 @@ if not is_running('xrit-rx.py'):
 if not is_processing('goesrecv', 15):
     MY_LOGGER.debug('goesrecv is not processing')
     REBOOT = True
+
+# log drive space free to file
+drive_validation()
 
 if REBOOT:
     # reboot the Pi

@@ -6,8 +6,31 @@
 import os
 import sys
 import glob
+import platform
 from subprocess import Popen, PIPE
 import wxcutils
+
+
+def drive_validation():
+    """validate drive space utilisation"""
+    dv_errors_found = False
+    dv_space = 'unknown'
+
+    dv_cmd = Popen(['df'], stdout=PIPE, stderr=PIPE)
+    dv_stdout, dv_stderr = dv_cmd.communicate()
+    MY_LOGGER.debug('stdout:%s', dv_stdout)
+    MY_LOGGER.debug('stderr:%s', dv_stderr)
+    dv_results = dv_stdout.decode('utf-8').splitlines()
+    for dv_line in dv_results:
+        if '/dev/root' in dv_line:
+            dv_space = dv_line.split()[4].split('%')[0]
+    MY_LOGGER.debug('dv_space  = %s used on %s', dv_space, platform.node())
+    dv_filename = 'used-' + platform.node() + '.txt'
+    wxcutils.save_file(OUTPUT_PATH, dv_filename, dv_space)
+
+    # rsync files to server
+    MY_LOGGER.debug('rsync: %s', dv_filename)
+    wxcutils.run_cmd('rsync -t ' + OUTPUT_PATH + dv_filename + ' ' + RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + ':' + RSYNC_CONFIG['remote directory'] + '/' + dv_filename)
 
 
 def process_file(pf_file_name):
@@ -100,6 +123,9 @@ MY_LOGGER.debug('QUEUE_PATH = %s', QUEUE_PATH)
 try:
     # load data for rsync
     RSYNC_CONFIG = wxcutils.load_json(CONFIG_PATH, 'config-rsync.json')
+
+    # log drive space free to file
+    drive_validation()
 
     # check for files to process
     no_files_to_process = True

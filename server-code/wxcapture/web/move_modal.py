@@ -100,6 +100,10 @@ def move_output_files():
     else:
         MY_LOGGER.debug('No %s to copy', mof_file)
 
+    # move used-*.txt.csv
+    MY_LOGGER.debug('Moving used-*.txt')
+    wxcutils.run_cmd('mv ' + MY_PATH + 'used-*.txt ' + TARGET)
+
     # scan for any unlock files
     MY_LOGGER.debug('Unlock files')
     files_moved = False

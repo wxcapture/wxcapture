@@ -41,7 +41,7 @@ def validate_file(vf_si):
         vf_text = 'ERROR ' + vf_si['Display Name'] + ' has exceeded the receiving threshold (' + \
             vf_si['Max Age'] + ' min) with age of ' + vf_age_text + \
             ' min - safety margin ' + vf_margin_text + ' min' + \
-            os.linesep + os.linesep
+            NEWLINE
         vf_html = '<td style=\"background-color:#FF0000\">ERROR</td>'
         vf_status = 'bad'
     else:
@@ -49,13 +49,13 @@ def validate_file(vf_si):
         vf_text = 'OK    ' + vf_si['Display Name'] + ' is within the receiving threshold (' + \
             vf_si['Max Age'] + ' min) with age of ' + vf_age_text + \
             ' min - safety margin ' + vf_margin_text + ' min' + \
-            os.linesep + os.linesep
+            NEWLINE
         vf_html = '<td style=\"background-color:#00FF00\">OK</td>'
 
     vf_html = '<tr>' + vf_html + '<td>' + vf_si['Display Name'] + '</td>' + \
         '<td>' + vf_si['Max Age'] + '</td>' + \
         '<td>' + vf_age_text + '</td>' + \
-        '<td>' + vf_margin_text + '</td></tr>'
+        '<td>' + vf_margin_text + '</td></tr>' + NEWLINE
 
     if vf_status != vf_si['Last Status']:
         vf_change = 'Y'
@@ -97,7 +97,7 @@ def validate_server(vs_si):
     vs_html = '<tr>' + vs_html + '<td>' + vs_si['Display Name'] + '</td>' + \
         '<td>' + vs_si['Max Used'] + '</td>' + \
         '<td>' + vs_space_used + '</td>' + \
-        '<td>' + vs_margin + '</td></tr>'
+        '<td>' + vs_margin + '</td></tr>' + NEWLINE
 
     if vs_status != vs_si['Last Status']:
         vs_change = 'Y'
@@ -127,27 +127,27 @@ def send_email(se_text, se_html, se_text2, se_html2):
         MY_LOGGER.debug('EMAIL TO -----> ' + email_address)
 
     # plain text
-    se_text = 'Status change - ' + ALERT_INFO + os.linesep + os.linesep + \
-        se_text + os.linesep + os.linesep + \
-        se_text2 + os.linesep + os.linesep + \
+    se_text = 'Status change - ' + ALERT_INFO + NEWLINE + \
+        se_text + NEWLINE + \
+        se_text2 + NEWLINE + \
         'Last status change on ' + ALERT_INFO 
     MY_LOGGER.debug('se_text = %s', se_text)
 
     # html text
     se_html = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' + \
         '<html><head>' + \
-        '<title>Watchdog - Status Change</title></head>' + \
-        '<body><h2>' + 'Status Change - ' + ALERT_INFO + '</h2>' + \
+        '<title>Watchdog - Status Change</title></head>' + NEWLINE + \
+        '<body><h2>' + 'Status Change - ' + ALERT_INFO + '</h2>' + NEWLINE + \
         '<h3>Satellites</h3>' + \
         '<table border="1">' + \
         '<tr><th>Status</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
         se_html + \
-        '</table>' + \
+        '</table>' + NEWLINE + \
         '<h3>Servers</h3>' + \
         '<table border="1">' + \
         '<tr><th>Status</th><th>Server</th><th>Max Used (percent)</th><th>Used (percent)</th><th>Delta (percent)</th></tr>' + \
         se_html2 + \
-        '</table>' + \
+        '</table>' + NEWLINE +\
         '<p>Last status change on ' + ALERT_INFO + '</p>' + \
         '</body></html>'
     MY_LOGGER.debug('se_html = %s', se_html)
@@ -262,6 +262,7 @@ EMAIL_TEXT2 = ''
 EMAIL_HTML2 = ''
 CSV_DATA = ''
 CSV_DATA2 = ''
+NEWLINE = os.linesep + os.linesep
 
 # load satellite info
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog.json')

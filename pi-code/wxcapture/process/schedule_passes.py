@@ -54,15 +54,24 @@ def is_daylight(id_pass_start, id_pass_end):
         daylight_end = wxcutils.utc_to_epoch(a_t[1].utc_iso().replace('T', ' ').replace('Z', ''),
                                             '%Y-%m-%d %H:%M:%S')
 
-        # capture if either:
-        # start of pass is in daylight
-        # OR
-        # end of pass is in daylight
+        # capture if middle of the pass is in daylight
+        id_pass_midpoint = id_pass_start + ((id_pass_end - id_pass_start) / 2)
+        MY_LOGGER.debug('daylight_start = %s, %s', daylight_start, wxcutils.epoch_to_local(daylight_start, '%a %d %b %H:%M'))
+        MY_LOGGER.debug('daylight_end = %s, %s', daylight_end, wxcutils.epoch_to_local(daylight_end, '%a %d %b %H:%M'))
+        MY_LOGGER.debug('id_pass_start = %s, %s', id_pass_start, wxcutils.epoch_to_local(id_pass_start, '%a %d %b %H:%M'))
+        MY_LOGGER.debug('id_pass_midpoint = %s, %s', id_pass_midpoint, wxcutils.epoch_to_local(id_pass_midpoint, '%a %d %b %H:%M'))
+        MY_LOGGER.debug('id_pass_end = %s, %s', id_pass_end, wxcutils.epoch_to_local(id_pass_end, '%a %d %b %H:%M'))
+
+        MY_LOGGER.debug('twighlight allowance in minutes = %s', CONFIG_INFO['twilight allowance'])
         id_twighlight = float(CONFIG_INFO['twilight allowance']) * 60
         MY_LOGGER.debug('twighlight allowance in seconds = %f', id_twighlight)
-        if (float(daylight_start) - id_twighlight) <= id_pass_start <= (float(daylight_end) + id_twighlight) or \
-            (float(daylight_start) - id_twighlight) <= id_pass_end <= (float(daylight_end) + id_twighlight):
+ 
+        if (float(daylight_start) - id_twighlight) <= id_pass_midpoint <= (float(daylight_end) + id_twighlight) or \
+            (float(daylight_start) - id_twighlight) <= id_pass_midpoint <= (float(daylight_end) + id_twighlight):
+            MY_LOGGER.debug('This is a daylight pass')
             return 'Y'
+        else:
+            MY_LOGGER.debug('This is NOT a daylight pass')
     except:
         MY_LOGGER.debug('Exception during is_daylight: %s %s %s',
                         sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

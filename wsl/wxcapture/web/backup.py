@@ -359,7 +359,7 @@ WORKING_PATH = CODE_PATH + 'working/'
 CONFIG_PATH = CODE_PATH + 'config/'
 
 # start logging
-MODULE = 'find_files'
+MODULE = 'backup'
 MY_LOGGER = wxcutils.get_logger(MODULE, LOG_PATH, MODULE + '.log')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
 MY_LOGGER.debug('Execution start')

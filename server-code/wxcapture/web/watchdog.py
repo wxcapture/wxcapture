@@ -42,7 +42,7 @@ def validate_file(vf_si):
             vf_si['Max Age'] + ' min) with age of ' + vf_age_text + \
             ' min - safety margin ' + vf_margin_text + ' min' + \
             NEWLINE
-        vf_html = '<td style=\"background-color:#FF0000\">ERROR</td>'
+        vf_html = '<td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
         vf_status = 'bad'
     else:
         MY_LOGGER.debug('Young enough')
@@ -50,17 +50,19 @@ def validate_file(vf_si):
             vf_si['Max Age'] + ' min) with age of ' + vf_age_text + \
             ' min - safety margin ' + vf_margin_text + ' min' + \
             NEWLINE
-        vf_html = '<td style=\"background-color:#00FF00\">OK</td>'
-
-    vf_html = '<tr>' + vf_html + '<td>' + vf_si['Display Name'] + '</td>' + \
-        '<td>' + vf_si['Max Age'] + '</td>' + \
-        '<td>' + vf_age_text + '</td>' + \
-        '<td>' + vf_margin_text + '</td></tr>' + NEWLINE
+        vf_html = '<td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
 
     if vf_status != vf_si['Last Status']:
         vf_change = 'Y'
     else:
         vf_change = 'N'
+
+    vf_html = '<tr>' + vf_html + \
+        '<td align=\"center\">' + vf_change + '</td>' + \
+        '<td>' + vf_si['Display Name'] + '</td>' + \
+        '<td align=\"center\">' + vf_si['Max Age'] + '</td>' + \
+        '<td align=\"center\">' + vf_age_text + '</td>' + \
+        '<td align=\"center\">' + vf_margin_text + '</td></tr>' + NEWLINE
 
     vf_data = vf_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + vf_si['Max Age'] + ',' + vf_age_text + ',' + vf_margin_text + ',' + vf_change + ',' + vf_status + '\r\n'
 
@@ -85,24 +87,26 @@ def validate_server(vs_si):
         MY_LOGGER.debug('Too much! %s >= %s', vs_space_used, vs_si['Max Used'])
         vs_text = 'ERROR ' + vs_si['Display Name'] + ' has exceeded the max percent used threshold (' + \
             vs_si['Max Used'] + ' percent) with ' + vs_space_used + ' percent used'
-        vs_html = '<td style=\"background-color:#FF0000\">ERROR</td>'
+        vs_html = '<td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
         vs_status = 'bad'
     else:
         MY_LOGGER.debug('Not too much %s < %s', vs_space_used, vs_si['Max Used'])
         vs_text = 'OK    ' + vs_si['Display Name'] + ' is within the max percent used threshold (' + \
             vs_si['Max Used'] + ' percent) with ' + vs_space_used + ' percent used'
-        vs_html = '<td style=\"background-color:#00FF00\">OK</td>'
-
-    vs_margin = str(int(vs_si['Max Used']) - int(vs_space_used))
-    vs_html = '<tr>' + vs_html + '<td>' + vs_si['Display Name'] + '</td>' + \
-        '<td>' + vs_si['Max Used'] + '</td>' + \
-        '<td>' + vs_space_used + '</td>' + \
-        '<td>' + vs_margin + '</td></tr>' + NEWLINE
+        vs_html = '<td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
 
     if vs_status != vs_si['Last Status']:
         vs_change = 'Y'
     else:
         vs_change = 'N'
+
+    vs_margin = str(int(vs_si['Max Used']) - int(vs_space_used))
+    vs_html = '<tr>' + vs_html + \
+        '<td align=\"center\">' + vs_change + '</td>' + \
+        '<td>' + vs_si['Display Name'] + '</td>' + \
+        '<td align=\"center\">' + vs_si['Max Used'] + '</td>' + \
+        '<td align=\"center\">' + vs_space_used + '</td>' + \
+        '<td align=\"center\">' + vs_margin + '</td></tr>' + NEWLINE
 
     vs_data = vs_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + vs_si['Max Used'] + ',' + vs_space_used + ',' + vs_margin + ',' + vs_change + ',' + vs_status + '\r\n'
 
@@ -140,12 +144,12 @@ def send_email(se_text, se_html, se_text2, se_html2):
         '<body><h2>' + 'Status Change - ' + ALERT_INFO + '</h2>' + NEWLINE + \
         '<h3>Satellites</h3>' + \
         '<table border="1">' + \
-        '<tr><th>Status</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
         se_html + \
         '</table>' + NEWLINE + \
         '<h3>Servers</h3>' + \
         '<table border="1">' + \
-        '<tr><th>Status</th><th>Server</th><th>Max Used (percent)</th><th>Used (percent)</th><th>Delta (percent)</th></tr>' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Server</th><th>Max Used (percent)</th><th>Used (percent)</th><th>Delta (percent)</th></tr>' + \
         se_html2 + \
         '</table>' + NEWLINE +\
         '<p>Last status change on ' + ALERT_INFO + '</p>' + \

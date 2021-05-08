@@ -5,10 +5,11 @@
 # import libraries
 import os
 import time
-import subprocess
 import smtplib
 import platform
 import ssl
+import sys
+import subprocess
 from subprocess import Popen, PIPE
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -18,7 +19,7 @@ import wxcutils
 def validate_file(vf_si):
     """see if an image was created in a suitable
     time period"""
-    MY_LOGGER.debug('vf_si = %s',vf_si)
+    MY_LOGGER.debug('vf_si = %s', vf_si)
 
     vf_status = 'good'
     vf_text = ''
@@ -30,7 +31,8 @@ def validate_file(vf_si):
     MY_LOGGER.debug('Last modified = %d', round(last_modified, 0))
 
     file_age = CURRENT_TIME - last_modified
-    MY_LOGGER.debug('file_age = %d sec (Rounded [%s min] or [%s hours])', round(file_age,0), str(round(file_age / 60, 0)), str(round(file_age / 3600, 0)))
+    MY_LOGGER.debug('file_age = %d sec (Rounded [%s min] or [%s hours])', round(file_age, 0),
+                    str(round(file_age / 60, 0)), str(round(file_age / 3600, 0)))
 
     vf_age_text = str(round(file_age / 60))
     vf_margin_text = str(round((file_age / 60) - float(vf_si['Max Age'])))
@@ -64,14 +66,16 @@ def validate_file(vf_si):
         '<td align=\"center\">' + vf_age_text + '</td>' + \
         '<td align=\"center\">' + vf_margin_text + '</td></tr>' + NEWLINE
 
-    vf_data = vf_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + vf_si['Max Age'] + ',' + vf_age_text + ',' + vf_margin_text + ',' + vf_change + ',' + vf_status + '\r\n'
+    vf_data = vf_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + \
+        vf_si['Max Age'] + ',' + vf_age_text + ',' + vf_margin_text + ',' + \
+        vf_change + ',' + vf_status + '\r\n'
 
     return vf_status, vf_text, vf_html, vf_data
 
 
 def validate_server(vs_si):
     """validate server space used"""
-    MY_LOGGER.debug('vs_si = %s',vs_si)
+    MY_LOGGER.debug('vs_si = %s', vs_si)
 
     vs_status = 'good'
     vs_text = ''
@@ -85,13 +89,15 @@ def validate_server(vs_si):
     # see if too much used
     if int(vs_space_used) >= int(vs_si['Max Used']):
         MY_LOGGER.debug('Too much! %s >= %s', vs_space_used, vs_si['Max Used'])
-        vs_text = 'ERROR ' + vs_si['Display Name'] + ' has exceeded the max percent used threshold (' + \
+        vs_text = 'ERROR ' + vs_si['Display Name'] + \
+            ' has exceeded the max percent used threshold (' + \
             vs_si['Max Used'] + ' percent) with ' + vs_space_used + ' percent used'
         vs_html = '<td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
         vs_status = 'bad'
     else:
         MY_LOGGER.debug('Not too much %s < %s', vs_space_used, vs_si['Max Used'])
-        vs_text = 'OK    ' + vs_si['Display Name'] + ' is within the max percent used threshold (' + \
+        vs_text = 'OK    ' + vs_si['Display Name'] + \
+            ' is within the max percent used threshold (' + \
             vs_si['Max Used'] + ' percent) with ' + vs_space_used + ' percent used'
         vs_html = '<td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
 
@@ -108,33 +114,38 @@ def validate_server(vs_si):
         '<td align=\"center\">' + vs_space_used + '</td>' + \
         '<td align=\"center\">' + vs_margin + '</td></tr>' + NEWLINE
 
-    vs_data = vs_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + vs_si['Max Used'] + ',' + vs_space_used + ',' + vs_margin + ',' + vs_change + ',' + vs_status + '\r\n'
+    vs_data = vs_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + \
+        vs_si['Max Used'] + ',' + vs_space_used + ',' + vs_margin + ',' + \
+        vs_change + ',' + vs_status + '\r\n'
 
     return vs_status, vs_text, vs_html, vs_data
 
 
-def send_email(se_text, se_html, se_text2, se_html2):
+def send_email(se_text, se_html, se_text2, se_html2, se_config_file):
     """send the email"""
 
+    se_ok_status = True
+    MY_LOGGER.debug('Using config file %s', se_config_file)
+
     # load email config
-    EMAIL_INFO = wxcutils.load_json(CONFIG_PATH, 'email.json')
+    email_info = wxcutils.load_json(CONFIG_PATH, se_config_file)
     # don't log ALL the email config, it includes a password
 
     # setup the message
     message = MIMEMultipart('alternative')
     message['Subject'] = 'Watchdog - Status Change'
-    message['From'] = EMAIL_INFO['from']
-    message['To'] = EMAIL_INFO['notify']
-    MY_LOGGER.debug('Sending (header) to = %s', EMAIL_INFO['notify'])
-    MY_LOGGER.debug('Sending (deliver) to:') 
-    for email_address in EMAIL_INFO['notify'].split(','):
-        MY_LOGGER.debug('EMAIL TO -----> ' + email_address)
+    message['From'] = email_info['from']
+    message['To'] = email_info['notify']
+    MY_LOGGER.debug('Sending (header) to = %s', email_info['notify'])
+    MY_LOGGER.debug('Sending (deliver) to:')
+    for email_address in email_info['notify'].split(','):
+        MY_LOGGER.debug('EMAIL TO -----> %s', email_address)
 
     # plain text
     se_text = 'Status change - ' + ALERT_INFO + NEWLINE + \
         se_text + NEWLINE + \
         se_text2 + NEWLINE + \
-        'Last status change on ' + ALERT_INFO 
+        'Last status change on ' + ALERT_INFO
     MY_LOGGER.debug('se_text = %s', se_text)
 
     # html text
@@ -161,13 +172,23 @@ def send_email(se_text, se_html, se_text2, se_html2):
     message.attach(MIMEText(se_html, "html"))
 
     # send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP(EMAIL_INFO['smtp server'], EMAIL_INFO['smtp server port']) as server:
-        server.ehlo()
-        server.starttls(context=context)
-        server.ehlo()
-        server.login(EMAIL_INFO['username'], EMAIL_INFO['password'])
-        server.sendmail(EMAIL_INFO['from'], EMAIL_INFO['notify'].split(','), message.as_string())
+    try:
+        MY_LOGGER.debug('Trying to send email')
+        context = ssl.create_default_context()
+        with smtplib.SMTP(email_info['smtp server'], email_info['smtp server port']) as server:
+            server.ehlo()
+            server.starttls(context=context)
+            server.ehlo()
+            server.login(email_info['username'], email_info['password'])
+            server.sendmail(email_info['from'], email_info['notify'].split(','),
+                            message.as_string())
+            MY_LOGGER.debug('Email sent')
+    except:
+        se_ok_status = False
+        MY_LOGGER.error('Email sending error - %s %s %s', sys.exc_info()[0],
+                        sys.exc_info()[1], sys.exc_info()[2])
+
+    return se_ok_status
 
 
 def drive_validation():
@@ -290,7 +311,8 @@ for si in SATELLITE_INFO:
         if status != si['Last Status']:
             STATUS_CHANGE_DETECTED = True
             EMAIL_REQUIRED = True
-            MY_LOGGER.debug('Status change detected - old = %s, new = %s', si['Last Status'], status)
+            MY_LOGGER.debug('Status change detected - old = %s, new = %s',
+                            si['Last Status'], status)
             si['Last Status'] = status
             si['Status Change'] = ALERT_INFO
         EMAIL_TEXT += text
@@ -322,7 +344,8 @@ for si in SERVER_INFO:
         if status != si['Last Status']:
             STATUS_CHANGE_DETECTED = True
             EMAIL_REQUIRED = True
-            MY_LOGGER.debug('Status change detected - old = %s, new = %s', si['Last Status'], status)
+            MY_LOGGER.debug('Status change detected - old = %s, new = %s',
+                            si['Last Status'], status)
             si['Last Status'] = status
             si['Status Change'] = ALERT_INFO
         EMAIL_TEXT2 += text
@@ -343,15 +366,22 @@ if EMAIL_REQUIRED:
 
     MY_LOGGER.debug('Saving updated config')
     MY_LOGGER.debug('Sending Email')
-    send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2)
+    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, 'email.json'):
+        # try with alternate email
+        MY_LOGGER.debug('Sending Email using alternate server')
+        if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, 'email2.json'):
+            MY_LOGGER.debug('Sending Email using alternate server also failed')
+        else:
+            MY_LOGGER.debug('Sending Email using alternate server worked')
 
     # save the new sat info
-    wxcutils.save_json(CONFIG_PATH, 'config-watchdog.json', SATELLITE_INFO) 
+    wxcutils.save_json(CONFIG_PATH, 'config-watchdog.json', SATELLITE_INFO)
     # save the new server info
-    wxcutils.save_json(CONFIG_PATH, 'config-watchdog-servers.json', SERVER_INFO) 
-    
+    wxcutils.save_json(CONFIG_PATH, 'config-watchdog-servers.json', SERVER_INFO)
+
 else:
     MY_LOGGER.debug('No status changes so email not required...')
+MY_LOGGER.debug('-' * 20)
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

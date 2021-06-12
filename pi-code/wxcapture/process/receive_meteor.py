@@ -154,8 +154,8 @@ try:
                                                                       str(MAX_ELEVATION))
 
     # capture pass to wav file
-    # timeout 600 rtl_fm -M raw -f 137.9M -s 100k -g 8 -p 0 |
-    # sox -t raw -r 100k -c 2 -b 16 -e s - -t wav "meteor_a.wav" rate 192k
+    # timeout 600 rtl_fm -M raw -f 137.9M -s 768k -g 8 -p 0 |
+    # sox -t raw -r 768k -c 2 -b 16 -e s - -t wav "meteor_a.wav" rate 192k
     if REPROCESS != 'Y':
         BIAS_T = get_bias_t()
 
@@ -166,8 +166,8 @@ try:
         MY_LOGGER.debug('Starting audio capture')
         wxcutils.run_cmd('timeout ' + DURATION + ' rtl_fm -d ' +
                          str(WX_SDR) + BIAS_T + ' -M raw -f ' + str(PASS_INFO['frequency']) +
-                         'M -s 100k ' + GAIN_COMMAND +
-                         ' -p 0 | sox -t raw -r 100k -c 2 -b 16 -e s - -t wav \"' +
+                         'M -s 768k ' + GAIN_COMMAND +
+                         ' -p 0 | sox -t raw -r 768k -c 2 -b 16 -e s - -t wav \"' +
                          AUDIO_PATH + FILENAME_BASE + '.wav\" rate 192k')
         if os.path.isfile(AUDIO_PATH + FILENAME_BASE + '.wav'):
             MY_LOGGER.debug('Audio file created')

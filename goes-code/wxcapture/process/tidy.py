@@ -333,8 +333,8 @@ MY_LOGGER.debug('BASEDIR = %s', BASEDIR)
 
 SANCHEZ_PATH = BASEDIR + 'sanchez/'
 
-# minumum age for files to be deleted > 31 days
-MIN_AGE = 31 * 24 * 60 * 60
+# minumum age for files to be deleted > 21 days
+MIN_AGE = 21 * 24 * 60 * 60
 MY_LOGGER.debug('MIN_AGE = %s', MIN_AGE)
 
 # get current epoch time

@@ -442,8 +442,11 @@ def remove_jobs(match):
     """remove old AT jobs"""
     text = subprocess.check_output('atq')
     lines = text.splitlines()
+    MY_LOGGER.debug('lines = %s', lines)
     for line in lines:
         id_value = line.split()[0]
+        MY_LOGGER.debug('  line = %s', line)
+        MY_LOGGER.debug('  id_value = %s', id_value.decode('utf-8'))
         cmd = Popen(['/usr/bin/at', '-c', id_value.decode('utf-8')],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                     universal_newlines=True)
@@ -704,24 +707,32 @@ VISIBLE_NO = '_'
 # global try block to catch any exceptions
 try:
     # load config
+    MY_LOGGER.debug('Load config')
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
 
     # load satellites
+    MY_LOGGER.debug('Load satellites')
     SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')
 
     # load SDRs
+    MY_LOGGER.debug('Load SDRs')
     SDR_INFO = wxcutils.load_json(CONFIG_PATH, 'sdr.json')
 
     # get local time zone
+    MY_LOGGER.debug('Get Timezone')
     LOCAL_TIME_ZONE = subprocess.check_output("date").decode('utf-8').split(' ')[-2]
+    MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
     # reboot? sleep 60 seconds to enable all services to start
+    MY_LOGGER.debug('Need to sleep post a reboot?')
     reboot_handler(60)
 
     # Remove all AT jobs for scheduler
+    MY_LOGGER.debug('Remove any existing AT jobs')
     remove_jobs('receive_')
 
     # validate tle files exist
+    MY_LOGGER.debug('Validate TLE files exist')
     wxcutils.validate_tle(WORKING_PATH)
 
     # check if we email at job output or not

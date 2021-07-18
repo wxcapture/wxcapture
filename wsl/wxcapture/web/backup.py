@@ -328,6 +328,12 @@ def do_backup_new():
     errors.append({'type': 'Website - sensors',
                    'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/sensors/', '/mnt/f/kiwiweather/sensors/')})
 
+    # remover images from the sensors/images folder as no need to back these up
+    MY_LOGGER.debug('Remove images from sensor images folder')
+    filelist = glob.glob('/mnt/f/kiwiweather/sensors/images/*')
+    for filename in filelist:
+        MY_LOGGER.debug('  removing %s', filename)
+        os.remove(filename)
     
     # not backed up are:
     # wp-admin

@@ -123,7 +123,7 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 URL_BASE = 'https://kiwiweather.com/goes/'
 MY_LOGGER.debug('URL_BASE = %s', URL_BASE)
-THRESHOLD = 5
+THRESHOLD = 25
 MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 
 # do each webhook

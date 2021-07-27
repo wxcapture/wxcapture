@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""tweet Sanchez images"""
+"""Discoord webhook Sanchez images"""
 
 
 # import libraries

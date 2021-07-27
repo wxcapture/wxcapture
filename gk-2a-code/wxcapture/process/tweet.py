@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""tweet Sanchez images"""
+"""tweet images"""
 
 
 # import libraries
 import os
 from os import path
+import time
 import sys
 import tweepy
 import wxcutils
@@ -59,8 +60,10 @@ try:
         'See more at https://kiwiweather.com. Click on image to see more detail.'
     # files are ~ 2MB, so can tweet full size image
     TWEET_IMAGE = OUTPUT_PATH + 'sanchez.jpg'
-    # only proceed if the image exists
-    if path.exists(TWEET_IMAGE):
+    # only proceed if the image exists and less than an hour old
+    IMAGE_AGE = time.time() - os.stat(TWEET_IMAGE).st_mtime
+    MY_LOGGER.debug('IMAGE_AGE = %f', IMAGE_AGE)
+    if path.exists(TWEET_IMAGE) and IMAGE_AGE < 3600:
         try:
             tweet_text_image(CONFIG_PATH, 'config-twitter.json',
                              TWEET_TEXT, TWEET_IMAGE)

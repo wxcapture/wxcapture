@@ -347,6 +347,9 @@ process_goes('17')
 # process GOES 16 files
 process_goes('16')
 
+# process GOES 15 files
+process_goes('15')
+
 # process Himawari 8 files
 process_himawari('8')
 

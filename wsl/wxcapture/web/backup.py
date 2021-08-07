@@ -76,6 +76,9 @@ def do_backup_all():
     MY_LOGGER.debug('NWS')
     errors.append({'type': 'NWS', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')})
 
+    MY_LOGGER.debug('GOES 15')
+    errors.append({'type': 'GOES 15', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes15/', '/mnt/f/Satellites/goes15/')})
+
     MY_LOGGER.debug('GOES 16')
     errors.append({'type': 'GOES 16', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')})
 
@@ -134,7 +137,7 @@ def daterange(start_date, end_date):
 
 def do_backup_new():
     """backup since the day of the last backup"""
-    MY_LOGGER.debug('Backing up ince the day of the last backup')
+    MY_LOGGER.debug('Backing up since the day of the last backup')
 
     # UTC date for the last backup
     MY_LOGGER.debug('Last backup date = %s', LAST_BACKUP_DATA['last backup date'])
@@ -186,6 +189,20 @@ def do_backup_new():
                        'errors': do_rsync('caWv', '',
                                           'pi@192.168.100.15:/home/pi/goes/nwsdata/' + date_dir + '/',
                                           '/mnt/f/Satellites/nwsdata/' + date_dir + '/')})
+
+    MY_LOGGER.debug('GOES 15')
+    directories = ['combine-north', 'combine-south', 'fd', 'nh', 'sh']
+    # get all dates between the ranges
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %s', dir)
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'GOES 15 - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/goes15/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/goes15/' + dir + '/' + date_dir + '/')})
+
 
     MY_LOGGER.debug('GOES 16')
     directories = ['fd/ch13', 'fd/ch13_enhanced']

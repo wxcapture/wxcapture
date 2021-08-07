@@ -130,7 +130,7 @@ def do_combined_sanchez(ds_dest, ds_date_time):
 
 
 def process_goes(sat_num):
-    """process GOES xx files"""
+    """process GOES xx files using standard directory structure"""
 
     MY_LOGGER.debug('---------------------------------------------')
     sat_dir = BASEDIR + 'goes' + sat_num
@@ -149,6 +149,7 @@ def process_goes(sat_num):
             MY_LOGGER.debug('---')
             MY_LOGGER.debug('channel_directory = %s', channel_directory)
             search_directory = os.path.join(channels_directory, channel_directory)
+            MY_LOGGER.debug('search_directory = %s', search_directory)
             latest_directory = find_latest_directory(search_directory)
             MY_LOGGER.debug('latest_directory = %s', latest_directory)
 
@@ -243,6 +244,78 @@ def process_goes(sat_num):
                     # update latest
                     LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
 
+
+
+    MY_LOGGER.debug('---------------------------------------------')
+
+
+def process_goes_2(sat_num):
+    """process GOES xx files using non-standard directory structure
+       based on Himawari code"""
+
+    # Note that this code only looks in the latest directory only
+    # It is possible that there is a later image of a type only in
+    # a previous day's file, but this will be missed with the
+    # current search approach
+
+    MY_LOGGER.debug('---------------------------------------------')
+    sat_dir = BASEDIR + 'goes' + sat_num
+    MY_LOGGER.debug('GOES%s', sat_num)
+    MY_LOGGER.debug('sat_dir = %s', sat_dir)
+
+    image_types = ['IR',  'WV']
+
+    # find directories
+    type_directories = find_directories(sat_dir)
+    for type_directory in type_directories:
+        MY_LOGGER.debug('--')
+        MY_LOGGER.debug('type_directory = %s', type_directory)
+        channels_directory = os.path.join(sat_dir, type_directory)
+
+        latest_directory = find_latest_directory(channels_directory)
+        MY_LOGGER.debug('latest_directory = %s', latest_directory)
+        latest_dir = os.path.join(os.path.join(sat_dir, type_directory), latest_directory)
+        MY_LOGGER.debug('latest_dir = %s', latest_dir)
+
+        for image_type in image_types:
+            MY_LOGGER.debug('image_type = %s', image_type)
+            latest_file = find_latest_file_contains(latest_dir, image_type)
+            MY_LOGGER.debug('latest_file = %s', latest_file)
+
+            filename, extenstion = os.path.splitext(latest_file)
+            new_filename = 'goes_' + sat_num + '_' + type_directory + '_' + image_type
+
+            # see when last saved
+            stored_timestamp = 0.0
+            try:
+                stored_timestamp = LATESTTIMESTAMPS[new_filename + extenstion]
+            except NameError:
+                pass
+            except KeyError:
+                pass
+
+            # date time for original file
+            latest = os.path.getmtime(os.path.join(latest_dir, latest_file))
+
+            MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
+
+            if stored_timestamp != int(latest):
+                # new file found which hasn't yet been copied over
+
+                # copy to output directory
+                MY_LOGGER.debug('new_filename = %s', new_filename)
+                wxcutils.copy_file(os.path.join(latest_dir, latest_file),
+                                   os.path.join(OUTPUT_PATH,
+                                                new_filename + extenstion))
+
+                # create thumbnail
+                create_thumbnail(new_filename, extenstion)
+
+                 # create file with date time info
+                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
+
+                # update latest
+                LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
 
 
     MY_LOGGER.debug('---------------------------------------------')
@@ -514,6 +587,9 @@ process_goes('17')
 
 # process GOES 16 files
 process_goes('16')
+
+# process GOES 15 files
+process_goes_2('15')
 
 # process Himawari 8 files
 process_himawari('8')

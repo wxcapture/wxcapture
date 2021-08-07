@@ -5,6 +5,7 @@
 # import libraries
 import os
 import sys
+import time
 import requests
 from discord_webhook import DiscordWebhook, DiscordEmbed
 import cv2
@@ -98,6 +99,13 @@ def webhook(url, sat, image_desc):
                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 
+def get_image_age(image):
+    """find the age of the image in seconds"""
+    image_age = time.time() - os.stat(OUTPUT_PATH + image).st_mtime
+    MY_LOGGER.debug('image_age = %f', image_age)
+    return image_age
+
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -128,37 +136,69 @@ MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 
 # do each webhook
 # GOES 17
-webhook('goes_17_fd_fc-tn.jpg', 'GOES 17', 'Full colour')
+IMAGE = 'goes_17_fd_fc-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'GOES 17', 'Full colour')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 IMAGE = 'goes_17_m1_fc-tn.jpg'
-if is_light(IMAGE, THRESHOLD):
-    MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
-    webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 1')
-else:
-    MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
-    IMAGE = 'goes_17_m1_ch07-tn.jpg'
+if get_image_age(IMAGE) < 3600:
     if is_light(IMAGE, THRESHOLD):
         MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
-        webhook(IMAGE, 'GOES 17', 'Infra red Meso 1 (normally California)')
+        webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 1')
+    else:
+        MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
+        IMAGE = 'goes_17_m1_ch07-tn.jpg'
+        if is_light(IMAGE, THRESHOLD):
+            MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+            webhook(IMAGE, 'GOES 17', 'Infra red Meso 1 (normally California)')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 IMAGE = 'goes_17_m2_fc-tn.jpg'
-if is_light(IMAGE, THRESHOLD):
-    MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
-    webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 2')
-else:
-    MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
-    IMAGE = 'goes_17_m2_ch07-tn.jpg'
+if get_image_age(IMAGE) < 3600:
     if is_light(IMAGE, THRESHOLD):
         MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
-        webhook(IMAGE, 'GOES 17', 'Infra red Meso 2 (normally Alaska)')
+        webhook(IMAGE, 'GOES 17', 'Full colour Meso Area 2')
+    else:
+        MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
+        IMAGE = 'goes_17_m2_ch07-tn.jpg'
+        if is_light(IMAGE, THRESHOLD):
+            MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+            webhook(IMAGE, 'GOES 17', 'Infra red Meso 2 (normally Alaska)')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # GOES 16
-webhook('goes_16_fd_ch13_enhanced-tn.jpg', 'GOES 16',
-        'Enhanced clean IR longwave band')
+IMAGE = 'goes_16_fd_ch13_enhanced-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'GOES 16',
+            'Enhanced clean IR longwave band')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+# GOES 15
+IMAGE = 'goes_15_fd_IR-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'GOES 15',
+            'IR band')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
 
 # Himawari 8
-webhook('himawari_8_fd_IR-tn.jpg', 'Himawari 8', 'Infra red')
-webhook('himawari_8_fd_VS-tn.jpg', 'Himawari 8', 'Visible band')
+IMAGE = 'himawari_8_fd_IR-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'Himawari 8', 'Infra red')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+IMAGE = 'himawari_8_fd_VS-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'Himawari 8', 'Visible band')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 
 MY_LOGGER.debug('Execution end')

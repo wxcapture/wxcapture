@@ -163,6 +163,24 @@ if get_image_age(IMAGE) < 3600:
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
+# GOES 15
+IMAGE = 'goes_15_fd_IR-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    tweet(IMAGE,
+          'Latest GOES 15 weather satellite enhanced IR image. ' +
+          'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+IMAGE = 'goes_15_combine-north_IR-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    tweet(IMAGE,
+          'Latest GOES 15 weather satellite enhanced IR/WV image - USA, Canada, Pacific. ' +
+          'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+
 # Himawari 8
 IMAGE = 'himawari_8_fd_IR-tn.jpg'
 if get_image_age(IMAGE) < 3600:

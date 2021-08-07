@@ -65,6 +65,41 @@ def process_goes(sat_num):
     MY_LOGGER.debug('---------------------------------------------')
 
 
+def process_goes_2(sat_num):
+    """process GOES xx files - non-standard directory structure"""
+
+    MY_LOGGER.debug('---------------------------------------------')
+    sat_dir = BASEDIR + 'goes' + sat_num
+    MY_LOGGER.debug('GOES%s', sat_num)
+    MY_LOGGER.debug('sat_dir = %s', sat_dir)
+
+    # find directories
+    type_directories = find_directories(sat_dir)
+    for type_directory in type_directories:
+        # MY_LOGGER.debug('--')
+        # MY_LOGGER.debug('type_directory = %s', type_directory)
+        channels_directory = os.path.join(sat_dir, type_directory)
+
+        for date_directory in find_directories(channels_directory):
+            # MY_LOGGER.debug('date_directory = %s', date_directory)
+
+            for filename in os.listdir(channels_directory + '/' + date_directory):
+                # date time for the file
+                file_age = TIME_NOW - os.path.getmtime(os.path.join(channels_directory + '/' + date_directory, filename))
+                if file_age > MIN_AGE:
+                    MY_LOGGER.debug('DELETE - %s %f %f %f', channels_directory + '/' + date_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+                    wxcutils.run_cmd('rm ' + channels_directory + '/' + date_directory + '/' + filename)
+                # else:
+                #     MY_LOGGER.debug('keep   - %s %f %f %f', channels_directory + '/' + date_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+
+            # directory may be empty, if so, remove it
+            if not os.listdir(channels_directory + '/' + date_directory):
+                MY_LOGGER.debug('deleting empty directory - %s', channels_directory + '/' + date_directory)
+                wxcutils.run_cmd('rmdir ' + channels_directory + '/' + date_directory)
+
+    MY_LOGGER.debug('---------------------------------------------')
+
+
 def process_himawari(sat_num):
     """process Himawari xx files"""
 
@@ -348,7 +383,7 @@ process_goes('17')
 process_goes('16')
 
 # process GOES 15 files
-process_goes('15')
+process_goes_2('15')
 
 # process Himawari 8 files
 process_himawari('8')

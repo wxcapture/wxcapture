@@ -27,6 +27,15 @@
 		"Active": "yes"
 	},
 	{
+		"Display Name": "GOES 15",
+		"Location": "goes",
+		"Test Image": "goes_15_fd_IR.jpg",
+		"Max Age": "540",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
 		"Display Name": "Himawari 8",
 		"Location": "goes",
 		"Test Image": "himawari_8_fd_IR.jpg",

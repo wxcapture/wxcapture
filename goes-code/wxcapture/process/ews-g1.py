@@ -72,14 +72,14 @@ LOCAL_TIME_ZONE = subprocess.check_output("date"). \
     decode('utf-8').split(' ')[-2]
 MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
-URL_BASE = 'https://satellites.altillimity.com/EWS-G1/'
-MY_LOGGER.debug('URL_BASE = %s', URL_BASE)
-
 FILE_BASE = '/home/pi/goes/EWS-G1/'
 MY_LOGGER.debug('FILE_BASE = %s', FILE_BASE)
 
 # get the last directory name used for a sync
 CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'ews-g1.json')
+
+URL_BASE = CONFIG_INFO['URL']
+MY_LOGGER.debug('URL_BASE = %s', URL_BASE)
 
 LAST_DIRECTORY = CONFIG_INFO['Last Directory']
 MY_LOGGER.debug('LAST_DIRECTORY = %s', LAST_DIRECTORY)
@@ -104,9 +104,12 @@ for directory in directories:
 
         for file in image_files:
             filename = file.split('/')[-1]
-            if 'EWS-G1' in filename:
+            if 'G13' in filename:
                 MY_LOGGER.debug('filename = %s', filename)
-                file_location = FILE_BASE + date_element + '/' + filename[7] + '/'
+                if filename[4] == 'F':
+                    file_location = FILE_BASE + date_element + '/FC/'
+                else:
+                    file_location = FILE_BASE + date_element + '/' + filename[4] + '/'
                 MY_LOGGER.debug('file_location = %s', file_location)
                 # see if file exists, if not, get it
                 if not os.path.exists(file_location + filename):
@@ -117,6 +120,7 @@ for directory in directories:
                     mk_dir(FILE_BASE + date_element + '/3')
                     mk_dir(FILE_BASE + date_element + '/4')
                     mk_dir(FILE_BASE + date_element + '/5')
+                    mk_dir(FILE_BASE + date_element + '/FC')
                     # get file
                     MY_LOGGER.debug('Getting file %s', filename)
                     data = requests.get(file)
@@ -138,7 +142,7 @@ for directory in directories:
                     wxcutils.run_cmd('rm ' + file_location + filename)
 
                     # save a thumbnail of a channel 1 image to send to webserver
-                    if filename[7] == '1':
+                    if filename[4] == '1':
                         cmd = 'vips resize ' + file_location + filename.replace('.png', '.jpg') + ' ' + OUTPUT_PATH + 'ews-g1-1.jpg' + ' 0.1843'
                         MY_LOGGER.debug('cmd %s', cmd)
                         wxcutils.run_cmd(cmd)

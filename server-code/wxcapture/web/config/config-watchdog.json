@@ -3,7 +3,7 @@
 		"Display Name": "GK-2A",
 		"Location": "gk-2a",
 		"Test Image": "FD.jpg",
-		"Max Age": "30",
+		"Max Age": "40",
 		"Last Status": "good",
 		"Status Change": "",
 		"Active": "yes"
@@ -36,6 +36,33 @@
 		"Active": "yes"
 	},
 	{
+		"Display Name": "GOES 15 GVAR",
+		"Location": "goes",
+		"Test Image": "goes15gvar-FC.jpg",
+		"Max Age": "180",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 14",
+		"Location": "goes",
+		"Test Image": "goes14-FC.jpg",
+		"Max Age": "180",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 13",
+		"Location": "goes",
+		"Test Image": "goes13-FC.jpg",
+		"Max Age": "180",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
 		"Display Name": "Himawari 8",
 		"Location": "goes",
 		"Test Image": "himawari_8_fd_IR.jpg",
@@ -48,16 +75,7 @@
 		"Display Name": "Electro-L 2",
 		"Location": "goes",
 		"Test Image": "electro-l-2-rgb.jpg",
-		"Max Age": "90",
-		"Last Status": "good",
-		"Status Change": "",
-		"Active": "yes"
-	},
-	{
-		"Display Name": "EWS-G1",
-		"Location": "goes",
-		"Test Image": "ews-g1-1.jpg",
-		"Max Age": "60",
+		"Max Age": "150",
 		"Last Status": "good",
 		"Status Change": "",
 		"Active": "yes"

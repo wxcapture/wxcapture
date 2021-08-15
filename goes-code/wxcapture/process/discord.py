@@ -186,6 +186,41 @@ if get_image_age(IMAGE) < 3600:
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
+# GOES 15 GVR
+IMAGE = 'goes15gvar-FC-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        webhook(IMAGE, 'GOES 15 GVAR',
+                'Full Colour')
+    else:
+        webhook('goes15gvar-4-tn.jpg', 'GOES 15 GVAR',
+                'IR band')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+# GOES 14
+IMAGE = 'goes14-FC-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        webhook(IMAGE, 'GOES 14 GVAR',
+                'Full Colour')
+    else:
+        webhook('goes14-4-tn.jpg', 'GOES 14 GVAR',
+                'IR band')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+# GOES 13
+IMAGE = 'goes13-FC-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        webhook(IMAGE, 'GOES 13 GVAR',
+                'Full Colour')
+    else:
+        webhook('goes13-4-tn.jpg', 'GOES 13 GVAR',
+                'IR band')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # Himawari 8
 IMAGE = 'himawari_8_fd_IR-tn.jpg'

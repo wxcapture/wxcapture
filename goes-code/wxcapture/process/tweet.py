@@ -180,6 +180,54 @@ if get_image_age(IMAGE) < 3600:
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
+# GOES 15 GVR
+IMAGE = 'goes15gvar-FC-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
+        tweet(IMAGE,
+              'Latest GOES 15 weather satellite full colour image (US, Canada, Pacific). ' +
+              'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+    else:
+        MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR', IMAGE)
+        tweet('goes15gvar-4-tn.jpg',
+              'Latest GOES 15 weather satellite infra red image (US, Canada, Pacific). ' +
+              'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+# GOES 14
+IMAGE = 'goes14-FC-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
+        tweet(IMAGE,
+              'Latest GOES 14 weather satellite full colour image (US, Canada, Pacific). ' +
+              'See more at https://kiwiweather.com. #weather #satellite #GOES14')
+    else:
+        MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR', IMAGE)
+        tweet('goes14-4-tn.jpg',
+              'Latest GOES 14 weather satellite infra red image (US, Canada, Pacific). ' +
+              'See more at https://kiwiweather.com. #weather #satellite #GOES14')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+# GOES 13
+IMAGE = 'goes13-FC-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
+        tweet(IMAGE,
+              'Latest GOES 13 weather satellite full colour image (US, Canada, Pacific). ' +
+              'See more at https://kiwiweather.com. #weather #satellite #GOES13')
+    else:
+        MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR', IMAGE)
+        tweet('goes13-4-tn.jpg',
+              'Latest GOES 13 weather satellite infra red image (US, Canada, Pacific). ' +
+              'See more at https://kiwiweather.com. #weather #satellite #GOES13')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
 
 # Himawari 8
 IMAGE = 'himawari_8_fd_IR-tn.jpg'

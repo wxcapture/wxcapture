@@ -582,9 +582,6 @@ SANCHEZ_PATH = BASEDIR + 'sanchez/'
 # load latest times data
 LATESTTIMESTAMPS = wxcutils.load_json(OUTPUT_PATH, 'goes_info.json')
 
-# process GOES 17 files
-process_goes('17')
-
 # process GOES 16 files
 process_goes('16')
 
@@ -593,6 +590,11 @@ process_goes_2('15')
 
 # process Himawari 8 files
 process_himawari('8')
+
+# process GOES 17 files
+# do this one last of the image files so we've got the other
+# image files already loaded
+process_goes('17')
 
 # process nws files
 process_nws()

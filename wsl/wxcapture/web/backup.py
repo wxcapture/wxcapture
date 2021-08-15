@@ -76,8 +76,17 @@ def do_backup_all():
     MY_LOGGER.debug('NWS')
     errors.append({'type': 'NWS', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')})
 
+    MY_LOGGER.debug('GOES 13')
+    errors.append({'type': 'GOES 13', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes13/', '/mnt/f/Satellites/goes13/')})
+
+    MY_LOGGER.debug('GOES 14')
+    errors.append({'type': 'GOES 14', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes14/', '/mnt/f/Satellites/goes14/')})
+
     MY_LOGGER.debug('GOES 15')
     errors.append({'type': 'GOES 15', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes15/', '/mnt/f/Satellites/goes15/')})
+
+    MY_LOGGER.debug('GOES 15 GVAR')
+    errors.append({'type': 'GOES 15 GVAR', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes15gvar/', '/mnt/f/Satellites/goes15gvar/')})
 
     MY_LOGGER.debug('GOES 16')
     errors.append({'type': 'GOES 16', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')})
@@ -190,6 +199,36 @@ def do_backup_new():
                                           'pi@192.168.100.15:/home/pi/goes/nwsdata/' + date_dir + '/',
                                           '/mnt/f/Satellites/nwsdata/' + date_dir + '/')})
 
+    MY_LOGGER.debug('GOES 13')
+    # get all dates between the ranges
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y-%m-%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        errors.append({'type': 'GOES13 - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                         'pi@192.168.100.15:/home/pi/goes/goes13/' + date_dir + '/',
+                                         '/mnt/f/Satellites/goes13/' + date_dir + '/')})
+
+    MY_LOGGER.debug('GOES 14')
+    # get all dates between the ranges
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y-%m-%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        errors.append({'type': 'GOES14 - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                         'pi@192.168.100.15:/home/pi/goes/goes14/' + date_dir + '/',
+                                         '/mnt/f/Satellites/goes14/' + date_dir + '/')})
+
+    MY_LOGGER.debug('GOES 15 GVAR')
+    # get all dates between the ranges
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y-%m-%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        errors.append({'type': 'GOES15 GVAR - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                         'pi@192.168.100.15:/home/pi/goes/goes15gvar/' + date_dir + '/',
+                                         '/mnt/f/Satellites/goes15gvar/' + date_dir + '/')})
+
     MY_LOGGER.debug('GOES 15')
     directories = ['combine-north', 'combine-south', 'fd', 'nh', 'sh']
     # get all dates between the ranges
@@ -202,7 +241,6 @@ def do_backup_new():
                            'errors': do_rsync('caWv', '',
                                               'pi@192.168.100.15:/home/pi/goes/goes15/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/goes15/' + dir + '/' + date_dir + '/')})
-
 
     MY_LOGGER.debug('GOES 16')
     directories = ['fd/ch13', 'fd/ch13_enhanced']
@@ -345,7 +383,7 @@ def do_backup_new():
     errors.append({'type': 'Website - sensors',
                    'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/sensors/', '/mnt/f/kiwiweather/sensors/')})
 
-    # remover images from the sensors/images folder as no need to back these up
+    # remove images from the sensors/images folder as no need to back these up
     MY_LOGGER.debug('Remove images from sensor images folder')
     filelist = glob.glob('/mnt/f/kiwiweather/sensors/images/*')
     for filename in filelist:

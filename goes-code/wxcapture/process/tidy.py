@@ -100,6 +100,40 @@ def process_goes_2(sat_num):
     MY_LOGGER.debug('---------------------------------------------')
 
 
+def process_goes2(sat_num):
+    """process GOES non-standard directory xx files"""
+
+    MY_LOGGER.debug('---------------------------------------------')
+    sat_dir = BASEDIR + 'goes' + sat_num
+    MY_LOGGER.debug('GOES %s', sat_num)
+    MY_LOGGER.debug('sat_dir = %s', sat_dir)
+
+    for date_directory in find_directories(sat_dir):
+        # MY_LOGGER.debug('date_directory = %s', date_directory)
+        type_directories = find_directories(sat_dir + '/' + date_directory)
+        for type_directory in type_directories:
+            # MY_LOGGER.debug('type_directory = %s', type_directory)
+            for filename in os.listdir(sat_dir + '/' + date_directory + '/' + type_directory):
+                # MY_LOGGER.debug('filename = %s', filename)
+                # date time for the file
+                file_age = TIME_NOW - os.path.getmtime(os.path.join(sat_dir + '/' + date_directory + '/' + type_directory, filename))
+                if file_age > MIN_AGE:
+                    MY_LOGGER.debug('DELETE - %s %f %f %f', sat_dir + '/' + date_directory + '/' + type_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+                    wxcutils.run_cmd('rm ' +sat_dir + '/' + date_directory + '/' + type_directory + '/' + filename)
+                else:
+                    MY_LOGGER.debug('keep   - %s %f %f %f', sat_dir + '/' + date_directory + '/' + type_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
+
+            # directory may be empty, if so, remove it
+            if not os.listdir(sat_dir + '/' + date_directory + '/' + type_directory):
+                MY_LOGGER.debug('deleting empty directory - %s',sat_dir + '/' + date_directory + '/' + type_directory)
+                wxcutils.run_cmd('rmdir ' + sat_dir + '/' + date_directory + '/' + type_directory)
+        # directory may be empty, if so, remove it
+        if not os.listdir(sat_dir + '/' + date_directory):
+            MY_LOGGER.debug('deleting empty directory - %s',sat_dir + '/' + date_directory)
+            wxcutils.run_cmd('rmdir ' + sat_dir + '/' + date_directory)
+    MY_LOGGER.debug('---------------------------------------------')
+
+
 def process_himawari(sat_num):
     """process Himawari xx files"""
 
@@ -375,6 +409,15 @@ MY_LOGGER.debug('MIN_AGE = %s', MIN_AGE)
 # get current epoch time
 TIME_NOW = time.time()
 MY_LOGGER.debug('TIME_NOW = %s', TIME_NOW)
+
+# process GOES 13 files
+process_goes2('13')
+
+# process GOES 14 files
+process_goes2('14')
+
+# process GOES 15 files
+process_goes2('15gvar')
 
 # process GOES 17 files
 process_goes('17')

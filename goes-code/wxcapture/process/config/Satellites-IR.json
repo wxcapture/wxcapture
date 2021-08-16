@@ -62,12 +62,26 @@
     "FilenameParser": "Goesproc",
     "Invert": true,
     "Longitude": 61.5,
-    "Brightness": 0.9,
+    "Brightness": 1.0,
     "Crop": [
       0.003166,
       0.089925,
       0.001166,
       0.001010
     ]
-  }
+  },
+  {
+      "DisplayName": "GOES-13",
+      "FilenamePrefix": "G13_4_",
+      "FilenameParser": "Goesproc",
+      "Invert": true,
+      "Longitude": 61.5,
+      "Brightness": 1.2,
+      "Crop": [
+        0.003166,
+        0.089925,
+        0.001166,
+        0.001010
+      ]
+    }
 ]

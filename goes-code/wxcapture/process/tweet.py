@@ -228,7 +228,6 @@ if get_image_age(IMAGE) < 3600:
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
-
 # Himawari 8
 IMAGE = 'himawari_8_fd_IR-tn.jpg'
 if get_image_age(IMAGE) < 3600:
@@ -237,6 +236,17 @@ if get_image_age(IMAGE) < 3600:
           'See more at https://kiwiweather.com. #weather #satellite #Himawari8')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+# Combined
+IMAGE = 'combined-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    tweet(IMAGE,
+          'Global IR image - GOES 13 / GOES 16 / GOES 17 / Himawari 8 / GK-2A. ' +
+          'See more at https://kiwiweather.com. #weather #satellite #GOES13 #GOES16 #GOES17 #Himawari8 #GK-2A')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

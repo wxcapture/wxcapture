@@ -235,6 +235,12 @@ if get_image_age(IMAGE) < 3600:
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
+# Combined
+IMAGE = 'combined-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'GOES 13 / GOES 16 / GOES 17 / Himawari 8 / GK-2A', 'Infra red')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

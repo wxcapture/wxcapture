@@ -206,7 +206,12 @@ for key, value in SATELLITE_INFO.items():
             if si['Active'] == 'yes':
                 MY_LOGGER.debug('-' * 20)
                 MY_LOGGER.debug(si)
-                proccess_satellite(si)
+                try:
+                    proccess_satellite(si)
+                except:
+                    MY_LOGGER.debug('Exception whilst processing satellite %s', si['Name'])
+                    MY_LOGGER.error('Loop exception handler: %s %s %s',
+                                    sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 # save updated config
 wxcutils.save_json(CONFIG_PATH, 'web.json', SATELLITE_INFO)

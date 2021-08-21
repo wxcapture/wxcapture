@@ -136,13 +136,13 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
                 MY_LOGGER.debug('sanchez file to create')
                 MY_LOGGER.debug('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + '/' +
                                 FILES[a_counter]['file'] + FILES[a_counter]['ext'] +
-                                ' -m /home/pi/sanchez/Resources/Mask.jpg -u /home/pi/sanchez/Resources/GK-2A/Underlay.jpg -o ' + \
+                                ' -o ' + \
                                 FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + \
-                                FILES[a_counter]['ext'] + ' -t 0070BA')
+                                FILES[a_counter]['ext'] + ' -f')
                 wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + \
                     '/' + FILES[a_counter]['file'] + FILES[a_counter]['ext'] + \
-                    ' -m /home/pi/sanchez/Resources/Mask.jpg -u /home/pi/sanchez/Resources/GK-2A/Underlay.jpg -o ' + \
-                    FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'] + ' -t 0070BA')
+                    '  -o ' + \
+                    FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'] + ' -f')
             else:
                 MY_LOGGER.debug('%s file to create', a_suffix)
         a_counter += 1
@@ -284,7 +284,7 @@ for directory in data_directories:
                 wxcutils.copy_file(os.path.join(location, filename + '_sanchez' + extenstion), os.path.join(OUTPUT_PATH, 'sanchez.jpg'))
             else:
                 MY_LOGGER.debug('File does not exist, create it')
-                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + OUTPUT_PATH + 'clahe.jpg -m /home/pi/sanchez/Resources/Mask.jpg -u /home/pi/sanchez/Resources/GK-2A/Underlay.jpg -o ' + OUTPUT_PATH + 'sanchez.jpg -t 0070BA -f')
+                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + OUTPUT_PATH + 'clahe.jpg -o ' + OUTPUT_PATH + 'sanchez.jpg -f')
             create_thumbnail('sanchez', extenstion)
             date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
             wxcutils.save_file(OUTPUT_PATH, 'sanchez.txt', date_time)

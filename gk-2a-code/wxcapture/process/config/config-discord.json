@@ -1,0 +1,8 @@
+{
+	"discord token": "",
+	"server": "",
+    "webhooks": ["",
+                 "",
+				 ""],
+    "footer": "WxCapture | Find full size images and past captures at [SITE]"
+}

@@ -8,6 +8,7 @@ from os import path
 import sys
 import time
 import requests
+import random
 import tweepy
 import cv2
 import wxcutils
@@ -55,11 +56,52 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
     MY_LOGGER.debug('Tweet sent with status = %s', tt_status)
 
 
-def tweet(image, text):
+def get_image_text(image):
+    """pick a random image text line from what is configured"""
+
+
+    main_text = ''
+    main_hashtag = ''
+    base_hashtag = ''
+    see_more = ''
+    for key, value in TWEETTEXT.items():
+        MY_LOGGER.debug('key = %s', key)
+
+        if key == 'images':
+            for img in TWEETTEXT[key]:
+                if image == img['Filename']:
+                    # select a random main text
+                    random_pick = random.randint(1, len(img['Textlines'])) - 1
+                    MY_LOGGER.debug('>> pick = %d, text = %s', random_pick, img['Textlines'][random_pick])
+                    main_text = img['Textlines'][random_pick]
+                    # select a random main hashtag
+                    random_pick = random.randint(1, len(img['hashtags'])) - 1
+                    MY_LOGGER.debug('>> pick = %d, text = %s', random_pick, img['hashtags'][random_pick])
+                    main_hashtag = img['hashtags'][random_pick]
+
+        # select a random base hashtag
+        if key == 'base hashtags':
+            MY_LOGGER.debug('key = %s, value = %s', key, value)
+            random_pick = random.randint(1, len(value)) - 1
+            MY_LOGGER.debug('>> pick = %d, text = %s', random_pick, value[random_pick])
+            base_hashtag = value[random_pick]
+
+        # select a random see more
+        if key == 'see more':
+            MY_LOGGER.debug('key = %s, value = %s', key, value)
+            random_pick = random.randint(1, len(value)) - 1
+            MY_LOGGER.debug('>> pick = %d, text = %s', random_pick, value[random_pick])
+            see_more = value[random_pick]
+
+    return main_text + ' ' + main_hashtag + ' ' + base_hashtag + ' ' + see_more
+
+
+def tweet(image):
     """do the tweets"""
 
     try:
         # tweet image
+        text = get_image_text(image)
         MY_LOGGER.debug('Tweeting %s for image %s', text, image)
         # only proceed if the image exists
         if path.exists(OUTPUT_PATH + image):
@@ -73,7 +115,6 @@ def tweet(image, text):
         else:
             MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.',
                             image)
-
     except:
         MY_LOGGER.critical('Global exception handler: %s %s %s',
                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
@@ -114,135 +155,117 @@ MY_LOGGER.debug('URL_BASE = %s', URL_BASE)
 THRESHOLD = 25
 MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 
+# load tweet text strings
+TWEETTEXT = wxcutils.load_json(CONFIG_PATH, 'twitter-text.json')
+
 # do each tweet, if image is less than an hour old
 # GOES 17
 IMAGE = 'goes_17_fd_fc-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
-    tweet(IMAGE,
-          'Latest GOES 17 weather satellite full colour image. ' +
-          'See more at https://kiwiweather.com. #weather #satellite #GOES17')
+    tweet(IMAGE)
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 IMAGE = 'goes_17_m1_fc-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
     if is_light(IMAGE, THRESHOLD):
         MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
-        tweet(IMAGE,
-              'Latest GOES 17 weather satellite full colour detail image (normally California). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES17')
+        tweet(IMAGE)
     else:
         MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR shortwave', IMAGE)
-        tweet('goes_17_m1_ch07-tn.jpg',
-              'Latest GOES 17 weather satellite infra red image (normally California). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES17')
+        tweet(IMAGE)
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 IMAGE = 'goes_17_m2_fc-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
     if is_light(IMAGE, THRESHOLD):
         MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
-        tweet(IMAGE,
-              'Latest GOES 17 weather satellite full colour detail image (normally Alaska). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES17')
+        tweet(IMAGE)
     else:
         MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR shortwave', IMAGE)
-        tweet('goes_17_m2_ch07-tn.jpg',
-              'Latest GOES 17 weather satellite infra red image (normally Alaska). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES17')
+        tweet('goes_17_m2_ch07-tn.jpg')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # GOES 16
 IMAGE = 'goes_16_fd_ch13_enhanced-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
-    tweet(IMAGE,
-          'Latest GOES 16 weather satellite enhanced IR image. ' +
-          'See more at https://kiwiweather.com. #weather #satellite #GOES16')
+    tweet(IMAGE)
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # GOES 15
 IMAGE = 'goes_15_fd_IR-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
-    tweet(IMAGE,
-          'Latest GOES 15 weather satellite enhanced IR image. ' +
-          'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+    tweet(IMAGE)
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 IMAGE = 'goes_15_combine-north_IR-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
-    tweet(IMAGE,
-          'Latest GOES 15 weather satellite enhanced IR/WV image - USA, Canada, Pacific. ' +
-          'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+    tweet(IMAGE)
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # GOES 15 GVR
 IMAGE = 'goes15gvar-FC-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
     if is_light(IMAGE, THRESHOLD):
         MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
-        tweet(IMAGE,
-              'Latest GOES 15 weather satellite full colour image (US, Canada, Pacific). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+        tweet(IMAGE)
     else:
         MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR', IMAGE)
-        tweet('goes15gvar-4-tn.jpg',
-              'Latest GOES 15 weather satellite infra red image (US, Canada, Pacific). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES15')
+        tweet('goes15gvar-4-tn.jpg')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # GOES 14
 IMAGE = 'goes14-FC-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
     if is_light(IMAGE, THRESHOLD):
         MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
-        tweet(IMAGE,
-              'Latest GOES 14 weather satellite full colour image (US, Canada, Pacific). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES14')
+        tweet(IMAGE)
     else:
         MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR', IMAGE)
-        tweet('goes14-4-tn.jpg',
-              'Latest GOES 14 weather satellite infra red image (US, Canada, Pacific). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES14')
+        tweet('goes14-4-tn.jpg')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # GOES 13
 IMAGE = 'goes13-FC-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
     if is_light(IMAGE, THRESHOLD):
         MY_LOGGER.debug('%s is not dark, tweeting', IMAGE)
-        tweet(IMAGE,
-              'Latest GOES 13 weather satellite full colour image (US, Canada, Pacific). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES13')
+        tweet(IMAGE)
     else:
         MY_LOGGER.debug('%s is dark, not tweeting visible, so using IR', IMAGE)
-        tweet('goes13-4-tn.jpg',
-              'Latest GOES 13 weather satellite infra red image (US, Canada, Pacific). ' +
-              'See more at https://kiwiweather.com. #weather #satellite #GOES13')
+        tweet('goes13-4-tn.jpg')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # Himawari 8
 IMAGE = 'himawari_8_fd_IR-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
-    tweet(IMAGE,
-          'Latest Himawari 8 weather satellite enhanced IR image. ' +
-          'See more at https://kiwiweather.com. #weather #satellite #Himawari8')
+    tweet(IMAGE)
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # Combined
 IMAGE = 'combined-tn.jpg'
+MY_LOGGER.debug('IMAGE = %s', IMAGE)
 if get_image_age(IMAGE) < 3600:
-    tweet(IMAGE,
-          'Global IR image - GOES 13 / GOES 16 / GOES 17 / Himawari 8 / GK-2A. ' +
-          'See more at https://kiwiweather.com. #weather #satellite #GOES13 #GOES16 #GOES17 #Himawari8 #GK-2A')
+    tweet(IMAGE)
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 

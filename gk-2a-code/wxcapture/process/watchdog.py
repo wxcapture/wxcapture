@@ -25,6 +25,21 @@ def is_running(process_name):
     return False
 
 
+def number_processes(process_name):
+    """see how many processes are running"""
+    try:
+        cmd = subprocess.Popen(('ps', '-ef'), stdout=subprocess.PIPE)
+        output = subprocess.check_output(('grep', CODE_PATH + process_name), stdin=cmd.stdout)
+        cmd.wait()
+        MY_LOGGER.debug('output = %s', output.decode('utf-8'))
+        MY_LOGGER.debug('%s process(es) are running', output.decode('utf-8').count(process_name))
+        return output.decode('utf-8').count(process_name)
+    except:
+        MY_LOGGER.debug('%s is NOT running', process_name)
+    MY_LOGGER.debug('%s is NOT running', process_name)
+    return 0
+
+
 def is_processing(process_name, minutes):
     """see if images are being created in last defined number of minutes"""
     cmd = Popen(['find', '/home/pi/gk-2a/xrit-rx/received', '-cmin',
@@ -95,6 +110,11 @@ if not is_running('xrit-rx.py'):
 
 if not is_processing('goesrecv', 15):
     MY_LOGGER.debug('goesrecv is not processing')
+    REBOOT = True
+
+# see if too many find_files.py are running
+if number_processes('find_files.py') > 1:
+    MY_LOGGER.debug('Too many find_files.py running')
     REBOOT = True
 
 # log drive space free to file

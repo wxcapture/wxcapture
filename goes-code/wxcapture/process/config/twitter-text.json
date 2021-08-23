@@ -1,0 +1,179 @@
+{
+	"see more": ["See more at https://kiwiweather.com",
+				 "https://kiwiweather.com - for lots more images",
+				 "https://kiwiweather.com - more similar images",
+				 "https://kiwiweather.com",
+				 "Check out https://kiwiweather.com"],
+	"base hashtags": ["#weather",
+					  "#satellite",
+					  "#space"
+	],
+	"images": [
+		{
+			"Filename": "goes_17_fd_fc-tn.jpg",
+			"Textlines": ["Latest GOES 17 weather satellite full colour image for the Pacific and Americas",
+						  "Visible light image of the Pacific / Americas from GOES 17",
+						  "Amazing weather satellite image from GOES 17 over the Pacific and Americas"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#Pacific",
+						 "#Americas"]
+		},
+		{
+			"Filename": "goes_17_m1_fc-tn.jpg",
+			"Textlines": ["Latest GOES 17 weather satellite full colour detail image (normally California)",
+						  "Full colour satellite image (often California)",
+						  "Amazing weather satellite image (normally California)"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#California",
+						 "#USA"]
+		},
+		{
+			"Filename": "goes_17_m1_ch07-tn.jpg",
+			"Textlines": ["Latest GOES 17 weather satellite infra red image (normally California)",
+						  "Infra red satellite image (often California)",
+						  "Amazing weather satellite image (normally California)"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#California",
+						 "#USA"]
+		},
+		{
+			"Filename": "goes_17_m2_fc-tn.jpg",
+			"Textlines": ["Latest GOES 17 weather satellite full colour detail image (normally Alaska)",
+						  "Full colour satellite image (often Alaska)",
+						  "Amazing weather satellite image (normally Alaska)"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#Alaska",
+						 "#USA"]
+		},
+		{
+			"Filename": "goes_17_m2_ch07-tn.jpg",
+			"Textlines": ["Latest GOES 17 weather satellite infra red image (normally Alaska)",
+						  "Infra red satellite image (often Alaska)",
+						  "Amazing weather satellite image (normally Alaska)"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#Alaska",
+						 "#USA"]
+		},
+		{
+			"Filename": "goes_16_fd_ch13_enhanced-tn.jpg",
+			"Textlines": ["Latest GOES 16 weather satellite enhanced IR image - Americas / Atlantic",
+						  "Enhanced IR image from GOES 16 over the Atlantic and Americas",
+						  "GOES 16 image covering the Atlantic and Americas highlighting weather systems"],
+			"hashtags": ["#GOES16",
+						 "#GOES",
+						 "#Americas",
+						 "#USA",
+						 "#Atlantic"]
+		},
+		{
+			"Filename": "goes_15_fd_IR-tn.jpg",
+			"Textlines": ["Latest GOES 15 weather satellite IR image - North America / Pacific",
+						  "Infra red image from GOES 15 over the Pacific / North America",
+						  "Pacific / North America - GOES 15 full disk infra red image"],
+			"hashtags": ["#GOES15",
+						 "#GOES",
+						 "#Pacific",
+						 "#NorthAmerica"]
+		},
+		{
+			"Filename": "goes_15_combine-north_IR-tn.jpg",
+			"Textlines": ["Latest GOES 15 weather satellite IR/WV image - USA, Canada, Pacific",
+						  "Infra red / water vapour image for North America / Pacific from GOES 15",
+						  "GOES 15 image for North America / Pacific from GOES 15"],
+			"hashtags": ["#GOES15",
+						 "#GOES",
+						 "#Pacific",
+						 "#NorthAmerica"]
+		},
+		{
+			"Filename": "goes15gvar-FC-tn.jp",
+			"Textlines": ["Latest GOES 15 weather satellite full colour image (US, Canada, Pacific)",
+						  "GOES 15 full colour image for the North Pacific region",
+						  "North Pacific region GOES 15 full colour image"],
+			"hashtags": ["#GOES15",
+						 "#GOES",
+						 "#Pacific",
+						 "#NorthAmerica"]
+		},
+		{
+			"Filename": "goes15gvar-4-tn.jpg",
+			"Textlines": ["Latest GOES 15 weather satellite infra red image (US, Canada, Pacific)",
+						  "GOES 15 infra red image for the North Pacific region",
+						  "North Pacific region GOES 15 infra red image"],
+			"hashtags": ["#GOES15",
+						 "#GOES",
+						 "#Pacific",
+						 "#NorthAmerica"]
+		},
+		{
+			"Filename": "goes14-FC-tn.jpg",
+			"Textlines": ["Latest GOES 14 weather satellite full colour image (Americas, Pacific)",
+						  "GOES 14 full colour image for the Pacific",
+						  "Pacific / Americas full colour image from GOES 14"],
+			"hashtags": ["#GOES14",
+						 "#GOES"]
+		},
+		{
+			"Filename": "goes14-4-tn.jpg",
+			"Textlines": ["Latest GOES 14 weather satellite infra red image (Americas, Pacific)",
+						  "GOES 14 infra red image for the Pacific / Americas",
+						  "Pacific / Americas infra red image from GOES 14"],
+			"hashtags": ["#GOES14",
+						 "#GOES",
+						 "#Pacific",
+						 "#Americas"]
+		},
+		{
+			"Filename": "goes13-FC-tn.jpg",
+			"Textlines": ["Latest GOES 13 weather satellite full colour image (Africa, Asia, Indian Ocean)",
+						  "GOES 13 full colour image covering Africa, Asia and the Indian Ocean",
+						  "Africa, Asia and the Indian Ocean full colour image from GOES 13"],
+			"hashtags": ["#GOES13",
+						 "#GOES"]
+		},
+		{
+			"Filename": "goes13-4-tn.jpg",
+			"Textlines": ["Latest GOES 13 weather satellite infra red image (Africa, Asia, Indian Ocean)",
+						  "GOES 13 infra red image covering Africa, Asia and the Indian Ocean",
+						  "Africa, Asia and the Indian Ocean infra red image from GOES 13"],
+			"hashtags": ["#GOES13",
+						 "#GOES",
+						 "#Africa",
+						 "#Asia",
+						 "#IndiaOcean"]
+		},
+		{
+			"Filename": "himawari_8_fd_IR-tn.jpg",
+			"Textlines": ["Latest Himawari 8 weather satellite enhanced IR image - Asia, Pacific, Australia, New Zealand",
+						  "Asia, Pacific, Australia, New Zealand - Himawari 8 infra red image",
+						  "Infra red image covering Asia, Pacific, Australia, New Zealand from Himawari 8"],
+			"hashtags": ["#Himawari8",
+						 "#Himawari",
+						 "#Asia",
+						 "#Australia",
+						 "#NewZealand",
+						 "#Pacific"]
+		},
+		{
+			"Filename": "combined-tn.jpg",
+			"Textlines": ["Global IR image - GOES 13 / GOES 16 / GOES 17 / Himawari 8 / GK-2A / Electro L-2",
+						  "Sanchez processed global infra red image - GOES / Himawari / GK-2A / Electro satellites",
+						  "Planet wide infra red image from multiple geostationary weather satellites",
+						  "Asia, Africa, Europe, Americas and Oceana - all in one IR image"],
+			"hashtags": ["#GOES",
+						 "#GOES13",
+						 "#GOES16",
+						 "#GOES17",
+						 "#Himawari",
+						 "#Himawari8",
+						 "#GK2A",
+						 "#ElectroL2"]
+		}
+	]
+
+}

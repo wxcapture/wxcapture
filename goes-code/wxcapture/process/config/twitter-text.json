@@ -3,10 +3,13 @@
 				 "https://kiwiweather.com - for lots more images",
 				 "https://kiwiweather.com - more similar images",
 				 "https://kiwiweather.com",
+				 "https://kiwiweather.com has lots more images like this",
+				 "Explore more images and satellites at https://kiwiweather.com",
 				 "Check out https://kiwiweather.com"],
 	"base hashtags": ["#weather",
 					  "#satellite",
-					  "#space"
+					  "#space",
+					  "#weathersatellites"
 	],
 	"images": [
 		{

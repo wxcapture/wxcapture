@@ -59,7 +59,6 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
 def get_image_text(image):
     """pick a random image text line from what is configured"""
 
-
     main_text = ''
     main_hashtag = ''
     base_hashtag = ''

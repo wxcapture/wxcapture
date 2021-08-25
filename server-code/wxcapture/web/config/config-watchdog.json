@@ -39,7 +39,7 @@
 		"Display Name": "GOES 15 GVAR",
 		"Location": "goes",
 		"Test Image": "goes15gvar-FC.jpg",
-		"Max Age": "180",
+		"Max Age": "240",
 		"Last Status": "good",
 		"Status Change": "",
 		"Active": "yes"
@@ -48,7 +48,7 @@
 		"Display Name": "GOES 14",
 		"Location": "goes",
 		"Test Image": "goes14-FC.jpg",
-		"Max Age": "180",
+		"Max Age": "240",
 		"Last Status": "good",
 		"Status Change": "",
 		"Active": "yes"
@@ -57,7 +57,7 @@
 		"Display Name": "GOES 13",
 		"Location": "goes",
 		"Test Image": "goes13-FC.jpg",
-		"Max Age": "180",
+		"Max Age": "240",
 		"Last Status": "good",
 		"Status Change": "",
 		"Active": "yes"
@@ -75,7 +75,7 @@
 		"Display Name": "Electro-L 2",
 		"Location": "goes",
 		"Test Image": "electro-l-2-rgb.jpg",
-		"Max Age": "240",
+		"Max Age": "300",
 		"Last Status": "good",
 		"Status Change": "",
 		"Active": "yes"

@@ -11,6 +11,30 @@ import cv2
 import wxcutils
 
 
+def number_processes(process_name):
+    """see how many processes are running"""
+    try:
+        cmd = subprocess.Popen(('ps', '-ef'), stdout=subprocess.PIPE)
+        output = subprocess.check_output(('grep', process_name), stdin=cmd.stdout)
+        cmd.wait()
+        MY_LOGGER.debug('output = %s', output.decode('utf-8'))
+        process_count = 0
+        lines = output.decode('utf-8').splitlines()
+        for line in lines:
+            if 'grep' in line or '/bin/bash' in line:
+                # ignore grep or cron lines
+                process_count += 0
+            else:
+                process_count += 1
+        MY_LOGGER.debug('%d process(es) are running', process_count)
+        return process_count
+    except:
+        # note this should not be possible!
+        MY_LOGGER.debug('%s is NOT running', process_name)
+    MY_LOGGER.debug('%s is NOT running', process_name)
+    return 0
+
+
 def find_latest_directory(directory):
     """find latest directory in directory"""
     latest = 0
@@ -44,8 +68,8 @@ def crawl_images(ci_directory):
             # IMG_FD_014_IR105_20200808_022006
             # only add the FD images to the index
             if len(sub_bits) == 6:
-                MY_LOGGER.debug('dir = %s, file = %s, ext = %s, date = %s, time = %s',
-                                bits[0], l_filename, l_extenstion, sub_bits[4], sub_bits[5])
+                # MY_LOGGER.debug('dir = %s, file = %s, ext = %s, date = %s, time = %s',
+                #                 bits[0], l_filename, l_extenstion, sub_bits[4], sub_bits[5])
                 FILES.append({'dir': bits[0], 'file': l_filename, 'ext': l_extenstion,
                               'datetime': sub_bits[4] + sub_bits[5]})
 
@@ -189,117 +213,121 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 
 # try:
-# get local time zone
-LOCAL_TIME_ZONE = subprocess.check_output("date"). \
-    decode('utf-8').split(' ')[-2]
 
-base_dir = '/home/pi/gk-2a/xrit-rx/received/LRIT/'
-MY_LOGGER.debug('base_dir = %s', base_dir)
+# check if find_files is already running, if so exit this code
+if number_processes('find_files.py') == 1:
+    # get local time zone
+    LOCAL_TIME_ZONE = subprocess.check_output("date"). \
+        decode('utf-8').split(' ')[-2]
 
-# load latest times data
-latest_timestamps = wxcutils.load_json(OUTPUT_PATH, 'gk2a_info.json')
+    base_dir = '/home/pi/gk-2a/xrit-rx/received/LRIT/'
+    MY_LOGGER.debug('base_dir = %s', base_dir)
 
-# find latest directory
-date_directory = find_latest_directory(base_dir)
-MY_LOGGER.debug('latest directory = %s', date_directory)
+    # load latest times data
+    latest_timestamps = wxcutils.load_json(OUTPUT_PATH, 'gk2a_info.json')
 
-date_base_dir = os.path.join(base_dir, date_directory)
-data_directories = find_directories(date_base_dir)
+    # find latest directory
+    date_directory = find_latest_directory(base_dir)
+    MY_LOGGER.debug('latest directory = %s', date_directory)
 
-# data store for files list
-# currently just for FD
-FILES = []
+    date_base_dir = os.path.join(base_dir, date_directory)
+    data_directories = find_directories(date_base_dir)
 
-# find latest file in each directory and copy to output directory
-for directory in data_directories:
-    MY_LOGGER.debug('---------------------------------------------')
-    MY_LOGGER.debug('directory = %s', directory)
-    location = os.path.join(date_base_dir, directory)
-    MY_LOGGER.debug('location = %s', location)
-    latest_file = find_latest_file(location)
-    MY_LOGGER.debug('latest_file = %s', latest_file)
-    filename, extenstion = os.path.splitext(latest_file)
-    MY_LOGGER.debug('extenstion = %s', extenstion)
+    # data store for files list
+    # currently just for FD
+    FILES = []
 
-    # date time for original file
-    latest = os. path. getmtime(os.path.join(location, latest_file))
-    MY_LOGGER.debug('latest = %d', latest)
-    latest_local = wxcutils.epoch_to_local(latest, '%a %d %b %H:%M')
-    MY_LOGGER.debug('latest_local = %s', latest_local)
+    # find latest file in each directory and copy to output directory
+    for directory in data_directories:
+        MY_LOGGER.debug('---------------------------------------------')
+        MY_LOGGER.debug('directory = %s', directory)
+        location = os.path.join(date_base_dir, directory)
+        MY_LOGGER.debug('location = %s', location)
+        latest_file = find_latest_file(location)
+        MY_LOGGER.debug('latest_file = %s', latest_file)
+        filename, extenstion = os.path.splitext(latest_file)
+        MY_LOGGER.debug('extenstion = %s', extenstion)
 
-    stored_timestamp = 0.0
-    try:
-        stored_timestamp = latest_timestamps[directory + extenstion]
-    except NameError:
-        pass
-    except KeyError:
-        pass
+        # date time for original file
+        latest = os. path. getmtime(os.path.join(location, latest_file))
+        MY_LOGGER.debug('latest = %d', latest)
+        latest_local = wxcutils.epoch_to_local(latest, '%a %d %b %H:%M')
+        MY_LOGGER.debug('latest_local = %s', latest_local)
 
-    # REMOVE REMOVE REMOVE
-    # if directory == 'FD':
-    #     stored_timestamp = 0
+        stored_timestamp = 0.0
+        try:
+            stored_timestamp = latest_timestamps[directory + extenstion]
+        except NameError:
+            pass
+        except KeyError:
+            pass
 
-    MY_LOGGER.debug('stored_timestamp = %f, %f', stored_timestamp, latest)
-    if stored_timestamp != int(latest):
-        MY_LOGGER.debug('New %s file added', directory)
-        latest_timestamps[directory + extenstion] = int(latest)
+        # REMOVE REMOVE REMOVE
+        # if directory == 'FD':
+        #     stored_timestamp = 0
 
-        # copy file to the output directory
-        wxcutils.copy_file(os.path.join(location, latest_file), os.path.join(OUTPUT_PATH, directory + extenstion))
+        MY_LOGGER.debug('stored_timestamp = %f, %f', stored_timestamp, latest)
+        if stored_timestamp != int(latest):
+            MY_LOGGER.debug('New %s file added', directory)
+            latest_timestamps[directory + extenstion] = int(latest)
 
-        # create thumbnail
-        create_thumbnail(directory, extenstion)
+            # copy file to the output directory
+            wxcutils.copy_file(os.path.join(location, latest_file), os.path.join(OUTPUT_PATH, directory + extenstion))
 
-        # create file with date time info
-        date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-        if directory != 'ANT':
-            wxcutils.save_file(OUTPUT_PATH, directory + '.txt', date_time)
-        else:
-            wxcutils.save_file(OUTPUT_PATH, 'ANT.txt.txt', date_time)
+            # create thumbnail
+            create_thumbnail(directory, extenstion)
 
-        # additional processing of FD image
-        if directory == 'FD':
-            # crawl directories for all files
-            crawl_images(directory)
-            # sort
-            FILES = sorted(FILES, key=lambda k: k['datetime'])
-            # save to file system for debugging only
-            # wxcutils.save_json(WORKING_PATH, 'crawl.json', FILES)
-            animate(directory, filename, extenstion, 143, '')
-            animate(directory, filename, extenstion, 143, 'sanchez')
-            animate(directory, filename, extenstion, 143 * 5, '')
-            animate(directory, filename, extenstion, 143 * 5, 'sanchez')
-
-            # CLAHE processing
-            clahe_process(OUTPUT_PATH, 'FD.jpg', OUTPUT_PATH, 'clahe.jpg')
-            create_thumbnail('clahe', extenstion)
+            # create file with date time info
             date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-            wxcutils.save_file(OUTPUT_PATH, 'clahe.txt', date_time)
-
-            # sanchez processing
-            # image should have been created already for the animations
-            MY_LOGGER.debug('Checking for %s', os.path.join(location, filename + '_sanchez' + extenstion))
-            if os.path.isfile(os.path.join(location, filename + '_sanchez' + extenstion)):
-                MY_LOGGER.debug('File already exists, copy it')
-                wxcutils.copy_file(os.path.join(location, filename + '_sanchez' + extenstion), os.path.join(OUTPUT_PATH, 'sanchez.jpg'))
+            if directory != 'ANT':
+                wxcutils.save_file(OUTPUT_PATH, directory + '.txt', date_time)
             else:
-                MY_LOGGER.debug('File does not exist, create it')
-                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + OUTPUT_PATH + 'clahe.jpg -o ' + OUTPUT_PATH + 'sanchez.jpg -f')
-            create_thumbnail('sanchez', extenstion)
-            date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-            wxcutils.save_file(OUTPUT_PATH, 'sanchez.txt', date_time)
+                wxcutils.save_file(OUTPUT_PATH, 'ANT.txt.txt', date_time)
+
+            # additional processing of FD image
+            if directory == 'FD':
+                # crawl directories for all files
+                crawl_images(directory)
+                # sort
+                FILES = sorted(FILES, key=lambda k: k['datetime'])
+                # save to file system for debugging only
+                # wxcutils.save_json(WORKING_PATH, 'crawl.json', FILES)
+                animate(directory, filename, extenstion, 143 * 3, '')
+                animate(directory, filename, extenstion, 143 * 3, 'sanchez')
+
+                # CLAHE processing
+                clahe_process(OUTPUT_PATH, 'FD.jpg', OUTPUT_PATH, 'clahe.jpg')
+                create_thumbnail('clahe', extenstion)
+                date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+                wxcutils.save_file(OUTPUT_PATH, 'clahe.txt', date_time)
+
+                # sanchez processing
+                # image should have been created already for the animations
+                MY_LOGGER.debug('Checking for %s', os.path.join(location, filename + '_sanchez' + extenstion))
+                if os.path.isfile(os.path.join(location, filename + '_sanchez' + extenstion)):
+                    MY_LOGGER.debug('File already exists, copy it')
+                    wxcutils.copy_file(os.path.join(location, filename + '_sanchez' + extenstion), os.path.join(OUTPUT_PATH, 'sanchez.jpg'))
+                else:
+                    MY_LOGGER.debug('File does not exist, create it')
+                    wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + OUTPUT_PATH + 'clahe.jpg -o ' + OUTPUT_PATH + 'sanchez.jpg -f')
+                create_thumbnail('sanchez', extenstion)
+                date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+                wxcutils.save_file(OUTPUT_PATH, 'sanchez.txt', date_time)
 
 
-    else:
-        MY_LOGGER.debug('File unchanged')
+        else:
+            MY_LOGGER.debug('File unchanged')
 
-# save latest times data
-wxcutils.save_json(OUTPUT_PATH, 'gk2a_info.json', latest_timestamps)
+    # save latest times data
+    wxcutils.save_json(OUTPUT_PATH, 'gk2a_info.json', latest_timestamps)
 
-# rsync files to servers
-wxcutils.run_cmd('rsync -rt ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
-wxcutils.run_cmd('rsync -rt ' + base_dir + ' pi@192.168.100.15:/home/pi/goes/gk-2a')
+    # rsync files to servers
+    wxcutils.run_cmd('rsync -rt ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
+    wxcutils.run_cmd('rsync -rt ' + base_dir + ' pi@192.168.100.15:/home/pi/goes/gk-2a')
 
+else:
+    MY_LOGGER.debug('Another instance of find_files.py is already running')
+    MY_LOGGER.debug('Skip running this instance to allow the existing one to complete')
 
 # except:
 #     MY_LOGGER.critical('Global exception handler: %s %s %s',

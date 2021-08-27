@@ -10,6 +10,30 @@ import subprocess
 import wxcutils
 
 
+def number_processes(process_name):
+    """see how many processes are running"""
+    try:
+        cmd = subprocess.Popen(('ps', '-ef'), stdout=subprocess.PIPE)
+        output = subprocess.check_output(('grep', process_name), stdin=cmd.stdout)
+        cmd.wait()
+        MY_LOGGER.debug('output = %s', output.decode('utf-8'))
+        process_count = 0
+        lines = output.decode('utf-8').splitlines()
+        for line in lines:
+            if 'grep' in line or '/bin/bash' in line:
+                # ignore grep or cron lines
+                process_count += 0
+            else:
+                process_count += 1
+        MY_LOGGER.debug('%d process(es) are running', process_count)
+        return process_count
+    except:
+        # note this should not be possible!
+        MY_LOGGER.debug('%s is NOT running', process_name)
+    MY_LOGGER.debug('%s is NOT running', process_name)
+    return 0
+
+
 def mk_dir(directory):
     """only create if it does not already exist"""
     MY_LOGGER.debug('Make? %s', directory)
@@ -570,67 +594,75 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 
 # try:
-# get local time zone
-LOCAL_TIME_ZONE = subprocess.check_output("date"). \
-    decode('utf-8').split(' ')[-2]
 
-BASEDIR = '/home/pi/goes/'
-MY_LOGGER.debug('BASEDIR = %s', BASEDIR)
 
-SANCHEZ_PATH = BASEDIR + 'sanchez/'
+# check if find_files is already running, if so exit this code
+if number_processes('find_files.py') == 1:
+    # get local time zone
+    LOCAL_TIME_ZONE = subprocess.check_output("date"). \
+        decode('utf-8').split(' ')[-2]
 
-# load latest times data
-LATESTTIMESTAMPS = wxcutils.load_json(OUTPUT_PATH, 'goes_info.json')
+    BASEDIR = '/home/pi/goes/'
+    MY_LOGGER.debug('BASEDIR = %s', BASEDIR)
 
-# process GOES 16 files
-process_goes('16')
+    SANCHEZ_PATH = BASEDIR + 'sanchez/'
 
-# process GOES 15 files
-process_goes_2('15')
+    # load latest times data
+    LATESTTIMESTAMPS = wxcutils.load_json(OUTPUT_PATH, 'goes_info.json')
 
-# process Himawari 8 files
-process_himawari('8')
+    # process GOES 16 files
+    process_goes('16')
 
-# process GOES 17 files
-# do this one last of the image files so we've got the other
-# image files already loaded
-process_goes('17')
+    # process GOES 15 files
+    process_goes_2('15')
 
-# process nws files
-process_nws()
+    # process Himawari 8 files
+    process_himawari('8')
 
-# create animations
-# calculation = hours per day x frames per hour x number of days
+    # process GOES 17 files
+    # do this one last of the image files so we've got the other
+    # image files already loaded
+    process_goes('17')
 
-# GOES 16 - ch 13 enhanced - 1 frame per hour
-create_animation('goes16/fd/ch13_enhanced', '*', 24 * 1 * 3, 0.15, '800:800')
+    # process nws files
+    process_nws()
 
-# GOES 17 - FD visible - 2 frames per hour
-create_animation('goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
+    # create animations
+    # calculation = hours per day x frames per hour x number of days
 
-# ps -GOES 17 - FD visible Projected - 2 frames per hour
-create_animation('sanchez/goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
+    # GOES 16 - ch 13 enhanced - 1 frame per hour
+    create_animation('goes16/fd/ch13_enhanced', '*', 24 * 1 * 3, 0.15, '800:800')
 
-# ps -GOES 17 - ch13 visible Projected - 2 frames per hour
-create_animation('sanchez/goes17/fd/ch13', '*', 24 * 2 * 3, 0.15, '800:800')
+    # GOES 17 - FD visible - 2 frames per hour
+    create_animation('goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
 
-# GOES 17 - M1 ch 7 IR shortwave - 4 frames per hour
-create_animation('goes17/m1/ch07', '*', 24 * 4 * 3, 0.15, '800:800')
+    # ps -GOES 17 - FD visible Projected - 2 frames per hour
+    create_animation('sanchez/goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800')
 
-# GOES 17 - M2 ch 7 IR shortwave - 4 frames per hour
-create_animation('goes17/m2/ch07', '*', 24 * 4 * 3, 0.15, '800:800')
+    # ps -GOES 17 - ch13 visible Projected - 2 frames per hour
+    create_animation('sanchez/goes17/fd/ch13', '*', 24 * 2 * 3, 0.15, '800:800')
 
-# Himawari 8 - FD IR - 1 frame per hour
-create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800')
+    # GOES 17 - M1 ch 7 IR shortwave - 4 frames per hour
+    create_animation('goes17/m1/ch07', '*', 24 * 4 * 3, 0.15, '800:800')
 
-# combined images - 1 frame per hour
-create_animation('sanchez/combined/fd/ir', '*', 24 * 2 * 3, 0.15, '800:800')
+    # GOES 17 - M2 ch 7 IR shortwave - 4 frames per hour
+    create_animation('goes17/m2/ch07', '*', 24 * 4 * 3, 0.15, '800:800')
 
-# save latest times data
-wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', LATESTTIMESTAMPS)
+    # Himawari 8 - FD IR - 1 frame per hour
+    create_animation('himawari8/fd', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800')
 
-# rsync files to server
-wxcutils.run_cmd('rsync -rt ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/goes')
+    # combined images - 1 frame per hour
+    create_animation('sanchez/combined/fd/ir', '*', 24 * 2 * 3, 0.15, '800:800')
+
+    # save latest times data
+    wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', LATESTTIMESTAMPS)
+
+    # rsync files to server
+    wxcutils.run_cmd('rsync -rt ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/goes')
+
+else:
+    MY_LOGGER.debug('Another instance of find_files.py is already running')
+    MY_LOGGER.debug('Skip running this instance to allow the existing one to complete')
 
 # except:
 #     MY_LOGGER.critical('Global exception handler: %s %s %s',

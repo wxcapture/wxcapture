@@ -249,6 +249,19 @@ MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 MAXAGE = int(TWEETS['Max age'])
 MY_LOGGER.debug('MAXAGE = %d', MAXAGE)
 
+# determine delay between tweets based on number to tweet
+
+TWEET_COUNT = 0
+for key, value in TWEETS.items():
+    # MY_LOGGER.debug('key = %s, value = %s', key, value)
+    if key == 'Tweets':
+        for tweet in value:
+            TWEET_COUNT+= 1
+MY_LOGGER.debug('TWEET_COUNT = %d', TWEET_COUNT)
+TWEET_SLEEP = (3600 - 240) / TWEET_COUNT
+MY_LOGGER.debug('TWEET_SLEEP = %d', TWEET_SLEEP)
+
+
 # loop through tweets to tweet
 for key, value in TWEETS.items():
     # MY_LOGGER.debug('key = %s, value = %s', key, value)
@@ -283,6 +296,10 @@ for key, value in TWEETS.items():
             except:
                 MY_LOGGER.error('exception handler: %s %s %s',
                                 sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+            # sleep to spread out tweets over the hour
+            MY_LOGGER.debug('Sleeping for %d seconds', TWEET_SLEEP)
+            time.sleep(TWEET_SLEEP)
+            MY_LOGGER.debug('waking up again!')
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

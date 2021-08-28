@@ -176,6 +176,66 @@
 						 "#Himawari8",
 						 "#GK2A",
 						 "#ElectroL2"]
+		},
+		{
+			"Filename": "goes17-fd-fc-144-800x800.mp4",
+			"Textlines": ["Latest GOES 17 weather satellite video (last 3 days) for the Pacific and Americas",
+						  "Visible light video of the Pacific / Americas from GOES 17 for the last 3 days",
+						  "Amazing three day weather satellite video from GOES 17 over the Pacific and Americas",
+						  "GOES 17 looks at planet earth for three days"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#Pacific",
+						 "#Americas"]
+		},
+		{
+			"Filename": "sanchez-combined-fd-ir-144-800x800.mp4",
+			"Textlines": ["Global 3 day IR video - GOES 13 / GOES 16 / GOES 17 / Himawari 8 / GK-2A / Electro L-2",
+						  "Sanchez processed global infra red video (3 days) - GOES / Himawari / GK-2A / Electro satellites",
+						  "Planet wide infrared three day video from multiple geostationary weather satellites",
+						  "Asia, Africa, Europe, Americas and Oceana - all in one IR video for the last 3 days",
+						  "Three days of global weather as seen from multiple weather satellites - Sanchez processed"],
+			"hashtags": ["#GOES",
+						 "#GOES13",
+						 "#GOES16",
+						 "#GOES17",
+						 "#Himawari",
+						 "#Himawari8",
+						 "#GK2A",
+						 "#ElectroL2"]
+		},
+		{
+			"Filename": "sanchez-goes17-fd-ch13-144-800x800.mp4",
+			"Textlines": ["Latest GOES 17 weather satellite infrared video (last 3 days) for the Pacific and Americas (Sanchez processed)",
+						  "Infrared video of the Pacific / Americas from GOES 17 for the last 3 days",
+						  "Amazing three day weather satellite video from GOES 17 over the Pacific and Americas in infrared",
+						  "GOES 17 looks at planet earth for three days in the infrared spectrum"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#Pacific",
+						 "#Americas"]
+		},
+		{
+			"Filename": "sanchez-goes17-fd-fc-144-800x800.mp4",
+			"Textlines": ["Latest GOES 17 weather satellite video (last 3 days) for the Pacific and Americas (Sanchez processed)",
+						  "Visible light video of the Pacific / Americas from GOES 17 for the last 3 days",
+						  "Amazing three day weather satellite video from GOES 17 over the Pacific and Americas)",
+						  "GOES 17 looks at planet earth for three days"],
+			"hashtags": ["#GOES17",
+						 "#GOES",
+						 "#Pacific",
+						 "#Americas"]
+		},
+		{
+			"Filename": "goes16-fd-ch13_enhanced-72-800x800.mp4",
+			"Textlines": ["Latest GOES 16 weather satellite video (last 3 days) for the Atlantic and Americas in the infrared (enhanced)",
+						  "Processed infrared video of the Atlantic / Americas from GOES 16 for the last 3 days",
+						  "Amazing three day weather satellite video from GOES 16 over the Atlantic and Americas - processed infrared spectrum",
+						  "GOES 16 looks at planet earth for three days with enhanced infrared light"],
+			"hashtags": ["#GOES16",
+						 "#GOES",
+						 "#Atlantic",
+						 "#Americas"]
 		}
 	]
 

@@ -1,0 +1,21 @@
+{
+	"Max age": 3600,
+	"Light threshold": 25,
+	"Tweets": [
+		{
+			"Main Filename": "sanchez-tn.jpg",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		},
+		{
+			"Main Filename": "clahe.jpg",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		},
+		{
+			"Main Filename": "FD.jpg",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		}
+	]
+}

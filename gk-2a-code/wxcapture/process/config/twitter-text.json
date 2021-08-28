@@ -1,0 +1,59 @@
+{
+	"see more": ["See more at https://kiwiweather.com",
+				 "https://kiwiweather.com - for lots more images",
+				 "https://kiwiweather.com - more similar images",
+				 "https://kiwiweather.com",
+				 "https://kiwiweather.com has lots more images like this",
+				 "Explore more images and satellites at https://kiwiweather.com",
+				 "Check out https://kiwiweather.com"],
+	"base hashtags": ["#weather",
+					  "#satellite",
+					  "#space",
+					  "#weathersatellites"
+	],
+	"images": [
+		{
+			"Filename": "sanchez-tn.jpg",
+			"Textlines": ["Latest GK-2A weather satellite sanchez processed image for Asia, Australia and New Zealand",
+						  "Satellite sanchez image covering the Pacific, Indian Ocean, Asia, Australia and New Zealand",
+						  "Amazing sanchez weather satellite image from GK-2A over the Pacific and Indian Ocean plus Asia, Australia and New Zealand"],
+			"hashtags": ["#GK-2A",
+						 "#Asia",
+						 "#Pacific",
+						 "#Australia",
+						 "#NewZealand",
+						 "#NZ",
+						 "#IndianOcean",
+						 "#sanchez"]
+		},
+		{
+			"Filename": "clahe.jpg",
+			"Textlines": ["Latest GK-2A weather satellite clahe processed image for Asia, Australia and New Zealand",
+						  "Satellite clahe image covering the Pacific, Indian Ocean, Asia, Australia and New Zealand",
+						  "Amazing clahe weather satellite image from GK-2A over the Pacific and Indian Ocean plus Asia, Australia and New Zealand"],
+			"hashtags": ["#GK-2A",
+						 "#Asia",
+						 "#Pacific",
+						 "#Australia",
+						 "#NewZealand",
+						 "#NZ",
+						 "#IndianOcean",
+						 "#clahe"]
+		},
+		{
+			"Filename": "FD.jpg",
+			"Textlines": ["Latest GK-2A infrared weather satellite processed image for Asia, Australia and New Zealand",
+						  "Infrared Satellite image covering the Pacific, Indian Ocean, Asia, Australia and New Zealand",
+						  "Amazing infrared weather satellite image from GK-2A over the Pacific and Indian Ocean plus Asia, Australia and New Zealand"],
+			"hashtags": ["#GK-2A",
+						 "#Asia",
+						 "#Pacific",
+						 "#Australia",
+						 "#NewZealand",
+						 "#NZ",
+						 "#IndianOcean",
+						 "#infrared"]
+		}
+	]
+
+}

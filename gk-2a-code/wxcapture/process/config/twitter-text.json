@@ -27,6 +27,20 @@
 						 "#sanchez"]
 		},
 		{
+			"Filename": "FD-_sanchez-429.mp4",
+			"Textlines": ["Latest GK-2A weather satellite sanchez processed 3 day video for Asia, Australia and New Zealand",
+						  "Satellite sanchez processed video covering the Pacific, Indian Ocean, Asia, Australia and New Zealand - last 3 days",
+						  "Amazing sanchez processed weather satellite video (3 days) from GK-2A over the Pacific and Indian Ocean plus Asia, Australia and New Zealand"],
+			"hashtags": ["#GK2A",
+						 "#Asia",
+						 "#Pacific",
+						 "#Australia",
+						 "#NewZealand",
+						 "#NZ",
+						 "#IndianOcean",
+						 "#sanchez"]
+		},
+		{
 			"Filename": "clahe.jpg",
 			"Textlines": ["Latest GK-2A weather satellite clahe processed image for Asia, Australia and New Zealand",
 						  "Satellite clahe image covering the Pacific, Indian Ocean, Asia, Australia and New Zealand",
@@ -45,6 +59,20 @@
 			"Textlines": ["Latest GK-2A infrared weather satellite processed image for Asia, Australia and New Zealand",
 						  "Infrared Satellite image covering the Pacific, Indian Ocean, Asia, Australia and New Zealand",
 						  "Amazing infrared weather satellite image from GK-2A over the Pacific and Indian Ocean plus Asia, Australia and New Zealand"],
+			"hashtags": ["#GK2A",
+						 "#Asia",
+						 "#Pacific",
+						 "#Australia",
+						 "#NewZealand",
+						 "#NZ",
+						 "#IndianOcean",
+						 "#infrared"]
+		},
+		{
+			"Filename": "FD-raw-429.mp4",
+			"Textlines": ["Latest GK-2A infrared weather satellite processed video (3 days) for Asia, Australia and New Zealand",
+						  "Infrared Satellite video covering the Pacific, Indian Ocean, Asia, Australia and New Zealand - last 3 days",
+						  "Amazing infrared weather satellite 3 day video from GK-2A over the Pacific and Indian Ocean plus Asia, Australia and New Zealand"],
 			"hashtags": ["#GK2A",
 						 "#Asia",
 						 "#Pacific",

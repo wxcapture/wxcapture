@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""tweet Sanchez images"""
+"""tweet images"""
 
 
 # import libraries
@@ -139,10 +139,19 @@ def send_tweet(tt_config_path, tt_config_file, tt_text, tt_file):
 def get_tweet_text(image):
     """pick a random image text line from what is configured"""
 
+    def add_text(base, add):
+        """add in additional text if space available"""
+        if len(base) + len(add) <= 280:
+            MY_LOGGER.debug('length ok, adding')
+            return base + add
+        MY_LOGGER.debug('length exceeded, not adding')
+        return base
+
     main_text = 'Satellite image'
     main_hashtag = ''
     base_hashtag = ''
     see_more = ''
+    additional = ''
     for key, value in TWEETTEXT.items():
         # MY_LOGGER.debug('key = %s', key)
 
@@ -150,29 +159,61 @@ def get_tweet_text(image):
             for img in TWEETTEXT[key]:
                 if image == img['Filename']:
                     # select a random main text
-                    random_pick = random.randint(1, len(img['Textlines'])) - 1
-                    MY_LOGGER.debug('pick = %d, text = %s', random_pick, img['Textlines'][random_pick])
-                    main_text = img['Textlines'][random_pick]
+                    random_pick = random.randint(1, 1 + len(img['Textlines'])) - 2
+                    if random_pick > -1:
+                        main_text = img['Textlines'][random_pick] + '. '
+                    else:
+                        main_text = ''
                     # select a random main hashtag
-                    random_pick = random.randint(1, len(img['hashtags'])) - 1
-                    MY_LOGGER.debug('pick = %d, text = %s', random_pick, img['hashtags'][random_pick])
-                    main_hashtag = img['hashtags'][random_pick]
+                    random_pick = random.randint(1, 1 + len(img['hashtags'])) - 2
+                    if random_pick > -1:
+                        main_hashtag = img['hashtags'][random_pick] + ' '
+                    else:
+                        main_hashtag = ''
 
         # select a random base hashtag
         if key == 'base hashtags':
             # MY_LOGGER.debug('key = %s, value = %s', key, value)
-            random_pick = random.randint(1, len(value)) - 1
-            MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
-            base_hashtag = value[random_pick]
+            random_pick = random.randint(1, 1 + len(value)) - 2
+            if random_pick > -1:
+                base_hashtag = value[random_pick] + ' '
+            else:
+                base_hashtag = ''
 
         # select a random see more
         if key == 'see more':
             # MY_LOGGER.debug('key = %s, value = %s', key, value)
             random_pick = random.randint(1, len(value)) - 1
             MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
-            see_more = value[random_pick]
+            see_more = value[random_pick] + '. '
+        
+        # select a random additional
+        if key == 'additional':
+            # MY_LOGGER.debug('key = %s, value = %s', key, value)
+            random_pick = random.randint(1, len(value)) - 1
+            # MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
+            additional = value[random_pick] + '.'
 
-    return main_text + ' ' + main_hashtag + ' ' + base_hashtag + ' ' + see_more
+    # debug info
+    MY_LOGGER.debug('main_text = [%s]', main_text)
+    MY_LOGGER.debug('main_hashtag = [%s]', main_hashtag)
+    MY_LOGGER.debug('base_hashtag = [%s]', base_hashtag)
+    MY_LOGGER.debug('see_more = [%s]', see_more)
+    MY_LOGGER.debug('additional = [%s]', additional)
+
+    # add the elements, if there is space left
+    text = main_text
+    text = add_text(text, main_hashtag)
+    text = add_text(text, base_hashtag)
+    text = add_text(text, see_more)
+    # add additional at random - 1 in 3 chance
+    if random.randint(1, 3) == 1:
+        MY_LOGGER.debug('Additional included')
+        text = add_text(text, additional)
+
+    MY_LOGGER.debug('tweet text = %s, length = %d', text, len(text))
+
+    return text
 
 
 def do_tweet(image):
@@ -258,7 +299,7 @@ for key, value in TWEETS.items():
         for tweet in value:
             TWEET_COUNT+= 1
 MY_LOGGER.debug('TWEET_COUNT = %d', TWEET_COUNT)
-TWEET_SLEEP = (3600 - 240) / TWEET_COUNT
+TWEET_SLEEP = (3600 - 300) / TWEET_COUNT
 MY_LOGGER.debug('TWEET_SLEEP = %d', TWEET_SLEEP)
 
 

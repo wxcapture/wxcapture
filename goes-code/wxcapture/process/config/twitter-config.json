@@ -3,7 +3,27 @@
 	"Light threshold": 25,
 	"Tweets": [
 		{
+			"Main Filename": "goes17-fd-fc-144-800x800.mp4",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		},
+		{
 			"Main Filename": "goes_17_fd_fc-tn.jpg",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		},
+		{
+			"Main Filename": "goes_15_combine-north_IR-tn.jpg",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		},
+		{
+			"Main Filename": "goes13-FC-tn.jpg",
+			"Main check light": "Yes",
+			"Alternate Filename": "goes13-4-tn.jpg"
+		},
+		{
+			"Main Filename": "sanchez-combined-fd-ir-144-800x800.mp4",
 			"Main check light": "No",
 			"Alternate Filename": ""
 		},
@@ -18,52 +38,7 @@
 			"Alternate Filename": "goes_17_m2_ch07-tn.jpg"
 		},
 		{
-			"Main Filename": "goes_16_fd_ch13_enhanced-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes_15_fd_IR-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes_15_combine-north_IR-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes15gvar-FC-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes15gvar-4-tn.jpg"
-		},
-		{
-			"Main Filename": "goes14-FC-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes14-4-tn.jpg"
-		},
-		{
-			"Main Filename": "goes13-FC-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes13-4-tn.jpg"
-		},
-		{
 			"Main Filename": "himawari_8_fd_IR-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "combined-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes17-fd-fc-144-800x800.mp4",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "sanchez-combined-fd-ir-144-800x800.mp4",
 			"Main check light": "No",
 			"Alternate Filename": ""
 		},
@@ -73,12 +48,32 @@
 			"Alternate Filename": ""
 		},
 		{
+			"Main Filename": "goes_16_fd_ch13_enhanced-tn.jpg",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		},
+		{
+			"Main Filename": "goes15gvar-FC-tn.jpg",
+			"Main check light": "Yes",
+			"Alternate Filename": "goes15gvar-4-tn.jpg"
+		},
+		{
 			"Main Filename": "sanchez-goes17-fd-fc-144-800x800.mp4",
 			"Main check light": "No",
 			"Alternate Filename": ""
 		},
 		{
-			"Main Filename": "goes16-fd-ch13_enhanced-72-800x800.mp4",
+			"Main Filename": "goes_15_fd_IR-tn.jpg",
+			"Main check light": "No",
+			"Alternate Filename": ""
+		},
+		{
+			"Main Filename": "goes14-FC-tn.jpg",
+			"Main check light": "Yes",
+			"Alternate Filename": "goes14-4-tn.jpg"
+		},
+		{
+			"Main Filename": "combined-tn.jpg",
 			"Main check light": "No",
 			"Alternate Filename": ""
 		}

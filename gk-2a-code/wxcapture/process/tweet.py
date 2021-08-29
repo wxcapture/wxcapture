@@ -8,6 +8,7 @@ from os import path
 import sys
 import time
 import requests
+from TwitterAPI import TwitterAPI
 import random
 import tweepy
 import cv2
@@ -38,8 +39,67 @@ def is_light(filename, threshold):
     return False
 
 
-def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
+def upload_file_chunked(uf_config_path, uf_config_file, uf_file):
+    """upload a file to the Twitter API"""
+
+    # code based on https://gist.github.com/jcipriano/e506b81a6062307c5189
+
+    def check_status(r):
+        MY_LOGGER.debug('check status')
+        if r.status_code < 200 or r.status_code > 299:
+            MY_LOGGER.error('ERROR status')
+            MY_LOGGER.debug('status = %s', r.status_code)
+            MY_LOGGER.debug('text = %s', r.text)
+            sys.exit(0)
+        MY_LOGGER.debug('check status OK')
+
+    # get the Twitter API config
+    uf_config = wxcutils.load_json(uf_config_path, uf_config_file)
+
+    # start API
+    MY_LOGGER.debug('Start the API')
+    twitter = TwitterAPI(uf_config['consumer key'], uf_config['consumer secret'],
+                         uf_config['access token'], uf_config['access token secret'])
+
+    bytes_sent = 0
+    total_bytes = os.path.getsize(uf_file)
+    file = open(uf_file, 'rb')
+    MY_LOGGER.debug('file = %s, size = %d', uf_file, total_bytes)
+
+    # init
+    MY_LOGGER.debug('Init')
+    r = twitter.request('media/upload', {'command':'INIT', 'media_type':'video/mp4', 'total_bytes':total_bytes})
+    check_status(r)
+
+    media_id = r.json()['media_id']
+    segment_id = 0
+
+    MY_LOGGER.debug('Chunking')
+    # start chucked upload
+    while bytes_sent < total_bytes:
+        chunk = file.read(1*1024*1024)
+        
+        # upload chunk of byets (1MB max)
+        r = twitter.request('media/upload', {'command':'APPEND', 'media_id':media_id, 'segment_index':segment_id}, {'media':chunk})
+        check_status(r)
+        segment_id = segment_id + 1
+        bytes_sent = file.tell()
+
+    MY_LOGGER.debug('Chunking complete')
+
+    # finalize the upload
+    MY_LOGGER.debug('Finalize')
+    r = twitter.request('media/upload', {'command':'FINALIZE', 'media_id':media_id})
+    check_status(r)
+
+    MY_LOGGER.debug('media_id = %s', media_id)
+    return media_id
+
+
+def send_tweet(tt_config_path, tt_config_file, tt_text, tt_file):
     """tweet text with image using info from the config file"""
+
+    # get the Twitter API config
     tt_config = wxcutils.load_json(tt_config_path, tt_config_file)
 
     # authentication
@@ -50,24 +110,48 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
     # get api
     tt_api = tweepy.API(tt_auth)
 
-    # upload the image
-    MY_LOGGER.debug('Uploading image = %s', tt_image_file)
-    tt_media = tt_api.media_upload(tt_image_file)
+    # upload the file
+    MY_LOGGER.debug('Uploading file = %s', tt_file)
+    if '.jpg' in tt_file or '.gif'' in tt_file or ''.png' in tt_file:
+        MY_LOGGER.debug('Image file upload')
+        # upload file
+        tt_media = tt_api.media_upload(tt_file)
 
-    # send tweet
-    MY_LOGGER.debug('Sending tweet with text = %s, image = %s', tt_text, tt_image_file)
-    tt_status = tt_api.update_status(status=tt_text, media_ids=[tt_media.media_id])
+        # send tweet
+        MY_LOGGER.debug('Sending tweet with text = %s, image = %s', tt_text, tt_file)
+        tt_status = tt_api.update_status(status=tt_text, media_ids=[tt_media.media_id])
+    else:
+        if '.mp4' in tt_file:
+            MY_LOGGER.debug('Video file upload')
+            # upload file
+            # move to using Tweepy API when available in release 4.0.0
+            tt_media_id = upload_file_chunked(tt_config_path, tt_config_file, tt_file)
+            
+            # send tweet
+            MY_LOGGER.debug('Sending tweet with text = %s, image = %s', tt_text, tt_file)
+            tt_status = tt_api.update_status(status=tt_text, media_ids=[tt_media_id])
+        else:
+            MY_LOGGER.debug('Unknown file type - can''t upload')
 
     MY_LOGGER.debug('Tweet sent with status = %s', tt_status)
 
 
-def get_image_text(image):
+def get_tweet_text(image):
     """pick a random image text line from what is configured"""
+
+    def add_text(base, add):
+        """add in additional text if space available"""
+        if len(base) + len(add) <= 280:
+            MY_LOGGER.debug('length ok, adding')
+            return base + add
+        MY_LOGGER.debug('length exceeded, not adding')
+        return base
 
     main_text = 'Satellite image'
     main_hashtag = ''
     base_hashtag = ''
     see_more = ''
+    additional = ''
     for key, value in TWEETTEXT.items():
         # MY_LOGGER.debug('key = %s', key)
 
@@ -75,29 +159,61 @@ def get_image_text(image):
             for img in TWEETTEXT[key]:
                 if image == img['Filename']:
                     # select a random main text
-                    random_pick = random.randint(1, len(img['Textlines'])) - 1
-                    MY_LOGGER.debug('pick = %d, text = %s', random_pick, img['Textlines'][random_pick])
-                    main_text = img['Textlines'][random_pick]
+                    random_pick = random.randint(1, 1 + len(img['Textlines'])) - 2
+                    if random_pick > -1:
+                        main_text = img['Textlines'][random_pick] + '. '
+                    else:
+                        main_text = ''
                     # select a random main hashtag
-                    random_pick = random.randint(1, len(img['hashtags'])) - 1
-                    MY_LOGGER.debug('pick = %d, text = %s', random_pick, img['hashtags'][random_pick])
-                    main_hashtag = img['hashtags'][random_pick]
+                    random_pick = random.randint(1, 1 + len(img['hashtags'])) - 2
+                    if random_pick > -1:
+                        main_hashtag = img['hashtags'][random_pick] + ' '
+                    else:
+                        main_hashtag = ''
 
         # select a random base hashtag
         if key == 'base hashtags':
             # MY_LOGGER.debug('key = %s, value = %s', key, value)
-            random_pick = random.randint(1, len(value)) - 1
-            MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
-            base_hashtag = value[random_pick]
+            random_pick = random.randint(1, 1 + len(value)) - 2
+            if random_pick > -1:
+                base_hashtag = value[random_pick] + ' '
+            else:
+                base_hashtag = ''
 
         # select a random see more
         if key == 'see more':
             # MY_LOGGER.debug('key = %s, value = %s', key, value)
             random_pick = random.randint(1, len(value)) - 1
             MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
-            see_more = value[random_pick]
+            see_more = value[random_pick] + '. '
+        
+        # select a random additional
+        if key == 'additional':
+            # MY_LOGGER.debug('key = %s, value = %s', key, value)
+            random_pick = random.randint(1, len(value)) - 1
+            # MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
+            additional = value[random_pick] + '.'
 
-    return main_text + ' ' + main_hashtag + ' ' + base_hashtag + ' ' + see_more
+    # debug info
+    MY_LOGGER.debug('main_text = [%s]', main_text)
+    MY_LOGGER.debug('main_hashtag = [%s]', main_hashtag)
+    MY_LOGGER.debug('base_hashtag = [%s]', base_hashtag)
+    MY_LOGGER.debug('see_more = [%s]', see_more)
+    MY_LOGGER.debug('additional = [%s]', additional)
+
+    # add the elements, if there is space left
+    text = main_text
+    text = add_text(text, main_hashtag)
+    text = add_text(text, base_hashtag)
+    text = add_text(text, see_more)
+    # add additional at random - 1 in 3 chance
+    if random.randint(1, 3) == 1:
+        MY_LOGGER.debug('Additional included')
+        text = add_text(text, additional)
+
+    MY_LOGGER.debug('tweet text = %s, length = %d', text, len(text))
+
+    return text
 
 
 def do_tweet(image):
@@ -105,13 +221,14 @@ def do_tweet(image):
 
     try:
         # tweet image
-        text = get_image_text(image)
+        text = get_tweet_text(image)
         MY_LOGGER.debug('Tweeting %s for image %s', text, image)
         # only proceed if the image exists
         if path.exists(OUTPUT_PATH + image):
             try:
-                tweet_text_image(CONFIG_PATH, 'config-twitter.json',
-                                 text, OUTPUT_PATH + image)
+                MY_LOGGER.debug('sending...')
+                send_tweet(CONFIG_PATH, 'config-twitter.json',
+                           text, OUTPUT_PATH + image)
             except:
                 MY_LOGGER.critical('Tweet exception handler: %s %s %s',
                                    sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
@@ -173,6 +290,19 @@ MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 MAXAGE = int(TWEETS['Max age'])
 MY_LOGGER.debug('MAXAGE = %d', MAXAGE)
 
+# determine delay between tweets based on number to tweet
+
+TWEET_COUNT = 0
+for key, value in TWEETS.items():
+    # MY_LOGGER.debug('key = %s, value = %s', key, value)
+    if key == 'Tweets':
+        for tweet in value:
+            TWEET_COUNT+= 1
+MY_LOGGER.debug('TWEET_COUNT = %d', TWEET_COUNT)
+TWEET_SLEEP = (3600 - 300) / TWEET_COUNT
+MY_LOGGER.debug('TWEET_SLEEP = %d', TWEET_SLEEP)
+
+
 # loop through tweets to tweet
 for key, value in TWEETS.items():
     # MY_LOGGER.debug('key = %s, value = %s', key, value)
@@ -207,6 +337,10 @@ for key, value in TWEETS.items():
             except:
                 MY_LOGGER.error('exception handler: %s %s %s',
                                 sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+            # sleep to spread out tweets over the hour
+            MY_LOGGER.debug('Sleeping for %d seconds', TWEET_SLEEP)
+            time.sleep(TWEET_SLEEP)
+            MY_LOGGER.debug('waking up again!')
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

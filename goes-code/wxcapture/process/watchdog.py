@@ -13,7 +13,7 @@ import wxcutils
 def is_running(process_name):
     """see if a process is running"""
     try:
-        cmd = subprocess.Popen(('ps', '-A'), stdout=subprocess.PIPE)
+        cmd = subprocess.Popen(('ps', '-ef'), stdout=subprocess.PIPE)
         output = subprocess.check_output(('grep', process_name), stdin=cmd.stdout)
         cmd.wait()
         MY_LOGGER.debug('output = %s', output.decode('utf-8'))
@@ -97,6 +97,14 @@ if not is_running('goesproc') or not is_processing('goesproc', 10):
 
 # log drive space free to file
 drive_validation()
+
+# test if tweet.py is running, if not kick it off
+if not is_running('tweet.py'):
+    # need to kick off the code
+    MY_LOGGER.debug('tweet.py not running - kicking it off')
+    wxcutils.run_cmd(CODE_PATH + 'tweet.py &')
+else:
+    MY_LOGGER.debug('tweet.py is running')
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

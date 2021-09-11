@@ -7,6 +7,7 @@ import os
 import glob
 import time
 import subprocess
+from datetime import datetime
 import cv2
 import wxcutils
 
@@ -158,12 +159,9 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
             # need to generate file
             if a_suffix == '_sanchez':
                 MY_LOGGER.debug('sanchez file to create')
-                MY_LOGGER.debug('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + '/' +
-                                FILES[a_counter]['file'] + FILES[a_counter]['ext'] +
-                                ' -o ' + \
-                                FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + \
-                                FILES[a_counter]['ext'] + ' -f')
-                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + FILES[a_counter]['dir'] + \
+
+                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -u ' + CONFIG_PATH + 'world.2004' + str(datetime.now().month).zfill(2) +
+                    '.3x5400x2700.jpg -s ' + FILES[a_counter]['dir'] + \
                     '/' + FILES[a_counter]['file'] + FILES[a_counter]['ext'] + \
                     '  -o ' + \
                     FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'] + ' -f')
@@ -309,7 +307,8 @@ if number_processes('find_files.py') == 1:
                     wxcutils.copy_file(os.path.join(location, filename + '_sanchez' + extenstion), os.path.join(OUTPUT_PATH, 'sanchez.jpg'))
                 else:
                     MY_LOGGER.debug('File does not exist, create it')
-                    wxcutils.run_cmd('/home/pi/sanchez/Sanchez -s ' + OUTPUT_PATH + 'clahe.jpg -o ' + OUTPUT_PATH + 'sanchez.jpg -f')
+                    wxcutils.run_cmd('/home/pi/sanchez/Sanchez -u ' + CONFIG_PATH + 'world.2004' + str(datetime.now().month).zfill(2) +
+                                     '.3x5400x2700.jpg -s ' + OUTPUT_PATH + 'clahe.jpg -o ' + OUTPUT_PATH + 'sanchez.jpg -f')
                 create_thumbnail('sanchez', extenstion)
                 date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
                 wxcutils.save_file(OUTPUT_PATH, 'sanchez.txt', date_time)

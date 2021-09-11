@@ -192,7 +192,7 @@ def get_tweet_text(image):
             # MY_LOGGER.debug('key = %s, value = %s', key, value)
             random_pick = random.randint(1, len(value)) - 1
             # MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
-            additional = value[random_pick] + '.'
+            additional = value[random_pick] + '. '
 
     # debug info
     MY_LOGGER.debug('main_text = [%s]', main_text)
@@ -203,13 +203,15 @@ def get_tweet_text(image):
 
     # add the elements, if there is space left
     text = main_text
+    text = add_text(text, see_more)
     text = add_text(text, main_hashtag)
     text = add_text(text, base_hashtag)
-    text = add_text(text, see_more)
+
     # add additional at random - 1 in 3 chance
     if random.randint(1, 3) == 1:
         MY_LOGGER.debug('Additional included')
         text = add_text(text, additional)
+    text = add_text(text, '#KiwiWeather')
 
     MY_LOGGER.debug('tweet text = %s, length = %d', text, len(text))
 
@@ -289,6 +291,8 @@ THRESHOLD = int(TWEETS['Light threshold'])
 MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 MAXAGE = int(TWEETS['Max age'])
 MY_LOGGER.debug('MAXAGE = %d', MAXAGE)
+HOURS = int(TWEETS['Run hours'])
+MY_LOGGER.debug('HOURS = %d', HOURS)
 
 # determine delay between tweets based on number to tweet
 
@@ -299,9 +303,8 @@ for key, value in TWEETS.items():
         for tweet in value:
             TWEET_COUNT+= 1
 MY_LOGGER.debug('TWEET_COUNT = %d', TWEET_COUNT)
-TWEET_SLEEP = (3600 - 300) / TWEET_COUNT
+TWEET_SLEEP = ((3600 * HOURS) - 500) / TWEET_COUNT
 MY_LOGGER.debug('TWEET_SLEEP = %d', TWEET_SLEEP)
-
 
 # loop through tweets to tweet
 for key, value in TWEETS.items():
@@ -337,9 +340,11 @@ for key, value in TWEETS.items():
             except:
                 MY_LOGGER.error('exception handler: %s %s %s',
                                 sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-            # sleep to spread out tweets over the hour
-            MY_LOGGER.debug('Sleeping for %d seconds', TWEET_SLEEP)
-            time.sleep(TWEET_SLEEP)
+
+            # sleep to spread out tweets randomly over the time period
+            SLEEP_TIME = TWEET_SLEEP * (1 + (random.random() - 0.5)) 
+            MY_LOGGER.debug('Sleeping for %d seconds', SLEEP_TIME)
+            time.sleep(SLEEP_TIME)
             MY_LOGGER.debug('waking up again!')
 
 MY_LOGGER.debug('Execution end')

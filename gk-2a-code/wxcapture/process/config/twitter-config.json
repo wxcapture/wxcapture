@@ -1,7 +1,8 @@
 {
 	"Max age": 3600,
 	"Light threshold": 25,
-	"Tweets": [
+    "Run hours": 6,
+    "Tweets": [
 		{
 			"Main Filename": "sanchez-tn.jpg",
 			"Main check light": "No",

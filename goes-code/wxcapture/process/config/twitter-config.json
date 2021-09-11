@@ -1,81 +1,102 @@
 {
-	"Max age": 3600,
-	"Light threshold": 25,
-	"Tweets": [
-		{
-			"Main Filename": "goes17-fd-fc-144-800x800.mp4",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes_17_fd_fc-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes_15_combine-north_IR-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes13-FC-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes13-4-tn.jpg"
-		},
-		{
-			"Main Filename": "sanchez-combined-fd-ir-144-800x800.mp4",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes_17_m1_fc-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes_17_m1_ch07-tn.jpg"
-		},
-		{
-			"Main Filename": "goes_17_m2_fc-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes_17_m2_ch07-tn.jpg"
-		},
-		{
-			"Main Filename": "himawari_8_fd_IR-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "sanchez-goes17-fd-ch13-144-800x800.mp4",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes_16_fd_ch13_enhanced-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes15gvar-FC-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes15gvar-4-tn.jpg"
-		},
-		{
-			"Main Filename": "sanchez-goes17-fd-fc-144-800x800.mp4",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes_15_fd_IR-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		},
-		{
-			"Main Filename": "goes14-FC-tn.jpg",
-			"Main check light": "Yes",
-			"Alternate Filename": "goes14-4-tn.jpg"
-		},
-		{
-			"Main Filename": "combined-tn.jpg",
-			"Main check light": "No",
-			"Alternate Filename": ""
-		}
-	]
+   "Max age":3600,
+   "Light threshold":25,
+   "Run hours": 9,
+   "Tweets":[
+      {
+         "Main Filename":"goes17-fd-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes_17_fd_fc-tn.jpg",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes_15_combine-north_IR-tn.jpg",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes17-m1-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes13-FC-tn.jpg",
+         "Main check light":"Yes",
+         "Alternate Filename":"goes13-4-tn.jpg"
+      },
+      {
+         "Main Filename":"sanchez-combined-fd-ir-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes_17_m1_fc-tn.jpg",
+         "Main check light":"Yes",
+         "Alternate Filename":"goes_17_m1_ch07-tn.jpg"
+      },
+      {
+         "Main Filename":"goes17-m2-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"himawari_8_fd_IR-tn.jpg",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes_17_m2_fc-tn.jpg",
+         "Main check light":"Yes",
+         "Alternate Filename":"goes_17_m2_ch07-tn.jpg"
+      },
+      {
+         "Main Filename":"sanchez-goes17-fd-ch13-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes_16_fd_ch13_enhanced-tn.jpg",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes15gvar-FC-tn.jpg",
+         "Main check light":"Yes",
+         "Alternate Filename":"goes15gvar-4-tn.jpg"
+      },
+      {
+         "Main Filename":"sanchez-goes17-fd-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes_15_fd_IR-tn.jpg",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes17-m1-ch07-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes14-FC-tn.jpg",
+         "Main check light":"Yes",
+         "Alternate Filename":"goes14-4-tn.jpg"
+      },
+      {
+         "Main Filename":"combined-tn.jpg",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"himawari8-fd-72-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      }
+   ]
 }

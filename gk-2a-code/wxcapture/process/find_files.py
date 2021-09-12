@@ -7,7 +7,9 @@ import os
 import glob
 import time
 import subprocess
+import calendar
 from datetime import datetime
+import numpy as np
 import cv2
 import wxcutils
 
@@ -147,26 +149,16 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
         MY_LOGGER.debug('Reduced frames to %d as not enough frames exist (max = %d)',
                         a_frames, a_files)
     a_text = ''
+    a_original_suffix = a_suffix
 
     MY_LOGGER.debug('Going throught the last %d frames', a_frames)
     if a_suffix != '':
-        a_suffix = '_' + a_suffix
+        a_suffix = '_' + a_suffix + '_web'
+    else:
+        a_suffix = '_web'
     a_counter = a_files - a_frames
     while  a_counter < a_files:
         a_text = a_text + add_txt(FILES[a_counter]['dir'], FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'], True)
-        if not os.path.exists(FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + \
-            a_suffix + FILES[a_counter]['ext']):
-            # need to generate file
-            if a_suffix == '_sanchez':
-                MY_LOGGER.debug('sanchez file to create')
-
-                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -u ' + CONFIG_PATH + 'world.2004' + str(datetime.now().month).zfill(2) +
-                    '.3x5400x2700.jpg -s ' + FILES[a_counter]['dir'] + \
-                    '/' + FILES[a_counter]['file'] + FILES[a_counter]['ext'] + \
-                    '  -o ' + \
-                    FILES[a_counter]['dir'] + '/' + FILES[a_counter]['file'] + a_suffix + FILES[a_counter]['ext'] + ' -f')
-            else:
-                MY_LOGGER.debug('%s file to create', a_suffix)
         a_counter += 1
     # add last frame again, but with no duration
     a_text += add_txt(FILES[a_files - 1]['dir'], FILES[a_files - 1]['file'] + a_suffix + FILES[a_files - 1]['ext'], False)
@@ -175,8 +167,11 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
     wxcutils.save_file(WORKING_PATH, 'framelist.txt', a_text)
 
     # create animation
-    if a_suffix == '':
+    if a_original_suffix == '':
         a_suffix = 'raw'
+    else:
+        a_suffix = '_' + a_original_suffix
+
     wxcutils.run_cmd('ffmpeg -y -safe 0 -f concat -i ' + WORKING_PATH +
                      'framelist.txt -c:v libx264 -pix_fmt yuv420p -vf scale=800:800 ' + OUTPUT_PATH + 'FD-' +
                      a_suffix + '-' + str(a_frames) + '.mp4')
@@ -184,6 +179,101 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
     # create file with date time info
     date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
     wxcutils.save_file(OUTPUT_PATH, 'FD-' + a_suffix + '-' + str(a_frames) + '.txt', date_time)
+
+
+def create_branded():
+    """create branded images"""
+
+    def add_kiwiweather():
+        """add kiwiweather"""
+        # Kiwiweather.com
+        nonlocal image
+        image = cv2.putText(image, 'Kiwi', (20, 80),
+                            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
+        image = cv2.putText(image, 'Weather', (20, 160),
+                            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
+        image = cv2.putText(image, '.com', (20, 240),
+                            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
+
+    def add_logo(x_offset):
+        """add logo"""
+        # logo
+        y_offset = 0
+        nonlocal image
+        image[y_offset:y_offset+logo.shape[0], x_offset:x_offset+logo.shape[1]] = logo
+
+
+    def add_date(y_offset):
+        """add date and time"""
+
+        # date / time info
+        bits = file['file'].split('_')
+        year = bits[4][:4]
+        month = calendar.month_abbr[int(bits[4][4:6])]
+        day = bits[4][6:8]
+        hour = bits[5][:2]
+        min = bits[5][2:4]
+        # MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
+        nonlocal image
+        image = cv2.putText(image, hour + ':' + min + ' UTC', (20, y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
+        image = cv2.putText(image, day + '-' + month + '-' + year, (20, 80 + y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
+
+    def add_sat_info(x_offset, y_offset, satellite, process):
+        """add satellite info"""
+
+        nonlocal image
+        image = cv2.putText(image, satellite, (x_offset, y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
+        image = cv2.putText(image, process, (x_offset, 80 + y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
+
+    MY_LOGGER.debug('create branded images where required')
+
+    # load logo
+    MY_LOGGER.debug('load logo')
+    logo = cv2.imread(CONFIG_PATH + 'logo.jpg')
+
+    for file in FILES:
+            MY_LOGGER.debug('file = %s', file)
+
+            # does raw branded file exist?
+            if not os.path.exists(file['dir'] + '/' + file['file'] + '_web' + file['ext']):
+                MY_LOGGER.debug('creating raw branded')
+                # load raw image
+                image = cv2.imread(file['dir'] + '/' + file['file'] + file['ext'])
+                add_kiwiweather()
+                add_logo(2000)
+                add_date(2100)
+                add_sat_info(1700, 2100, 'GK-2A', 'IR')
+                # write out image
+                cv2.imwrite(file['dir'] + '/' + file['file'] + '_web' + file['ext'], image)
+            else:
+                MY_LOGGER.debug('raw branded exists')
+
+            # does sanchez file exist?
+            if not os.path.exists(file['dir'] + '/' + file['file'] + '_sanchez' + file['ext']):
+                MY_LOGGER.debug('creating sanchez')
+                wxcutils.run_cmd('/home/pi/sanchez/Sanchez -u ' + CONFIG_PATH + 'world.2004' + str(datetime.now().month).zfill(2) +
+                                '.3x5400x2700.jpg -s ' + file['dir'] + '/' + file['file'] + file['ext'] + \
+                                '  -o ' + file['dir'] + '/' + file['file'] + '_sanchez' + file['ext'])
+            else:
+                MY_LOGGER.debug('sanchez exists')
+
+            # does sanchez branded file exist?
+            if not os.path.exists(file['dir'] + '/' + file['file'] + '_sanchez_web' + file['ext']):
+                MY_LOGGER.debug('creating raw branded')
+                # load raw image
+                image = cv2.imread(file['dir'] + '/' + file['file'] + '_sanchez' + file['ext'])
+                add_kiwiweather()
+                add_logo(2512)
+                add_date(2612)
+                add_sat_info(2100, 2612, 'GK-2A', 'IR Sanchez')
+                # write out image
+                cv2.imwrite(file['dir'] + '/' + file['file'] + '_sanchez_web' + file['ext'], image)
+            else:
+                MY_LOGGER.debug('raw branded exists')
 
 
 # setup paths to directories
@@ -266,21 +356,9 @@ if number_processes('find_files.py') == 1:
 
         MY_LOGGER.debug('stored_timestamp = %f, %f', stored_timestamp, latest)
         if stored_timestamp != int(latest):
-            MY_LOGGER.debug('New %s file added', directory)
+            MY_LOGGER.debug('New %s file added, previous latest = %f, current latest = %f', directory, stored_timestamp, latest)
             latest_timestamps[directory + extenstion] = int(latest)
-
-            # copy file to the output directory
-            wxcutils.copy_file(os.path.join(location, latest_file), os.path.join(OUTPUT_PATH, directory + extenstion))
-
-            # create thumbnail
-            create_thumbnail(directory, extenstion)
-
-            # create file with date time info
             date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-            if directory != 'ANT':
-                wxcutils.save_file(OUTPUT_PATH, directory + '.txt', date_time)
-            else:
-                wxcutils.save_file(OUTPUT_PATH, 'ANT.txt.txt', date_time)
 
             # additional processing of FD image
             if directory == 'FD':
@@ -290,28 +368,48 @@ if number_processes('find_files.py') == 1:
                 FILES = sorted(FILES, key=lambda k: k['datetime'])
                 # save to file system for debugging only
                 # wxcutils.save_json(WORKING_PATH, 'crawl.json', FILES)
+
+                # create branded images
+                create_branded()
+
+                # do the animations
                 animate(directory, filename, extenstion, 143 * 3, '')
                 animate(directory, filename, extenstion, 143 * 3, 'sanchez')
 
-                # CLAHE processing
-                clahe_process(OUTPUT_PATH, 'FD.jpg', OUTPUT_PATH, 'clahe.jpg')
-                create_thumbnail('clahe', extenstion)
-                date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
+                wxcutils.save_file(OUTPUT_PATH, 'FD.txt', date_time)
                 wxcutils.save_file(OUTPUT_PATH, 'clahe.txt', date_time)
+                wxcutils.save_file(OUTPUT_PATH, 'FD_sanchez.txt', date_time)
 
                 # sanchez processing
-                # image should have been created already for the animations
-                MY_LOGGER.debug('Checking for %s', os.path.join(location, filename + '_sanchez' + extenstion))
-                if os.path.isfile(os.path.join(location, filename + '_sanchez' + extenstion)):
-                    MY_LOGGER.debug('File already exists, copy it')
-                    wxcutils.copy_file(os.path.join(location, filename + '_sanchez' + extenstion), os.path.join(OUTPUT_PATH, 'sanchez.jpg'))
-                else:
-                    MY_LOGGER.debug('File does not exist, create it')
-                    wxcutils.run_cmd('/home/pi/sanchez/Sanchez -u ' + CONFIG_PATH + 'world.2004' + str(datetime.now().month).zfill(2) +
-                                     '.3x5400x2700.jpg -s ' + OUTPUT_PATH + 'clahe.jpg -o ' + OUTPUT_PATH + 'sanchez.jpg -f')
+                # image will have been created during animation, so create thumbnail
                 create_thumbnail('sanchez', extenstion)
-                date_time = 'Last generated at ' + get_local_date_time() + ' ' + LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-                wxcutils.save_file(OUTPUT_PATH, 'sanchez.txt', date_time)
+
+                # copy latest files to the output directory
+                wxcutils.copy_file(FILES[-1]['dir'] + '/' + FILES[-1]['file'] + '_web' + FILES[-1]['ext'],
+                                   os.path.join(OUTPUT_PATH, directory + extenstion))
+                wxcutils.copy_file(FILES[-1]['dir'] + '/' + FILES[-1]['file'] + '_sanchez_web' + FILES[-1]['ext'],
+                                   os.path.join(OUTPUT_PATH, directory + '_sanchez' + extenstion))
+                create_thumbnail(directory, extenstion)
+                create_thumbnail(directory + '_sanchez', extenstion)
+
+                # CLAHE processing of latest
+                clahe_process(OUTPUT_PATH, 'FD.jpg', OUTPUT_PATH, 'clahe.jpg')
+                create_thumbnail('clahe', extenstion)
+
+            else:
+                # copy file to the output directory
+                wxcutils.copy_file(os.path.join(location, latest_file), os.path.join(OUTPUT_PATH, directory + extenstion))
+
+                # create thumbnail
+                if extenstion != '.txt':
+                    create_thumbnail(directory, extenstion)
+
+                # create file with date time info
+                if directory != 'ANT':
+                    wxcutils.save_file(OUTPUT_PATH, directory + '.txt', date_time)
+                else:
+                    wxcutils.save_file(OUTPUT_PATH, 'ANT.txt.txt', date_time)
+
 
 
         else:
@@ -322,7 +420,7 @@ if number_processes('find_files.py') == 1:
 
     # rsync files to servers
     wxcutils.run_cmd('rsync -rt ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
-    wxcutils.run_cmd('rsync -rt ' + base_dir + ' pi@192.168.100.15:/home/pi/goes/gk-2a')
+    wxcutils.run_cmd('rsync -rt ' + base_dir + ' --exclude *_sanchez* --exclude *web* pi@192.168.100.15:/home/pi/goes/gk-2a')
 
 else:
     MY_LOGGER.debug('Another instance of find_files.py is already running')

@@ -68,7 +68,7 @@ def do_backup_all():
     errors = []
 
     MY_LOGGER.debug('GK-2A - data')
-    errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/gk-2a/', '/mnt/f/Satellites/gk-2a/LRIT/')})
+    errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '*_sanchez* *web*', 'pi@192.168.100.15:/home/pi/goes/gk-2a/', '/mnt/f/Satellites/gk-2a/LRIT/')})
 
     MY_LOGGER.debug('GK-2A - gamma')
     errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')})
@@ -179,15 +179,16 @@ def do_backup_new():
                                          'pi@192.168.100.15:/home/pi/goes/gk-2a/' + date_dir + '/',
                                          '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')})
 
-    MY_LOGGER.debug('GK-2A - gamma')
-    # get all dates between the ranges
-    for single_date in daterange(utc_date_last, utc_date_now):
-        date_dir = single_date.strftime("%Y%m%d")
-        MY_LOGGER.debug('date = %s', date_dir)
-        errors.append({'type': 'GK-2A - gamma - ' + date_dir,
-                       'errors': do_rsync('caWv', '',
-                                         'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/' + date_dir + '/',
-                                         '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')})
+    # exclude as all GK-2A data goes to data
+    # MY_LOGGER.debug('GK-2A - gamma')
+    # # get all dates between the ranges
+    # for single_date in daterange(utc_date_last, utc_date_now):
+    #     date_dir = single_date.strftime("%Y%m%d")
+    #     MY_LOGGER.debug('date = %s', date_dir)
+    #     errors.append({'type': 'GK-2A - gamma - ' + date_dir,
+    #                    'errors': do_rsync('caWv', '',
+    #                                      'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/' + date_dir + '/',
+    #                                      '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')})
 
     MY_LOGGER.debug('NWS')
     # get all dates between the ranges

@@ -419,8 +419,8 @@ if number_processes('find_files.py') == 1:
     wxcutils.save_json(OUTPUT_PATH, 'gk2a_info.json', latest_timestamps)
 
     # rsync files to servers
-    wxcutils.run_cmd('rsync -rt ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
-    wxcutils.run_cmd('rsync -rt ' + base_dir + ' --exclude *_sanchez* --exclude *web* pi@192.168.100.15:/home/pi/goes/gk-2a')
+    wxcutils.run_cmd('rsync -rtP ' + OUTPUT_PATH + ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
+    wxcutils.run_cmd('rsync -rtP ' + base_dir + ' --exclude *_sanchez* --exclude *web* pi@192.168.100.15:/home/pi/goes/gk-2a')
 
 else:
     MY_LOGGER.debug('Another instance of find_files.py is already running')

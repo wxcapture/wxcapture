@@ -105,7 +105,7 @@ def clahe_process(cp_in_path, cp_in_file, cp_out_path, cp_out_file):
 
     MY_LOGGER.debug('clahe_process %s %s %s %s', cp_in_path, cp_in_file,
                     cp_out_path, cp_out_file)
-    MY_LOGGER.debug('process image')
+    MY_LOGGER.debug('process image - %s', cp_in_path + cp_in_file)
     cp_out_img = do_clahe_img(cv2.imread(cp_in_path + cp_in_file))
     MY_LOGGER.debug('write new image')
     cv2.imwrite(cp_out_path + cp_out_file, cp_out_img)
@@ -275,6 +275,22 @@ def create_branded():
             else:
                 MY_LOGGER.debug('raw branded exists')
 
+            # does clahe branded file exist?
+            if not os.path.exists(file['dir'] + '/' + file['file'] + '_clahe_web' + file['ext']):
+                MY_LOGGER.debug('creating clahe branded')
+                clahe_process(file['dir'] + '/', file['file'] + file['ext'],
+                              WORKING_PATH, 'clahe.jpg')
+                # load raw image
+                image = cv2.imread(WORKING_PATH + 'clahe.jpg')
+                add_kiwiweather()
+                add_logo(2000)
+                add_date(2100)
+                add_sat_info(1700, 2100, 'GK-2A', 'IR Clahe')
+                # write out image
+                cv2.imwrite(file['dir'] + '/' + file['file'] + '_clahe_web' + file['ext'], image)
+            else:
+                MY_LOGGER.debug('raw branded exists')
+
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -375,6 +391,7 @@ if number_processes('find_files.py') == 1:
                 # do the animations
                 animate(directory, filename, extenstion, 143 * 3, '')
                 animate(directory, filename, extenstion, 143 * 3, 'sanchez')
+                animate(directory, filename, extenstion, 143 * 3, 'clahe')
 
                 wxcutils.save_file(OUTPUT_PATH, 'FD.txt', date_time)
                 wxcutils.save_file(OUTPUT_PATH, 'clahe.txt', date_time)
@@ -389,11 +406,10 @@ if number_processes('find_files.py') == 1:
                                    os.path.join(OUTPUT_PATH, directory + extenstion))
                 wxcutils.copy_file(FILES[-1]['dir'] + '/' + FILES[-1]['file'] + '_sanchez_web' + FILES[-1]['ext'],
                                    os.path.join(OUTPUT_PATH, directory + '_sanchez' + extenstion))
+                wxcutils.copy_file(FILES[-1]['dir'] + '/' + FILES[-1]['file'] + '_clahe_web' + FILES[-1]['ext'],
+                                   os.path.join(OUTPUT_PATH, 'clahe' + extenstion))
                 create_thumbnail(directory, extenstion)
                 create_thumbnail(directory + '_sanchez', extenstion)
-
-                # CLAHE processing of latest
-                clahe_process(OUTPUT_PATH, 'FD.jpg', OUTPUT_PATH, 'clahe.jpg')
                 create_thumbnail('clahe', extenstion)
 
             else:

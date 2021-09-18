@@ -51,12 +51,18 @@ def brand_image(bi_filename,
         bi_height, bi_width = output_image.shape[:2]
         MY_LOGGER.debug('new height = %d width = %d', bi_height, bi_width)
 
+        # text size
+        bi_text_size = 2
+        if '-tn.jpg' in bi_filename:
+            MY_LOGGER.debug('Thumbnail - reduce text size')
+            bi_text_size = 0.7
+
         # headline
         MY_LOGGER.debug('add headline')
-        output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degree pass', (20, 60),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+        output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degrees ' + PASS_INFO['max_elevation_direction'] + ' pass', (20, 60),
+                                   cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
         output_image = cv2.putText(output_image, 'over ' + CONFIG_INFO['Location'], (20, 120),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                   cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
         # UTC date
         year = PASS_INFO['startDate'][11:16]
         month = PASS_INFO['startDate'][7:10]
@@ -65,7 +71,7 @@ def brand_image(bi_filename,
         minute = PASS_INFO['startDate'][19:21]
         MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, minute)
         output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' UTC', (20, 180),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                   cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # local date
         year = PASS_INFO['start_date_local'][11:16]
@@ -75,16 +81,16 @@ def brand_image(bi_filename,
         minute = PASS_INFO['start_date_local'][19:21]
         MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, minute)
         output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' local', (20, 240),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                   cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # pass info
         MY_LOGGER.debug('add pass info')
         output_image = cv2.putText(output_image, bi_processing, (20, 300),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                   cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # kiwiweather.com
         output_image = cv2.putText(output_image, bi_branding, (20, 360),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                   cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # add logo
         MY_LOGGER.debug('add logo')

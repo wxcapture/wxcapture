@@ -57,7 +57,7 @@ def brand_image(bi_filename,
             output_image = cv2.putText(output_image, bi_satellite + ' - passes', (20, 60),
                                        cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         else:
-            output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degree pass', (20, 60),
+            output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degrees ' + PASS_INFO['max_elevation_direction'] + ' pass', (20, 60),
                                        cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         output_image = cv2.putText(output_image, 'over ' + CONFIG_INFO['Location'], (20, 120),
                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)

@@ -17,8 +17,87 @@ import sys
 import glob
 import time
 import subprocess
+import cv2
 import wxcutils
 import wxcutils_pi
+
+
+def brand_image(bi_filename,
+                bi_satellite,
+                bi_max_elevation,
+                bi_processing,
+                bi_branding):
+    """add image branding"""
+    MY_LOGGER.debug('Adding image branding')
+    MY_LOGGER.debug('filename = %s', bi_filename)
+    MY_LOGGER.debug('satellite = %s', bi_satellite)
+    MY_LOGGER.debug('max_elevation = %s', bi_max_elevation)
+    MY_LOGGER.debug('processing = %s', bi_processing)
+    MY_LOGGER.debug('branding = %s', bi_branding)
+  
+    try:
+        # load the image
+        MY_LOGGER.debug('load image')
+        input_image = cv2.imread(bi_filename)
+
+        # image dimensions
+        bi_height, bi_width = input_image.shape[:2]
+        MY_LOGGER.debug('height = %d width = %d', bi_height, bi_width)
+
+        # add the border to the top of the image
+        output_image = cv2.copyMakeBorder(input_image, 380, 0, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+
+        # image dimensions
+        bi_height, bi_width = output_image.shape[:2]
+        MY_LOGGER.debug('new height = %d width = %d', bi_height, bi_width)
+
+        # headline
+        MY_LOGGER.debug('add headline')
+        output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degree pass', (20, 60),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+        output_image = cv2.putText(output_image, 'over ' + CONFIG_INFO['Location'], (20, 120),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+        # UTC date
+        year = PASS_INFO['startDate'][11:16]
+        month = PASS_INFO['startDate'][7:10]
+        day = PASS_INFO['startDate'][4:6]
+        hour = PASS_INFO['startDate'][16:18]
+        minute = PASS_INFO['startDate'][19:21]
+        MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, minute)
+        output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' UTC', (20, 180),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # local date
+        year = PASS_INFO['start_date_local'][11:16]
+        month = PASS_INFO['start_date_local'][7:10]
+        day = PASS_INFO['start_date_local'][4:6]
+        hour = PASS_INFO['start_date_local'][16:18]
+        minute = PASS_INFO['start_date_local'][19:21]
+        MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, minute)
+        output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' local', (20, 240),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # pass info
+        MY_LOGGER.debug('add pass info')
+        output_image = cv2.putText(output_image, bi_processing, (20, 300),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # kiwiweather.com
+        output_image = cv2.putText(output_image, bi_branding, (20, 360),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # add logo
+        MY_LOGGER.debug('add logo')
+        output_image[0:LOGO_IMAGE.shape[0], bi_width-LOGO_IMAGE.shape[1]:bi_width+LOGO_IMAGE.shape[1]] = LOGO_IMAGE
+
+        # write out the new image
+        MY_LOGGER.debug('write image')
+        cv2.imwrite(bi_filename, output_image)
+        MY_LOGGER.debug('brand_image completed')
+
+    except Exception as err:
+        MY_LOGGER.debug('Unexpected error creating brand_image : %s %s %s',
+                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 
 def get_bias_t():
@@ -121,6 +200,10 @@ try:
     # get local time zone
     LOCAL_TIME_ZONE = subprocess.check_output("date"). \
         decode('utf-8').split(' ')[-2]
+
+    # load logo image once
+    MY_LOGGER.debug('load logo')
+    LOGO_IMAGE = cv2.imread(CONFIG_PATH + 'logo.jpg')
 
     # create filename base
     FILENAME_BASE = wxcutils.epoch_to_utc(START_EPOCH, '%Y-%m-%d-%H-%M-%S') + \
@@ -450,6 +533,52 @@ try:
         html.close()
 
     if CREATE_PAGE:
+        # add branding to pages
+        brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Channel 0',
+                    'KiwiWeather.com')
+        brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Channel 0',
+                    'KiwiWeather.com')
+
+        brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Channel 1',
+                    'KiwiWeather.com')
+        brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Channel 1',
+                    'KiwiWeather.com')
+
+        brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Channel 2',
+                    'KiwiWeather.com')
+        brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Channel 2',
+                    'KiwiWeather.com')
+
+        brand_image(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Full colour',
+                    'KiwiWeather.com')
+        brand_image(IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Full colour',
+                    'KiwiWeather.com')
+
+        brand_image(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Processed full colour',
+                    'KiwiWeather.com')
+        brand_image(IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Processed full colour',
+                    'KiwiWeather.com')
+
         # migrate files to destinations
         MY_LOGGER.debug('migrate files to destinations')
         migrate_files()
@@ -481,6 +610,7 @@ try:
                                 TWEET_IMAGE)
         else:
             MY_LOGGER.debug('Tweeting not enabled')
+ 
         # discord webhook?
         if IMAGE_OPTIONS['discord webhooks'] == 'yes' and \
             int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):

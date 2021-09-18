@@ -55,12 +55,12 @@ def brand_image(bi_filename,
         MY_LOGGER.debug('add headline')
         if bi_projection:
             output_image = cv2.putText(output_image, bi_satellite + ' - passes', (20, 60),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         else:
             output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degree pass', (20, 60),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         output_image = cv2.putText(output_image, 'over ' + CONFIG_INFO['Location'], (20, 120),
-                                cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         # UTC date
         year = PASS_INFO['startDate'][11:16]
         month = PASS_INFO['startDate'][7:10]
@@ -73,10 +73,10 @@ def brand_image(bi_filename,
             if int(hour) >= 12:
                 bi_pass_meridian = 'Evening'
             output_image = cv2.putText(output_image, bi_pass_meridian + ' ' + day + '-' + month + '-' + year + ' UTC', (20, 180),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         else:
             output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' UTC', (20, 180),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
         # local date
         year = PASS_INFO['start_date_local'][11:16]
@@ -90,28 +90,28 @@ def brand_image(bi_filename,
             if int(hour) >= 12:
                 bi_pass_meridian = 'Evening'
             output_image = cv2.putText(output_image, bi_pass_meridian + ' ' + day + '-' + month + '-' + year + ' local', (20, 240),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         else:
             output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' local', (20, 240),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
         # pass info
         MY_LOGGER.debug('add pass info')
         if 'channel A' in bi_processing:
             bi_processing = bi_processing.replace('channel A', PASS_INFO['NOAA Channel A'][14:-1])
             output_image = cv2.putText(output_image, bi_processing, (20, 300),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)        
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)        
         elif 'channel B' in bi_processing:
             bi_processing = bi_processing.replace('channel B', PASS_INFO['NOAA Channel B'][14:-1])
             output_image = cv2.putText(output_image, bi_processing, (20, 300),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA) 
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA) 
         else:
             output_image = cv2.putText(output_image, bi_processing, (20, 300),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
         # kiwiweather.com
         output_image = cv2.putText(output_image, bi_branding, (20, 360),
-                                cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
         # add logo
         MY_LOGGER.debug('add logo')

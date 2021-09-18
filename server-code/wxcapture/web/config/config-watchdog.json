@@ -30,7 +30,7 @@
 		"Display Name": "GOES 15",
 		"Location": "goes",
 		"Test Image": "goes_15_fd_IR.jpg",
-		"Max Age": "540",
+		"Max Age": "720",
 		"Last Status": "good",
 		"Status Change": "",
 		"Active": "yes"

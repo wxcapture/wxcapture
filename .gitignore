@@ -21,3 +21,4 @@ server-code/wxcapture/web/discord_webhook_test.py
 server-code/wxcapture/web/discord_test.py
 gk-2a-code/wxcapture/process/find_files - framebuffer.py
 pi-code/wxcapture/process/test.py
+pi-code/wxcapture/process/labeltest.py

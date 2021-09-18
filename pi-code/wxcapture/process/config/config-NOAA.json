@@ -84,6 +84,7 @@
 		"999": {
 			"description": "Contrast - channels A,B image",
 			"options": "-e contrast",
+			"clahe": "no",
 			"active": "no",
 			"filename": "contrast",
 			"scale": "no",
@@ -92,6 +93,7 @@
 		"998": {
 			"description": "Histogram equalisation image",
 			"options": "-e histeq",
+			"clahe": "no",
 			"active": "no",
 			"filename": "histeq",
 			"scale": "no",
@@ -107,7 +109,7 @@
 			"projection": "no"
 		},
 		"003": {
-			"description": "Coloured infrared image highlighting precipitation",
+			"description": "Coloured IR image highlighting precipitation",
 			"options": "-e MCIR-precip",
 			"clahe": "no",
 			"active": "yes",
@@ -163,6 +165,7 @@
 		"997": {
 			"description": "Hurricane enhanced image",
 			"options": "-e BD",
+			"clahe": "no",
 			"active": "no",
 			"filename": "bd",
 			"scale": "yes",
@@ -171,6 +174,7 @@
 		"996": {
 			"description": "Warm season enhanced image",
 			"options": "-e MD",
+			"clahe": "no",
 			"active": "no",
 			"filename": "md",
 			"scale": "yes",
@@ -179,6 +183,7 @@
 		"995": {
 			"description": "Thunderstorm enhanced image",
 			"options": "-e MB",
+			"clahe": "no",
 			"active": "no",
 			"filename": "mb",
 			"scale": "yes",
@@ -196,6 +201,7 @@
 		"994": {
 			"description": "Sea surface / cold cloud enhanced image",
 			"options": "-e JF",
+			"clahe": "no",
 			"active": "no",
 			"filename": "jf",
 			"scale": "no",
@@ -229,8 +235,9 @@
 			"projection": "no"
 		},
 		"993": {
-			"description": "Multispecteral analysis enhanced image highlighting precipitation",
+			"description": "Multispecteral image highlighting precipitation",
 			"options": "-e MSA-precip",
+			"clahe": "no",
 			"active": "no",
 			"filename": "msa-precip",
 			"scale": "no",

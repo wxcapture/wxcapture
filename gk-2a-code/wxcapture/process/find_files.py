@@ -194,7 +194,8 @@ def create_branded(satellite):
                             cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
         image = cv2.putText(image, '.com', (20, 240),
                             cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
-
+        image = cv2.putText(image, 'ZL4MDE', (20, 320),
+                            cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
     def add_logo(x_offset):
         """add logo"""

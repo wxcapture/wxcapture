@@ -543,51 +543,52 @@ try:
         brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Channel 0',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
         brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Channel 0',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
 
         brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Channel 1',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
         brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Channel 1',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
 
         brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Channel 2',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
         brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Channel 2',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
 
         brand_image(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Full colour',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
         brand_image(IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Full colour',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
 
         brand_image(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Processed full colour',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
         brand_image(IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Processed full colour',
-                    'KiwiWeather.com')
+                    IMAGE_OPTIONS['Branding'])
 
         # migrate files to destinations
         MY_LOGGER.debug('migrate files to destinations')
         migrate_files()
+        
         # tweet?
         if IMAGE_OPTIONS['tweet'] == 'yes' and \
             int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):

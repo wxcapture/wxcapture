@@ -34,34 +34,41 @@ def brand_image(bi_filename,
     MY_LOGGER.debug('max_elevation = %s', bi_max_elevation)
     MY_LOGGER.debug('processing = %s', bi_processing)
     MY_LOGGER.debug('branding = %s', bi_branding)
-  
+
     try:
         # load the image
         MY_LOGGER.debug('load image')
         input_image = cv2.imread(bi_filename)
+
+        thumbnail = False
+        bi_text_size = 2
+        border_size = 380
+        y_inc = 60
+        y_val = 0
+        if '-tn.jpg' in bi_filename:
+            MY_LOGGER.debug('Thumbnail detected')
+            bi_text_size = 0.45
+            border_size = 20
+            y_inc = 30
 
         # image dimensions
         bi_height, bi_width = input_image.shape[:2]
         MY_LOGGER.debug('height = %d width = %d', bi_height, bi_width)
 
         # add the border to the top of the image
-        output_image = cv2.copyMakeBorder(input_image, 380, 0, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+        output_image = cv2.copyMakeBorder(input_image, border_size, 0, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
         # image dimensions
         bi_height, bi_width = output_image.shape[:2]
         MY_LOGGER.debug('new height = %d width = %d', bi_height, bi_width)
 
-        # text size
-        bi_text_size = 2
-        if '-tn.jpg' in bi_filename:
-            MY_LOGGER.debug('Thumbnail - reduce text size')
-            bi_text_size = 0.7
-
         # headline
         MY_LOGGER.debug('add headline')
-        output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degrees ' + PASS_INFO['max_elevation_direction'] + ' pass', (20, 60),
+        y_val += y_inc
+        output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degrees ' + PASS_INFO['max_elevation_direction'] + ' pass', (20, y_val),
                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
-        output_image = cv2.putText(output_image, 'over ' + CONFIG_INFO['Location'], (20, 120),
+        y_val += y_inc
+        output_image = cv2.putText(output_image, 'over ' + CONFIG_INFO['Location'], (20, y_val),
                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
         # UTC date
         year = PASS_INFO['startDate'][11:16]
@@ -70,7 +77,8 @@ def brand_image(bi_filename,
         hour = PASS_INFO['startDate'][16:18]
         minute = PASS_INFO['startDate'][19:21]
         MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, minute)
-        output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' UTC', (20, 180),
+        y_val += y_inc
+        output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' UTC', (20, y_val),
                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # local date
@@ -80,16 +88,19 @@ def brand_image(bi_filename,
         hour = PASS_INFO['start_date_local'][16:18]
         minute = PASS_INFO['start_date_local'][19:21]
         MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, minute)
-        output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' local', (20, 240),
+        y_val += y_inc
+        output_image = cv2.putText(output_image, hour + ':' + minute + ' ' + day + '-' + month + '-' + year + ' local', (20, y_val),
                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # pass info
         MY_LOGGER.debug('add pass info')
-        output_image = cv2.putText(output_image, bi_processing, (20, 300),
+        y_val += y_inc
+        output_image = cv2.putText(output_image, bi_processing, (20, y_val),
                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # kiwiweather.com
-        output_image = cv2.putText(output_image, bi_branding, (20, 360),
+        y_val += y_inc
+        output_image = cv2.putText(output_image, bi_branding, (20, y_val),
                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
 
         # add logo
@@ -130,9 +141,6 @@ def migrate_files():
                           'destination path': '', 'copied': 'no'})
     files_to_copy.append({'source path': OUTPUT_PATH,
                           'source file': FILENAME_BASE + 'weather.tle',
-                          'destination path': '', 'copied': 'no'})
-    files_to_copy.append({'source path': OUTPUT_PATH,
-                          'source file': FILENAME_BASE + '.dec',
                           'destination path': '', 'copied': 'no'})
     if CONFIG_INFO['save .wav files'] == 'yes':
         files_to_copy.append({'source path': AUDIO_PATH,
@@ -399,11 +407,6 @@ try:
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
                                  IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg\"')
 
-                # move .dec file to output directory
-                MY_LOGGER.debug('move .dec file to output directory')
-                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '.dec',
-                                   OUTPUT_PATH, FILENAME_BASE  + '.dec')
-
     # delete bmp and qpsk files
     # also intermediate jpg files
     # these will not error if the files do not exist
@@ -415,6 +418,7 @@ try:
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
+    wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.dec')
 
     # delete audio file?
     if CONFIG_INFO['save .wav files'] == 'no':

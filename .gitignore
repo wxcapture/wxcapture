@@ -23,3 +23,4 @@ gk-2a-code/wxcapture/process/find_files - framebuffer.py
 pi-code/wxcapture/process/test.py
 pi-code/wxcapture/process/labeltest.py
 goes-code/wxcapture/process/ff.py
+pi-code/wxcapture/process/test2.py

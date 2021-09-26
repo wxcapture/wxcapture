@@ -40,7 +40,6 @@ def brand_image(bi_filename,
         MY_LOGGER.debug('load image')
         input_image = cv2.imread(bi_filename)
 
-        thumbnail = False
         bi_text_size = 2
         border_size = 380
         y_inc = 60
@@ -48,7 +47,7 @@ def brand_image(bi_filename,
         if '-tn.jpg' in bi_filename:
             MY_LOGGER.debug('Thumbnail detected')
             bi_text_size = 0.45
-            border_size = 20
+            border_size = 200
             y_inc = 30
 
         # image dimensions

@@ -121,7 +121,7 @@ def validate_server(vs_si):
     return vs_status, vs_text, vs_html, vs_data
 
 
-def send_email(se_text, se_html, se_text2, se_html2, se_config_file):
+def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_config_file):
     """send the email"""
 
     se_ok_status = True
@@ -145,6 +145,7 @@ def send_email(se_text, se_html, se_text2, se_html2, se_config_file):
     se_text = 'Status change - ' + ALERT_INFO + NEWLINE + \
         se_text + NEWLINE + \
         se_text2 + NEWLINE + \
+        se_text3 + NEWLINE + \
         'Last status change on ' + ALERT_INFO
     MY_LOGGER.debug('se_text = %s', se_text)
 
@@ -163,6 +164,11 @@ def send_email(se_text, se_html, se_text2, se_html2, se_config_file):
         '<tr><th>Status</th><th>Status Change?</th><th>Server</th><th>Max Used (percent)</th><th>Used (percent)</th><th>Delta (percent)</th></tr>' + \
         se_html2 + \
         '</table>' + NEWLINE +\
+        '<h3>Network </h3>' + \
+        '<table border="1">' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Information</th><th>Date</th></tr>' + \
+        se_html3 + \
+         '</table>' + NEWLINE +\
         '<p>Last status change on ' + ALERT_INFO + '</p>' + \
         '</body></html>'
     MY_LOGGER.debug('se_html = %s', se_html)
@@ -356,9 +362,42 @@ for si in SERVER_INFO:
 
 MY_LOGGER.debug('-' * 20)
 
-
 # write data to the csv files
 write_data()
+
+# validate network connectivity
+MY_LOGGER.debug('-' * 20)
+LATESTNETWORK = wxcutils.load_json(WEB_PATH + 'goes/', 'network.json')
+PREVIOUSTNETWORK = wxcutils.load_json(CONFIG_PATH, 'network.json')
+
+EMAIL_TEXT3 = ''
+EMAIL_HTML3 = '<tr>'
+
+if LATESTNETWORK['goes17status'] == 'OK':
+    EMAIL_HTML3 += '<td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
+else:
+    EMAIL_HTML3 += '<td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+
+CHANGE = 'N'
+if LATESTNETWORK['goes17status'] != PREVIOUSTNETWORK['goes17status']:
+    EMAIL_REQUIRED = True
+    CHANGE = 'Y'
+EMAIL_HTML3 += '<td align = \"center\">' + CHANGE + '</td>'
+
+if LATESTNETWORK['goes17status'] == 'OK':
+    EMAIL_TEXT3 = 'OK - network connectivity is good'
+    EMAIL_HTML3 += '<td>Good connectivity</td><td>' + \
+        wxcutils.epoch_to_local(LATESTNETWORK['goes17when'], '%m/%d/%Y %H:%M') + '</td></tr>'
+else:
+    EMAIL_TEXT3 = 'Error - network connecitivity issue - ' + LATESTNETWORK['goes17status']
+    EMAIL_HTML3 += '<td>' + LATESTNETWORK['goes17status'] + '</td><td>' + \
+        wxcutils.epoch_to_local(LATESTNETWORK['goes17when'], '%m/%d/%Y %H:%M') + '</td></tr>'
+MY_LOGGER.debug('HTML = ' + EMAIL_HTML3)
+MY_LOGGER.debug('txt = ' + EMAIL_TEXT3)
+
+# save last
+wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
+
 
 MY_LOGGER.debug('-' * 20)
 if EMAIL_REQUIRED:
@@ -366,7 +405,7 @@ if EMAIL_REQUIRED:
 
     MY_LOGGER.debug('Saving updated config')
     MY_LOGGER.debug('Sending Email')
-    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, 'email.json'):
+    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, 'email.json'):
         # try with alternate email
         MY_LOGGER.debug('Sending Email using alternate server')
         if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, 'email2.json'):

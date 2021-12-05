@@ -311,41 +311,45 @@ def process_goes_2(sat_num):
             latest_file = find_latest_file_contains(latest_dir, image_type)
             MY_LOGGER.debug('latest_file = %s', latest_file)
 
-            filename, extenstion = os.path.splitext(latest_file)
-            new_filename = 'goes_' + sat_num + '_' + type_directory + '_' + image_type
+            # only process if there is a file to process
+            if latest_file:
 
-            # see when last saved
-            stored_timestamp = 0.0
-            try:
-                stored_timestamp = LATESTTIMESTAMPS[new_filename + extenstion]
-            except NameError:
-                pass
-            except KeyError:
-                pass
+                filename, extenstion = os.path.splitext(latest_file)
+                new_filename = 'goes_' + sat_num + '_' + type_directory + '_' + image_type
 
-            # date time for original file
-            latest = os.path.getmtime(os.path.join(latest_dir, latest_file))
+                # see when last saved
+                stored_timestamp = 0.0
+                try:
+                    stored_timestamp = LATESTTIMESTAMPS[new_filename + extenstion]
+                except NameError:
+                    pass
+                except KeyError:
+                    pass
 
-            MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
+                # date time for original file
+                latest = os.path.getmtime(os.path.join(latest_dir, latest_file))
 
-            if stored_timestamp != int(latest):
-                # new file found which hasn't yet been copied over
+                MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
 
-                # copy to output directory
-                MY_LOGGER.debug('new_filename = %s', new_filename)
-                wxcutils.copy_file(os.path.join(latest_dir, latest_file),
-                                   os.path.join(OUTPUT_PATH,
-                                                new_filename + extenstion))
+                if stored_timestamp != int(latest):
+                    # new file found which hasn't yet been copied over
 
-                # create thumbnail
-                create_thumbnail(new_filename, extenstion)
+                    # copy to output directory
+                    MY_LOGGER.debug('new_filename = %s', new_filename)
+                    wxcutils.copy_file(os.path.join(latest_dir, latest_file),
+                                    os.path.join(OUTPUT_PATH,
+                                                    new_filename + extenstion))
 
-                 # create file with date time info
-                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
+                    # create thumbnail
+                    create_thumbnail(new_filename, extenstion)
 
-                # update latest
-                LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+                    # create file with date time info
+                    wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
 
+                    # update latest
+                    LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+            else:
+                MY_LOGGER.debug('no file to process')
 
     MY_LOGGER.debug('---------------------------------------------')
 

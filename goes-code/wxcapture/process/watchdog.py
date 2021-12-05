@@ -4,10 +4,57 @@
 
 # import libraries
 import os
+import sys
 import subprocess
+import time
 import platform
 from subprocess import Popen, PIPE
+from tcping import Ping
 import wxcutils
+
+
+def test_connection(tc_ip, tc_port, tc_timout):
+    """test if we have connectivity"""
+    def try_connect():
+        """try the connection"""
+        MY_LOGGER.debug('-' * 4)
+        try:
+            ping.ping(attempt)
+            result = ''.join(ping.result.raw)
+            MY_LOGGER.debug('result = %s', result)
+            if str(attempt) + ' successed' in result:
+                MY_LOGGER.debug('Connection is active - OK')
+                NETCONFIG['goes17status'] = 'OK'
+                MY_LOGGER.debug('-' * 4)
+                return True
+            elif str(attempt) + ' failed' in result:
+                MY_LOGGER.debug('Connection timed out - ERROR')
+                NETCONFIG['goes17status'] = 'Time out'
+            else:
+                MY_LOGGER.error('Connection is not active - ERROR')
+                NETCONFIG['goes17status'] = 'Not active'
+        except ConnectionRefusedError:
+            MY_LOGGER.error('Connection refused when trying to connect - ERROR')
+            MY_LOGGER.critical('test_connection - Connection refused - exception handler: %s | %s | %s',
+                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+            NETCONFIG['goes17status'] = 'Connection refused'
+        
+        MY_LOGGER.debug('-' * 4)
+        return False
+
+
+    MY_LOGGER.debug('-' * 20)
+    MY_LOGGER.debug('Test connection - %s, %d, %d', tc_ip, tc_port, tc_timout)
+
+    attempt = 1
+    ping = Ping(tc_ip, tc_port, tc_timout)
+    NETCONFIG['goes17when'] = time.time()
+
+    if try_connect():
+        MY_LOGGER.debug('Connection - OK')
+    else:
+        MY_LOGGER.error('Connection - ERROR')
+        MY_LOGGER.debug('Likely to need either reboot of VM or resolved at source')
 
 
 def is_running(process_name):
@@ -83,6 +130,15 @@ MY_LOGGER.debug('OUTPUT_PATH = %s', OUTPUT_PATH)
 MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
+
+# load config
+NETCONFIG = wxcutils.load_json(OUTPUT_PATH, 'network.json')
+MY_LOGGER.debug('IP = %s', NETCONFIG['goes17ip'])
+MY_LOGGER.debug('Port = %s', NETCONFIG['goes17port'])
+
+# test for network connectivity
+test_connection(NETCONFIG['goes17ip'], int(NETCONFIG['goes17port']), 5)
+wxcutils.save_json(OUTPUT_PATH, 'network.json', NETCONFIG)
 
 # test if goesproc is running or processing
 if not is_running('goesproc') or not is_processing('goesproc', 10):

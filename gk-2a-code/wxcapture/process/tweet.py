@@ -39,63 +39,6 @@ def is_light(filename, threshold):
     return False
 
 
-def upload_file_chunked(uf_config_path, uf_config_file, uf_file):
-    """upload a file to the Twitter API"""
-
-    # code based on https://gist.github.com/jcipriano/e506b81a6062307c5189
-
-    def check_status(r):
-        MY_LOGGER.debug('check status')
-        if r.status_code < 200 or r.status_code > 299:
-            MY_LOGGER.error('ERROR status')
-            MY_LOGGER.debug('status = %s', r.status_code)
-            MY_LOGGER.debug('text = %s', r.text)
-            sys.exit(0)
-        MY_LOGGER.debug('check status OK')
-
-    # get the Twitter API config
-    uf_config = wxcutils.load_json(uf_config_path, uf_config_file)
-
-    # start API
-    MY_LOGGER.debug('Start the API')
-    twitter = TwitterAPI(uf_config['consumer key'], uf_config['consumer secret'],
-                         uf_config['access token'], uf_config['access token secret'])
-
-    bytes_sent = 0
-    total_bytes = os.path.getsize(uf_file)
-    file = open(uf_file, 'rb')
-    MY_LOGGER.debug('file = %s, size = %d', uf_file, total_bytes)
-
-    # init
-    MY_LOGGER.debug('Init')
-    r = twitter.request('media/upload', {'command':'INIT', 'media_type':'video/mp4', 'total_bytes':total_bytes})
-    check_status(r)
-
-    media_id = r.json()['media_id']
-    segment_id = 0
-
-    MY_LOGGER.debug('Chunking')
-    # start chucked upload
-    while bytes_sent < total_bytes:
-        chunk = file.read(1*1024*1024)
-        
-        # upload chunk of byets (1MB max)
-        r = twitter.request('media/upload', {'command':'APPEND', 'media_id':media_id, 'segment_index':segment_id}, {'media':chunk})
-        check_status(r)
-        segment_id = segment_id + 1
-        bytes_sent = file.tell()
-
-    MY_LOGGER.debug('Chunking complete')
-
-    # finalize the upload
-    MY_LOGGER.debug('Finalize')
-    r = twitter.request('media/upload', {'command':'FINALIZE', 'media_id':media_id})
-    check_status(r)
-
-    MY_LOGGER.debug('media_id = %s', media_id)
-    return media_id
-
-
 def send_tweet(tt_config_path, tt_config_file, tt_text, tt_file):
     """tweet text with image using info from the config file"""
 
@@ -112,7 +55,7 @@ def send_tweet(tt_config_path, tt_config_file, tt_text, tt_file):
 
     # upload the file
     MY_LOGGER.debug('Uploading file = %s', tt_file)
-    if '.jpg' in tt_file or '.gif'' in tt_file or ''.png' in tt_file:
+    if '.jpg' in tt_file or '.gif' in tt_file or '.png' in tt_file:
         MY_LOGGER.debug('Image file upload')
         # upload file
         tt_media = tt_api.media_upload(tt_file)
@@ -124,12 +67,13 @@ def send_tweet(tt_config_path, tt_config_file, tt_text, tt_file):
         if '.mp4' in tt_file:
             MY_LOGGER.debug('Video file upload')
             # upload file
-            # move to using Tweepy API when available in release 4.0.0
-            tt_media_id = upload_file_chunked(tt_config_path, tt_config_file, tt_file)
-            
+            # using Tweepy API v4
+            MY_LOGGER.debug('media_upload')
+            tt_media_id = tt_api.media_upload(tt_file, media_category='tweet_video', chunked=True)
+
             # send tweet
             MY_LOGGER.debug('Sending tweet with text = %s, image = %s', tt_text, tt_file)
-            tt_status = tt_api.update_status(status=tt_text, media_ids=[tt_media_id])
+            tt_status = tt_api.update_status(status=tt_text, media_ids=[tt_media_id.media_id])
         else:
             MY_LOGGER.debug('Unknown file type - can''t upload')
 
@@ -305,6 +249,7 @@ for key, value in TWEETS.items():
 MY_LOGGER.debug('TWEET_COUNT = %d', TWEET_COUNT)
 TWEET_SLEEP = ((3600 * HOURS) - 500) / TWEET_COUNT
 MY_LOGGER.debug('TWEET_SLEEP = %d', TWEET_SLEEP)
+
 
 # loop through tweets to tweet
 for key, value in TWEETS.items():

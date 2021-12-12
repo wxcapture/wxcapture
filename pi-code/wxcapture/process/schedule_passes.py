@@ -358,7 +358,7 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
 
         MY_LOGGER.debug('start_date_local = %s', start_date_local)
         pass_meridian = 'am'
-        if int(start_date_local.split(' ')[4].split(':')[0]) > 11:
+        if (int(start_date_local.split(' ')[4].split(':')[0]) > 13) and (int(start_date_local.split(' ')[4].split(':')[0]) < 2):
             pass_meridian = 'pm'
 
         filename_base = wxcutils.epoch_to_utc(start_epoch, '%Y-%m-%d-%H-%M-%S') + \

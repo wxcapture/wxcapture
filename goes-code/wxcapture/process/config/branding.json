@@ -1,0 +1,188 @@
+[
+	{
+		"sat":"goes16",
+		"desc":"GOES 16",
+		"acknowledge1":"Thanks to:",
+		"acknowledge2":"ZL1LAC",
+		"types":
+			[
+				{
+					"type":"fd",
+					"channels":
+					[
+						{
+							"channel":"ch13",
+							"desc":"Infrared",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch13_enhanced",
+							"desc":"Enhanced IR",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						}
+					]	
+				}
+			]
+	},
+	{
+		"sat":"goes17",
+		"desc":"GOES 17",
+		"acknowledge1":"Thanks to:",
+		"acknowledge2":"ZL1LAC",
+		"types":
+			[
+				{
+					"type":"fd",
+					"channels":
+					[
+						{
+							"channel":"ch02",
+							"desc":"Visible red",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch07",
+							"desc":"IR lower",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch08",
+							"desc":"IR upper",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch09",
+							"desc":"IR mid-level",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch13",
+							"desc":"IR clean long",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch14",
+							"desc":"IR long",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch15",
+							"desc":"IR dirty long",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"fc",
+							"desc":"Full colour",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						}
+					]	
+				},
+				{
+					"type":"m1",
+					"channels":
+					[
+						{
+							"channel":"ch02",
+							"desc":"Visible red",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch07",
+							"desc":"IR lower",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch13",
+							"desc":"IR clean long",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"fc",
+							"desc":"Full colour",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						}
+					]
+				},
+				{
+					"type":"m2",
+					"channels":
+					[
+						{
+							"channel":"ch02",
+							"desc":"Visible red",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch07",
+							"desc":"IR lower",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"ch13",
+							"desc":"IR clean long",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"fc",
+							"desc":"Full colour",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						}
+					]
+				}
+			]
+	},
+	{
+		"sat":"himawari8",
+		"desc":"Himawari 8",
+		"acknowledge1":"Thanks to:",
+		"acknowledge2":"ZL1LAC",
+		"types":
+			[
+				{
+					"type":"fd",
+					"channels":
+					[
+						{
+							"channel":"IR",
+							"desc":"Infrared",
+							"font colour": [0, 0, 0],
+							"logo":"white"
+						},
+						{
+							"channel":"VS",
+							"desc":"Visible",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"WV",
+							"desc":"Water vapour",
+							"font colour": [0, 0, 0],
+							"logo":"white"
+						}
+					]	
+				}
+			]
+	}
+	
+	
+	
+]

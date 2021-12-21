@@ -103,6 +103,12 @@ def do_backup_all():
     MY_LOGGER.debug('Electro-L 2')
     errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/electro-l-2/', '/mnt/f/Satellites/electro-l-2/')})
 
+    MY_LOGGER.debug('Sanchez')
+    errors.append({'type': 'Sanchez', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/sanchez/', '/mnt/f/Satellites/sanchez/')})
+
+    MY_LOGGER.debug('Web')
+    errors.append({'type': 'WEB', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/web/', '/mnt/f/Satellites/web/')})
+
     MY_LOGGER.debug('NOAA / Meteor / ISS')
     errors.append({'type': 'NOAA / Meteor / ISS - data', 'errors': do_rsync('caWv', '',
                                                                             'pi@192.168.100.9:/home/pi/wxcapture/output/',
@@ -291,6 +297,20 @@ def do_backup_new():
                                               'pi@192.168.100.15:/home/pi/goes/sanchez/goes16/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/sanchez/goes16/' + dir + '/' + date_dir + '/')})
 
+    MY_LOGGER.debug('GOES 16 web Data')
+    directories = ['fd/ch13', 'fd/ch13_enhanced']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            
+            errors.append({'type': 'GOES 16 web - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/web/goes16/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/web/goes16/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 17')
     directories = ['fd/ch02', 'fd/ch07', 'fd/ch08', 'fd/ch09', 'fd/ch13', 'fd/ch14', 'fd/ch15', 'fd/fc',
@@ -323,6 +343,21 @@ def do_backup_new():
                                               'pi@192.168.100.15:/home/pi/goes/sanchez/goes17/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/sanchez/goes17/' + dir + '/' + date_dir + '/')})
 
+    MY_LOGGER.debug('GOES 17 web Data')
+    directories = ['fd/ch02', 'fd/ch07', 'fd/ch08', 'fd/ch09', 'fd/ch13', 'fd/ch14', 'fd/ch15', 'fd/fc']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/web/goes17/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/web/goes17/' + dir + '/' + date_dir + '/')})
+
+
     MY_LOGGER.debug('Himawari 8')
     for single_date in daterange(utc_date_last, utc_date_now):
         date_dir = single_date.strftime("%Y-%m-%d")
@@ -331,6 +366,20 @@ def do_backup_new():
                        'errors': do_rsync('caWv', '',
                                           'pi@192.168.100.15:/home/pi/goes/himawari8/fd/' + date_dir + '/',
                                           '/mnt/f/Satellites/himawari8/fd/' + date_dir + '/')})
+
+    MY_LOGGER.debug('Himawari 8 web Data')
+    directories = ['fd/IR', 'fd/VS', 'fd/WV']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/web/himawari8/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/web/himawari8/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')
     # no date selectivity

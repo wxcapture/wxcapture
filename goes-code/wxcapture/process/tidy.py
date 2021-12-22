@@ -317,12 +317,12 @@ def process_electro_l_2():
             wxcutils.run_cmd('rmdir ' + dates_directory)
 
 
-def process_sanchez():
+def process_generated(pg_directory):
     """process Sanchez files"""
 
     MY_LOGGER.debug('---------------------------------------------')
-    sat_dir = BASEDIR + 'sanchez'
-    MY_LOGGER.debug('Himawari')
+    sat_dir = BASEDIR + pg_directory
+    MY_LOGGER.debug('Processing %s', pg_directory)
     MY_LOGGER.debug('sat_dir = %s', sat_dir)
 
     # find directories
@@ -435,7 +435,10 @@ process_himawari('8')
 process_nws()
 
 # process sanchez files
-process_sanchez()
+process_generated('sanchez')
+
+# process web files
+process_generated('web')
 
 # process GK-2A files
 process_gk_2a()

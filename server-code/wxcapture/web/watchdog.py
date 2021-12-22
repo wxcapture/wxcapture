@@ -371,7 +371,7 @@ LATESTNETWORK = wxcutils.load_json(WEB_PATH + 'goes/', 'network.json')
 PREVIOUSTNETWORK = wxcutils.load_json(CONFIG_PATH, 'network.json')
 
 EMAIL_TEXT3 = ''
-EMAIL_HTML3 = '<tr>'
+EMAIL_HTML3 = ''
 PREVIOUS = ''
 
 
@@ -382,9 +382,9 @@ for key, value in LATESTNETWORK.items():
                 MY_LOGGER.debug('-' * 20)
                 MY_LOGGER.debug(nc)
                 if nc['status'] == 'OK':
-                    EMAIL_HTML3 += '<td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
+                    EMAIL_HTML3 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
                 else:
-                    EMAIL_HTML3 += '<td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+                    EMAIL_HTML3 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
 
                 # get the previous state
                 for key2, value2 in PREVIOUSTNETWORK.items():

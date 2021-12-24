@@ -220,7 +220,58 @@
 					]	
 				}
 			]
+	},
+	{
+		"sat":"goes13",
+		"desc":"GOES 13",
+		"acknowledge1":"Thanks to:",
+		"acknowledge2":"zbychu/Aang23",
+		"types":
+			[
+				{
+					"type":"fd",
+					"desc":"Full disc",
+					"channels":
+					[
+						{
+							"channel":"1",
+							"desc":"Visible 0.65um",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"2",
+							"desc":"IR 3.9um",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"3",
+							"desc":"Water vapour",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"4",
+							"desc":"IR 10.7um",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"5",
+							"desc":"IR 12.0um",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
+							"channel":"FC",
+							"desc":"Full colour",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						}
+					]	
+				}
+			]
 	}
-	
 	
 ]

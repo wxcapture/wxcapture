@@ -216,6 +216,20 @@ def do_backup_new():
                                          'pi@192.168.100.15:/home/pi/goes/goes13/' + date_dir + '/',
                                          '/mnt/f/Satellites/goes13/' + date_dir + '/')})
 
+    MY_LOGGER.debug('GOES 13 web Data')
+    directories = ['fd/1', 'fd/2', 'fd/3', 'fd/4', 'fd/5', 'fd/FC']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'GOES 13 web - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/web/goes13/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/web/goes13/' + dir + '/' + date_dir + '/')})
+
     MY_LOGGER.debug('GOES 14')
     # get all dates between the ranges
     for single_date in daterange(utc_date_last, utc_date_now):
@@ -291,7 +305,7 @@ def do_backup_new():
         for single_date in daterange(utc_date_last, utc_date_now):
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
-            
+
             errors.append({'type': 'GOES 16 Sanchez - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
                                               'pi@192.168.100.15:/home/pi/goes/sanchez/goes16/' + dir + '/' + date_dir + '/',
@@ -306,7 +320,7 @@ def do_backup_new():
         for single_date in daterange(utc_date_last, utc_date_now):
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
-            
+
             errors.append({'type': 'GOES 16 web - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
                                               'pi@192.168.100.15:/home/pi/goes/web/goes16/' + dir + '/' + date_dir + '/',
@@ -370,7 +384,7 @@ def do_backup_new():
         for single_date in daterange(utc_date_last, utc_date_now):
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
-            errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
+            errors.append({'type': 'GOES 17 web - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
                                               'pi@192.168.100.15:/home/pi/goes/web/goes17/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/goes17/' + dir + '/' + date_dir + '/')})
@@ -457,7 +471,7 @@ def do_backup_new():
     for filename in filelist:
         MY_LOGGER.debug('  removing %s', filename)
         os.remove(filename)
-    
+
     # not backed up are:
     # wp-admin
     # wp-content

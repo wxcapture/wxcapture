@@ -213,7 +213,7 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
         nonlocal image
         # add acknowledgement?
         MY_LOGGER.debug('adding acknowledgement %s, %s', sat['acknowledge1'], sat['acknowledge2'])
-        x_offset = int(image.shape[1] * .8)
+        x_offset = int(image.shape[1] * .77)
         image = cv2.putText(image, sat['acknowledge1'], (x_offset, yborder + (y_offset * 1)),
                             cv2.FONT_HERSHEY_SIMPLEX, font_size,
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
@@ -227,11 +227,11 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
     def add_date(ad_date, ad_time):
         """add date and time"""
         nonlocal image
-        image = cv2.putText(image, ad_time, (xborder, image.shape[1] - yborder - y_offset),
+        image = cv2.putText(image, ad_time, (xborder, image.shape[0] - yborder - y_offset),
                             cv2.FONT_HERSHEY_SIMPLEX, font_size,
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
-        image = cv2.putText(image, ad_date, (xborder, image.shape[1] - yborder),
+        image = cv2.putText(image, ad_date, (xborder, image.shape[0] - yborder),
                             cv2.FONT_HERSHEY_SIMPLEX, font_size,
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
@@ -241,12 +241,12 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
         """add satellite info"""
         nonlocal image
         MY_LOGGER.debug('%d, %d, %d', image.shape[1], (80 * len(channel['desc'])), yborder)
-        x_offset = int(image.shape[1] * .75)
-        image = cv2.putText(image, sat['desc'], (x_offset, image.shape[1] - yborder - y_offset),
+        x_offset = int(image.shape[1] * .77)
+        image = cv2.putText(image, sat['desc'], (x_offset, image.shape[0] - yborder - y_offset),
                             cv2.FONT_HERSHEY_SIMPLEX, font_size,
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
-        image = cv2.putText(image, channel['desc'], (x_offset, image.shape[1] - yborder),
+        image = cv2.putText(image, channel['desc'], (x_offset, image.shape[0] - yborder),
                             cv2.FONT_HERSHEY_SIMPLEX, font_size,
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
@@ -334,11 +334,21 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
 
                                 # raise Exception('check image created')
 
+                                # create directory (if needed)
+                                MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat)
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+
                                 # write out image
-                                MY_LOGGER.debug('Saving to %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension)
-                                cv2.imwrite(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension, image)
+                                output_file = WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                                MY_LOGGER.debug('Saving to %s', output_file)
+                                cv2.imwrite(output_file, image)
+
+
                                 MY_LOGGER.debug('=' * 30)
-                                return WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                                return output_file
                             elif cb_type in ('m1', 'm2') or cb_channel in ('fcsanchez', 'ch13sanchez'):
                                 MY_LOGGER.debug('M1 / M2 image or sanchez reprojection')
                                 
@@ -389,16 +399,18 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
 
                                 # write out image as is without modifications
                                 # create directory (if needed)
+                                MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat)
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
 
                                 # write out image
-                                MY_LOGGER.debug('Saving to %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension)
-                                cv2.imwrite(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension, image)
+                                output_file = WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                                MY_LOGGER.debug('Saving to %s', output_file)
+                                cv2.imwrite(output_file, image)
                                 MY_LOGGER.debug('=' * 30)
-                                return WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                                return output_file
                             elif cb_type == 'fd':
                                 MY_LOGGER.debug('Full disc image')
                                 # add data into the image
@@ -410,6 +422,7 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                                 add_sat_info()
 
                                 # create directory (if needed)
+                                MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat)
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
@@ -418,10 +431,11 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                                 # cv2.imwrite(CODE_PATH + cb_sat_type + cb_sat + '_' + cb_type + '_' + cb_channel + cb_extension, image)
 
                                 # write out image
-                                MY_LOGGER.debug('Saving to %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension)
-                                cv2.imwrite(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension, image)
+                                output_file = WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                                MY_LOGGER.debug('Saving to %s', output_file)
+                                cv2.imwrite(output_file, image)
                                 MY_LOGGER.debug('=' * 30)
-                                return WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                                return output_file
 
 
     MY_LOGGER.debug('Should not see this - validate branding.json')
@@ -511,11 +525,11 @@ def process_goes(sat_num):
                     sanchez_dir = SANCHEZ_PATH + 'goes' + sat_num + '/' + type_directory + '/' + channel_directory + '/'
                     # create directory (if needed)
                     mk_dir(sanchez_dir + latest_directory)
-                    san_file_dir = sanchez_dir + latest_directory + '/'
+                    san_file_dir = sanchez_dir + latest_directory
 
                     # create sanchez image
                     do_sanchez(os.path.join(latest_dir, latest_file),
-                               san_file_dir + latest_file.replace('.jpg', '-sanchez.jpg'),
+                               san_file_dir + '/' + latest_file.replace('.jpg', '-sanchez.jpg'),
                                channel_directory)
 
                     web_file = create_branded('goes', '17', 'fd', channel_directory + 'sanchez', san_file_dir, latest_file.replace('.jpg', '-sanchez'), '.jpg', im_date, im_time)
@@ -537,7 +551,7 @@ def process_goes(sat_num):
                     if sat_num == '17' and type_directory == 'fd' and channel_directory == 'ch13':
                         # create directory (if needed)
                         combined_dir = SANCHEZ_PATH + 'combined' + '/'
-                        combined_file_dir = combined_dir + 'fd/ir/' + latest_directory + '/'
+                        combined_file_dir = combined_dir + 'fd/ir/' + latest_directory
 
                         MY_LOGGER.debug('Latest file epoch = %f', latest)
                         # example 1612641000 => 2021-02-06T19:50:00
@@ -546,12 +560,13 @@ def process_goes(sat_num):
                         MY_LOGGER.debug('op_filename = %s', op_filename)
 
                         # create combined sanchez image
-                        do_combined_sanchez(combined_file_dir + op_filename + '.jpg', combined_date_time)
+                        do_combined_sanchez(combined_file_dir  + '/' + op_filename + '.jpg', combined_date_time)
 
                         web_file = create_branded('combined', '', 'fd', 'ir', combined_file_dir, op_filename, '.jpg', im_date, im_time)
 
                         # copy to output directory
                         MY_LOGGER.debug('new_filename = %s', new_filename)
+                        MY_LOGGER.debug('>>%s<< %d', web_file, len(web_file))
                         wxcutils.copy_file(web_file,
                                            os.path.join(OUTPUT_PATH,
                                                         'combined.jpg'))

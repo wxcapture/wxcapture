@@ -10,6 +10,8 @@ import time
 import datetime
 import requests
 import subprocess
+import calendar
+import cv2
 from bs4 import BeautifulSoup
 import wxcutils
 
@@ -46,11 +48,171 @@ def get_last_generated_text(lgt_filename):
     return last_generated_text
 
 
+def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb_extension, cb_date, cb_time):
+    """Create branded file"""
+
+    def add_kiwiweather():
+        """add kiwiweather"""
+        # Kiwiweather.com
+        nonlocal image
+        image = cv2.putText(image, 'Kiwi', (xborder, yborder + y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            2, cv2.LINE_AA)
+        image = cv2.putText(image, 'Weather', (xborder, yborder + (y_offset * 2)),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            2, cv2.LINE_AA)
+        image = cv2.putText(image, '.com', (xborder, yborder + (y_offset * 3)),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            2, cv2.LINE_AA)
+        image = cv2.putText(image, 'ZL4MDE', (xborder, yborder + (y_offset * 4)),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size - 0,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            2, cv2.LINE_AA)
+
+        if channel['logo'] == 'white':
+            logo = LOGOWHITE
+        else:
+            logo = LOGOBLACK
+
+        MY_LOGGER.debug('image x = %d, y = %d', image.shape[1], image.shape[0])
+        MY_LOGGER.debug('logo x = %d, y = %d', logo.shape[1], logo.shape[0])
+        x_offset = xborder
+        MY_LOGGER.debug('%d, %d - %d, %d',
+                        0,
+                        logo.shape[0],
+                        x_offset,
+                        x_offset+logo.shape[1])
+
+        # need to scale logo to match image size
+        scaler = (image.shape[1] / 2700)
+        new_x = int(logo.shape[1] * scaler)
+        new_y = int(logo.shape[0] * scaler)
+        MY_LOGGER.debug('scaler = %d, new x = %d, new_y = %d', scaler, new_x, new_y)
+        scaled_image = cv2.resize(logo, (new_x, new_y), interpolation=cv2.INTER_AREA)
+
+        image[yborder+(y_offset * 4):yborder+scaled_image.shape[0]+(y_offset * 4), x_offset:x_offset+scaled_image.shape[1]] = scaled_image
+
+
+    def add_acknowledgement():
+        """add acknowledgement"""
+        nonlocal image
+        # add acknowledgement?
+        MY_LOGGER.debug('adding acknowledgement %s, %s', sat['acknowledge1'], sat['acknowledge2'])
+        x_offset = int(image.shape[1] * .8)
+        MY_LOGGER.debug('x_offset = %d, y_offset = %d, yborder = %d, font_size = %d', x_offset, y_offset, yborder, font_size)
+        image = cv2.putText(image, sat['acknowledge1'], (x_offset, yborder + (y_offset * 1)),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            font_size, cv2.LINE_AA)
+        image = cv2.putText(image, sat['acknowledge2'], (x_offset, yborder + (y_offset * 2)),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size - 1,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            font_size, cv2.LINE_AA)
+
+
+    def add_date(ad_date, ad_time):
+        """add date and time"""
+        MY_LOGGER.debug('date = %s, time = %s', ad_date, ad_time)
+        MY_LOGGER.debug('y_offset = %d, yborder = %d, font_size = %d', y_offset, yborder, font_size)
+        nonlocal image
+        image = cv2.putText(image, ad_time, (xborder, image.shape[0] - yborder - y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            font_size, cv2.LINE_AA)
+        image = cv2.putText(image, ad_date, (xborder, image.shape[0] - yborder),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            font_size, cv2.LINE_AA)
+
+
+    def add_sat_info():
+        """add satellite info"""
+        MY_LOGGER.debug('sat = %s, channel = %s', sat['desc'], channel['desc'])
+        nonlocal image
+        MY_LOGGER.debug('%d, %d, %d', image.shape[1], (80 * len(channel['desc'])), yborder)
+        x_offset = int(image.shape[1] * .8)
+        image = cv2.putText(image, sat['desc'], (x_offset, image.shape[0] - yborder - y_offset),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            font_size, cv2.LINE_AA)
+        image = cv2.putText(image, channel['desc'], (x_offset, image.shape[0] - yborder),
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                            font_size, cv2.LINE_AA)
+
+
+    MY_LOGGER.debug('=' * 30)
+    MY_LOGGER.debug('sat_type = %s, sat = %s, type = %s, channel = %s, dir = %s, file = %s, extension = %s', cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb_extension)
+
+    # load the image
+    MY_LOGGER.debug('Reading file - %s', cb_dir + '/' + cb_file + cb_extension)
+    image = cv2.imread(cb_dir + '/' + cb_file + cb_extension)
+    font_size = int(image.shape[0] / 900)
+    if font_size == 0:
+        font_size = 1
+
+    # find the config data for this combo
+    for sat in BRANDING:
+        if sat['sat'] == cb_sat_type + cb_sat:
+            # MY_LOGGER.debug('sat = %s', cb_sat_type + cb_sat)
+            for im_type in sat['types']:
+                # MY_LOGGER.debug('type = %s', im_type)
+                if im_type['type'] == cb_type:
+                    MY_LOGGER.debug('type = %s', cb_type)
+                    MY_LOGGER.debug('desc = %s', im_type['desc'])
+                    for channel in im_type['channels']:
+                        if channel['channel'] == cb_channel:
+                            # MY_LOGGER.debug('channel = %s', cb_channel)
+                            # MY_LOGGER.debug('desc = %s', channel['desc'])
+                            y_offset = 26 * font_size
+                            MY_LOGGER.debug('font size = %s, offset = %d', font_size, y_offset)
+                            MY_LOGGER.debug('font colour = %d, %d, %d', channel['font colour'][0], channel['font colour'][1], channel['font colour'][2])
+
+                            xborder = int(image.shape[1] / 55)
+                            yborder = int(image.shape[0] / 55)
+                            image_x = image.shape[1]
+                            image_y = image.shape[0]
+                            MY_LOGGER.debug('Image resolution - %d x %d', image_x, image_y)
+
+                            MY_LOGGER.debug('Full disc image')
+                            # add data into the image
+                            MY_LOGGER.debug('Add data into the image')
+                            add_kiwiweather()
+                            if sat['acknowledge1']:
+                                add_acknowledgement()
+                            add_date(cb_date, cb_time)
+                            add_sat_info()
+
+                            # create directory (if needed)
+                            MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+                            mk_dir(WEB_PATH + cb_sat_type + cb_sat)
+                            mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
+                            mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
+                            mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+
+                            # cv2.imwrite(CODE_PATH + cb_sat_type + cb_sat + '_' + cb_type + '_' + cb_channel + cb_extension, image)
+
+                            # write out image
+                            output_file = WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                            MY_LOGGER.debug('Saving to %s', output_file)
+                            cv2.imwrite(output_file, image)
+                            MY_LOGGER.debug('=' * 30)
+                            return output_file
+
+
+    MY_LOGGER.debug('Should not see this - validate branding.json')
+    MY_LOGGER.error('Error with invalid branding.json data')
+
+
 def proccess_satellite(sat_info):
     """process satellite info from web"""
 
     # set up variables
     file_directory = FILE_BASE + sat_info['File base']
+    MY_LOGGER.debug('Satellite = %s', sat_info['Name'])
     MY_LOGGER.debug('file_directory = %s', file_directory)
     MY_LOGGER.debug('last directory = %s', sat_info['Last Directory'])
     MY_LOGGER.debug('URL = %s', sat_info['URL'])
@@ -76,6 +238,7 @@ def proccess_satellite(sat_info):
             MY_LOGGER.debug('channel_locator = %s', channel_locator)
 
             # create directories
+            MY_LOGGER.debug('file_directory = %s', file_directory)
             mk_dir(file_directory + '/' +  date_element)
             mk_dir(file_directory + '/' +  date_element + '/1')
             mk_dir(file_directory + '/' +  date_element + '/2')
@@ -83,6 +246,15 @@ def proccess_satellite(sat_info):
             mk_dir(file_directory + '/' +  date_element + '/4')
             mk_dir(file_directory + '/' +  date_element + '/5')
             mk_dir(file_directory + '/' +  date_element + '/FC')
+
+            # make directory for web files (goes13 only)
+            if sat_info['Name'] == 'GOES 13':
+                mk_dir(WEB_PATH + '/goes13/fd/1/' +  date_element)
+                mk_dir(WEB_PATH + '/goes13/fd/2/' +  date_element)
+                mk_dir(WEB_PATH + '/goes13/fd/3/' +  date_element)
+                mk_dir(WEB_PATH + '/goes13/fd/4/' +  date_element)
+                mk_dir(WEB_PATH + '/goes13/fd/5/' +  date_element)
+                mk_dir(WEB_PATH + '/goes13/fd/FC/' +  date_element)
 
             existsCount = 0
 
@@ -125,14 +297,39 @@ def proccess_satellite(sat_info):
                         # can now delete the original image to save space
                         wxcutils.run_cmd('rm ' + file_location + filename)
 
-                        # copy file to output folder
-                        wxcutils.copy_file(file_location + filename.replace('.png', '.jpg'), OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg')
+                        if sat_info['Name'] == 'GOES 13':
+                            bits = filename.split('_')
+                            for bit in bits:
+                                MY_LOGGER.debug('bit %s', bit)
+                            year = bits[-1][:4]
+                            month = calendar.month_abbr[int(bits[-1][4:6])]
+                            day = bits[-1][6:8]
+                            hour = bits[-1][9:11]
+                            min = bits[-1][11:13]
+                            MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
+                            im_date = day + '-' + month + '-' + year
+                            im_time = hour + ':' + min + ' UTC'
+
+                            MY_LOGGER.debug('Creating branded image - %s, date %s, time %s', channel, im_date, im_time)
+
+                            web_file = create_branded('goes', '13', 'fd', channel, file_location, filename.replace('.png', ''), '.jpg', im_date, im_time)
+
+                            # copy to output directory
+                            new_filename = 'goes13-' + channel + '.jpg'
+                            MY_LOGGER.debug('new_filename = %s', new_filename)
+                            wxcutils.copy_file(web_file,
+                                               os.path.join(OUTPUT_PATH,
+                                                            new_filename))
+                        else:
+                            # non-GOES 13
+                            # copy file to output folder
+                            wxcutils.copy_file(file_location + filename.replace('.png', '.jpg'), OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg')
 
                         # create thumbnail and txt file
-                        cmd = 'vips resize ' + file_location + filename.replace('.png', '.jpg') + ' ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '-tn.jpg' + ' 0.1'
+                        cmd = 'vips resize ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg' + ' ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '-tn.jpg' + ' 0.1'
                         MY_LOGGER.debug('cmd %s', cmd)
                         wxcutils.run_cmd(cmd)
-                        
+
                         # create file with date time info
                         MY_LOGGER.debug('Writing out last generated date file')
                         wxcutils.save_file(OUTPUT_PATH, sat_info['File out prefix'] + '-' + channel + '.txt', get_last_generated_text(filename.replace('.png', '.jpg')))
@@ -196,6 +393,13 @@ MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
 FILE_BASE = '/home/pi/goes/'
 MY_LOGGER.debug('FILE_BASE = %s', FILE_BASE)
+
+WEB_PATH = FILE_BASE + 'web/'
+
+# load logo and branding info
+LOGOBLACK = cv2.imread(CONFIG_PATH + 'logo-black.jpg')
+LOGOWHITE = cv2.imread(CONFIG_PATH + 'logo-white.jpg')
+BRANDING = wxcutils.load_json(CONFIG_PATH, 'branding.json')
 
 # get the last directory name used for a sync
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'web.json')

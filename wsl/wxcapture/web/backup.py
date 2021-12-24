@@ -343,8 +343,26 @@ def do_backup_new():
                                               'pi@192.168.100.15:/home/pi/goes/sanchez/goes17/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/sanchez/goes17/' + dir + '/' + date_dir + '/')})
 
+    MY_LOGGER.debug('Combined Sanchez Data')
+    directories = ['fd/ir']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/web/combined/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/web/combined/' + dir + '/' + date_dir + '/')})
+
     MY_LOGGER.debug('GOES 17 web Data')
-    directories = ['fd/ch02', 'fd/ch07', 'fd/ch08', 'fd/ch09', 'fd/ch13', 'fd/ch14', 'fd/ch15', 'fd/fc']
+    directories = ['fd/ch02', 'fd/ch07', 'fd/ch08', 'fd/ch09', 'fd/ch13', 'fd/ch14',
+                   'fd/ch15', 'fd/fc', 'fd/ch13sanchez', 'fd/fcsanchez',
+                   'm1/ch02', 'm1/ch07', 'm1/ch13', 'm1/fc',
+                   'm2/ch02', 'm2/ch07', 'm2/ch13', 'm2/fc']
+
 
     for dir in directories:
         MY_LOGGER.debug('Directory = %a', dir)

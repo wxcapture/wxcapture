@@ -8,6 +8,7 @@
 			[
 				{
 					"type":"fd",
+					"desc":"Full disc",
 					"channels":
 					[
 						{
@@ -35,6 +36,7 @@
 			[
 				{
 					"type":"fd",
+					"desc":"Full disc",
 					"channels":
 					[
 						{
@@ -68,6 +70,12 @@
 							"logo":"black"
 						},
 						{
+							"channel":"ch13sanchez",
+							"desc":"IR clean long",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						},
+						{
 							"channel":"ch14",
 							"desc":"IR long",
 							"font colour": [255, 255, 255],
@@ -84,11 +92,18 @@
 							"desc":"Full colour",
 							"font colour": [255, 255, 255],
 							"logo":"black"
+						},
+						{
+							"channel":"fcsanchez",
+							"desc":"Full colour",
+							"font colour": [255, 255, 255],
+							"logo":"black"
 						}
 					]	
 				},
 				{
 					"type":"m1",
+					"desc":"M1",
 					"channels":
 					[
 						{
@@ -119,6 +134,7 @@
 				},
 				{
 					"type":"m2",
+					"desc":"M2",
 					"channels":
 					[
 						{
@@ -158,6 +174,7 @@
 			[
 				{
 					"type":"fd",
+					"desc":"Full disc",
 					"channels":
 					[
 						{
@@ -181,8 +198,29 @@
 					]	
 				}
 			]
+	},
+	{
+		"sat":"combined",
+		"desc":"GOES 13/16/17, Himawari 8, GK-2A and Electro L-2",
+		"acknowledge1":"Thanks to:",
+		"acknowledge2":"ZL1LAC, zbychu, Aang23 & NTs OMZ",
+		"types":
+			[
+				{
+					"type":"fd",
+					"desc":"Full disc",
+					"channels":
+					[
+						{
+							"channel":"ir",
+							"desc":"Infrared",
+							"font colour": [255, 255, 255],
+							"logo":"black"
+						}
+					]	
+				}
+			]
 	}
-	
 	
 	
 ]

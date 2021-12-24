@@ -258,7 +258,9 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
     # load the image
     MY_LOGGER.debug('Reading file - %s', cb_dir + '/' + cb_file + cb_extension)
     image = cv2.imread(cb_dir + '/' + cb_file + cb_extension)
-    font_size = int(image.shape[1] / 900)
+    font_size = int(image.shape[0] / 900)
+    if font_size == 0:
+        font_size = 1
 
     # find the config data for this combo
     for sat in BRANDING:
@@ -267,7 +269,8 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
             for im_type in sat['types']:
                 # MY_LOGGER.debug('type = %s', im_type)
                 if im_type['type'] == cb_type:
-                    # MY_LOGGER.debug('type = %s', cb_type)
+                    MY_LOGGER.debug('type = %s', cb_type)
+                    MY_LOGGER.debug('desc = %s', im_type['desc'])
                     for channel in im_type['channels']:
                         if channel['channel'] == cb_channel:
                             # MY_LOGGER.debug('channel = %s', cb_channel)
@@ -276,11 +279,130 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                             MY_LOGGER.debug('font size = %s, offset = %d', font_size, y_offset)
                             MY_LOGGER.debug('font colour = %d, %d, %d', channel['font colour'][0], channel['font colour'][1], channel['font colour'][2])
 
-                            if cb_type not in ('m1', 'm2'):
+                            xborder = int(image.shape[1] / 55)
+                            yborder = int(image.shape[0] / 55)
+                            image_x = image.shape[1]
+                            image_y = image.shape[0]
+                            MY_LOGGER.debug('Image resolution - %d x %d', image_x, image_y)
+
+                            if cb_sat_type == 'combined':
+                                MY_LOGGER.debug('Combined image')
+
+                                # add data to header / footer
+                                MY_LOGGER.debug('add data to header / footer')
+                                scaler = image_y / 1500
+                                branding_height = int(LOGOBLACK.shape[0] * scaler)
+                                if branding_height < 125:
+                                    branding_height = 125
+
+                                # add the border to the top of the image
+                                image = cv2.copyMakeBorder(image, branding_height, 0, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+                                image_y += branding_height
+                                MY_LOGGER.debug('New image resolution - %d x %d', image_x, image_y)
+
+                                # add in the logo
+                                new_x = int(LOGOBLACK.shape[1] * scaler)
+                                new_y = int(LOGOBLACK.shape[0] * scaler)
+                                scaled_logo = cv2.resize(LOGOBLACK, (new_x, new_y), interpolation=cv2.INTER_AREA)
+                                image[0:scaled_logo.shape[0], image_x-scaled_logo.shape[1]:image_x+scaled_logo.shape[1]] = scaled_logo
+
+                                # Kiwiweather.com
+                                image = cv2.putText(image, 'KiwiWeather.com ZL4MDE', (xborder, yborder + y_offset),
+                                                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                            2, cv2.LINE_AA)
+                                # Acknowledgement
+                                image = cv2.putText(image, sat['acknowledge1'].split(':')[0] + ' ' + sat['acknowledge2'], (xborder, yborder + (y_offset * 2)),
+                                                    cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                    (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                    font_size, cv2.LINE_AA)
+
+                                # add date
+                                image = cv2.putText(image, cb_date + ' ' + cb_time, (xborder, yborder + (y_offset * 3)),
+                                                    cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                    (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                    font_size, cv2.LINE_AA)
+
+                                # add sat info
+                                image = cv2.putText(image, sat['desc'] + ' ' + im_type['desc'] + ' ' + channel['desc'], (xborder, yborder + (y_offset * 4)),
+                                                    cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                    (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                    font_size, cv2.LINE_AA)
+
+                                # MY_LOGGER.debug('Saving to %s', CODE_PATH + cb_sat_type + cb_sat + '_' + cb_type + '_' + cb_channel + cb_extension)
+                                # cv2.imwrite(CODE_PATH + cb_sat_type + cb_sat + '_' + cb_type + '_' + cb_channel + cb_extension, image)
+
+                                # raise Exception('check image created')
+
+                                # write out image
+                                MY_LOGGER.debug('Saving to %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension)
+                                cv2.imwrite(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension, image)
+                                MY_LOGGER.debug('=' * 30)
+                                return WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                            elif cb_type in ('m1', 'm2') or cb_channel in ('fcsanchez', 'ch13sanchez'):
+                                MY_LOGGER.debug('M1 / M2 image or sanchez reprojection')
+                                
+                                # add data to header / footer
+                                MY_LOGGER.debug('add data to header / footer')
+                                scaler = image_y / 1400
+                                branding_height = int(LOGOBLACK.shape[0] * scaler)
+                                if branding_height < 125:
+                                    branding_height = 125
+
+                                # add the border to the top of the image
+                                image = cv2.copyMakeBorder(image, branding_height, 0, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+                                image_y += branding_height
+                                MY_LOGGER.debug('New image resolution - %d x %d', image_x, image_y)
+
+                                # add in the logo
+                                new_x = int(LOGOBLACK.shape[1] * scaler)
+                                new_y = int(LOGOBLACK.shape[0] * scaler)
+                                scaled_logo = cv2.resize(LOGOBLACK, (new_x, new_y), interpolation=cv2.INTER_AREA)
+                                image[0:scaled_logo.shape[0], image_x-scaled_logo.shape[1]:image_x+scaled_logo.shape[1]] = scaled_logo
+
+                                # Kiwiweather.com
+                                image = cv2.putText(image, 'KiwiWeather.com ZL4MDE', (xborder, yborder + y_offset),
+                                                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                            (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                            2, cv2.LINE_AA)
+                                # Acknowledgement
+                                image = cv2.putText(image, sat['acknowledge1'].split(':')[0] + ' ' + sat['acknowledge2'], (xborder, yborder + (y_offset * 2)),
+                                                    cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                    (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                    font_size, cv2.LINE_AA)
+
+                                # add date
+                                image = cv2.putText(image, cb_date + ' ' + cb_time, (xborder, yborder + (y_offset * 3)),
+                                                    cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                    (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                    font_size, cv2.LINE_AA)
+
+                                # add sat info
+                                image = cv2.putText(image, sat['desc'] + ' ' + im_type['desc'] + ' ' + channel['desc'], (xborder, yborder + (y_offset * 4)),
+                                                    cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                                                    (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
+                                                    font_size, cv2.LINE_AA)
+
+                                # cv2.imwrite(CODE_PATH + cb_sat_type + cb_sat + '_' + cb_type + '_' + cb_channel + cb_extension, image)
+
+                                # raise Exception('check image created')
+
+                                # write out image as is without modifications
+                                # create directory (if needed)
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat)
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
+                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+
+                                # write out image
+                                MY_LOGGER.debug('Saving to %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension)
+                                cv2.imwrite(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension, image)
+                                MY_LOGGER.debug('=' * 30)
+                                return WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                            elif cb_type == 'fd':
+                                MY_LOGGER.debug('Full disc image')
                                 # add data into the image
-                                MY_LOGGER.debug('Add data into the image')
-                                xborder = int(image.shape[1] / 55)
-                                yborder = int(image.shape[0] / 55)
+                                MY_LOGGER.debug('Add data into the non-m1/m2 image')
                                 add_kiwiweather()
                                 if sat['acknowledge1']:
                                     add_acknowledgement()
@@ -293,30 +415,17 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
                                 mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
 
-                                # write out image
-                                cv2.imwrite(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension, image)
-                                return WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
-                            else:
-                                
-                                # add data to header / footer
-                                MY_LOGGER.debug('add data to header / footer')
-
-                                # to code!
-
-                                # write out image as is without modifications
-                                # create directory (if needed)
-                                mk_dir(WEB_PATH + cb_sat_type + cb_sat)
-                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
-                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
-                                mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+                                # cv2.imwrite(CODE_PATH + cb_sat_type + cb_sat + '_' + cb_type + '_' + cb_channel + cb_extension, image)
 
                                 # write out image
+                                MY_LOGGER.debug('Saving to %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension)
                                 cv2.imwrite(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension, image)
+                                MY_LOGGER.debug('=' * 30)
                                 return WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+
 
     MY_LOGGER.debug('Should not see this - validate branding.json')
-
-    MY_LOGGER.debug('=' * 30)
+    MY_LOGGER.error('Error with invalid branding.json data')
 
 
 def process_goes(sat_num):
@@ -409,9 +518,11 @@ def process_goes(sat_num):
                                san_file_dir + latest_file.replace('.jpg', '-sanchez.jpg'),
                                channel_directory)
 
+                    web_file = create_branded('goes', '17', 'fd', channel_directory + 'sanchez', san_file_dir, latest_file.replace('.jpg', '-sanchez'), '.jpg', im_date, im_time)
+
                     # copy to output directory
-                    MY_LOGGER.debug('new_filename = %s', new_filename + '-sanchez')
-                    wxcutils.copy_file(san_file_dir + latest_file.replace('.jpg', '-sanchez.jpg'),
+                    MY_LOGGER.debug('new_filename = %s', new_filename)
+                    wxcutils.copy_file(web_file,
                                        os.path.join(OUTPUT_PATH, new_filename + '-sanchez' + extenstion))
 
                     # create thumbnail
@@ -437,9 +548,13 @@ def process_goes(sat_num):
                         # create combined sanchez image
                         do_combined_sanchez(combined_file_dir + op_filename + '.jpg', combined_date_time)
 
+                        web_file = create_branded('combined', '', 'fd', 'ir', combined_file_dir, op_filename, '.jpg', im_date, im_time)
+
                         # copy to output directory
-                        wxcutils.copy_file(combined_file_dir + op_filename + '.jpg',
-                                           OUTPUT_PATH + 'combined.jpg')
+                        MY_LOGGER.debug('new_filename = %s', new_filename)
+                        wxcutils.copy_file(web_file,
+                                           os.path.join(OUTPUT_PATH,
+                                                        'combined.jpg'))
 
                         # create thumbnail
                         create_thumbnail('combined', '.jpg')
@@ -838,13 +953,13 @@ if number_processes('find_files.py') == 1:
     LOGOWHITE = cv2.imread(CONFIG_PATH + 'logo-white.jpg')
     BRANDING = wxcutils.load_json(CONFIG_PATH, 'branding.json')
 
-    # process GOES 16 files
+    # # process GOES 16 files
     process_goes('16')
 
-    # process GOES 15 files
+    # # process GOES 15 files
     process_goes_2('15')
 
-    # process Himawari 8 files
+    # # process Himawari 8 files
     process_himawari('8')
 
     # process GOES 17 files

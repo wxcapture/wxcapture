@@ -27,6 +27,7 @@ def mk_dir(directory):
     """only create if it does not already exist"""
     # MY_LOGGER.debug('Make? %s', directory)
     if not os.path.isdir(directory):
+        MY_LOGGER.debug('Making directory %s', directory)
         wxcutils.make_directory(directory)
 
 
@@ -187,16 +188,17 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                             add_sat_info()
 
                             # create directory (if needed)
-                            MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+                            MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_dir.split('/')[-3])
                             mk_dir(WEB_PATH + cb_sat_type + cb_sat)
                             mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
                             mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)
                             mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1])
+                            mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1]  + '/' + cb_dir.split('/')[-3])
 
                             # cv2.imwrite(CODE_PATH + cb_sat_type + cb_sat + '_' + cb_type + '_' + cb_channel + cb_extension, image)
 
                             # write out image
-                            output_file = WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_file + '_web' + cb_extension
+                            output_file = WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1]  + '/' + cb_dir.split('/')[-3] + '/' + cb_file + '_web' + cb_extension
                             MY_LOGGER.debug('Saving to %s', output_file)
                             cv2.imwrite(output_file, image)
                             MY_LOGGER.debug('=' * 30)

@@ -356,11 +356,15 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
             symbol_rate = 'n/a'
             mode = 'n/a'
 
-        MY_LOGGER.debug('start_date_local = %s', start_date_local)
         pass_meridian = 'am'
-        if (int(start_date_local.split(' ')[4].split(':')[0]) > 13) and (int(start_date_local.split(' ')[4].split(':')[0]) < 2):
+        MY_LOGGER.debug('start_date_local = %s', start_date_local)
+        local_hour = int(start_date_local.split(' ')[4].split(':')[0])
+        MY_LOGGER.debug('local_hour = %d', local_hour)
+        if (int(start_date_local.split(' ')[4].split(':')[0]) >= 13) or (int(start_date_local.split(' ')[4].split(':')[0]) <= 2):
             pass_meridian = 'pm'
-
+            MY_LOGGER.debug('Setting to a night pass')
+        else:
+            MY_LOGGER.debug('Setting to a day pass')
         filename_base = wxcutils.epoch_to_utc(start_epoch, '%Y-%m-%d-%H-%M-%S') + \
             '-' + sat['name'].replace(' ', '_').replace('(', '').replace(')', '')
 
@@ -771,6 +775,7 @@ try:
                     wxcutils.run_cmd(elem['scheduler'])
                     elem['timezone'] = LOCAL_TIME_ZONE
                     wxcutils.save_json(OUTPUT_PATH, elem['filename_base'] + '.json', elem)
+                    MY_LOGGER.debug('pass json = %s', elem)
                 else:
                     MY_LOGGER.debug('%s - not scheduled due to being in the past',
                                     elem['satellite'])

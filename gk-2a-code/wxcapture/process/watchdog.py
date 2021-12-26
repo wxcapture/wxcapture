@@ -5,7 +5,11 @@
 # import libraries
 import subprocess
 import platform
+import sys
 from subprocess import Popen, PIPE
+import time
+import json
+from pynng import Sub0
 import wxcutils
 
 
@@ -73,6 +77,45 @@ def drive_validation():
     wxcutils.save_file(OUTPUT_PATH, 'used-' + platform.node() + '.txt', dv_space)
 
 
+def sat_validation():
+    """validate satellite info"""
+
+    def try_server(ip_address, label):
+        """test the server"""
+        MY_LOGGER.debug('server = %s, ip = %s', label, ip_address)
+        try:
+            with Sub0(dial= 'tcp://' + ip_address + ':6002', recv_timeout=100, topics="") as sub0:
+                    op = sub0.recv().decode("utf-8").replace('}', ',"label":"' + label + '","exception":"", "when":' + str(time.time()) + '}')
+                    MY_LOGGER.debug('op = %s', op)
+                    return 'OK', op
+        except Exception as err:
+            MY_LOGGER.debug('Unexpected error connecting to %s : 0 %s 1 %s 2 %s', ip_address,
+                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+            MY_LOGGER.debug('issue connecting to %s', ip_address)
+            return 'ERROR', '{"timestamp": "", "skipped_symbols": 0, "viterbi_errors": 0, "reed_solomon_errors": 0, "ok": 0, "label":"' + label + '","exception":"' + str(sys.exc_info()[1]) + '", "when":' + str(time.time()) + '}'
+
+
+    def retries(ip_address, label):
+        """work around intermittent errors"""
+        max_attempt = 10
+        attempt = 0
+        sleep_timer = 2
+        MY_LOGGER.debug('Trying up to %d attempts', max_attempt)
+        while attempt < max_attempt:
+            attempt += 1
+            ok, op = try_server(ip_address, label)
+            MY_LOGGER.debug('Attempt %d, result = %s', attempt, ok)
+            if ok == 'OK':
+                break
+            MY_LOGGER.debug('Sleeping %d seconds', sleep_timer)
+            time.sleep(sleep_timer)
+        return op
+
+    results = '[' + retries('127.0.0.1', 'gamma') + ',' + retries('203.86.195.49', 'goes') + ']'
+    MY_LOGGER.debug('Results = %s', results)
+    wxcutils.save_file(OUTPUT_PATH, 'satellite-receivers.json', results)
+
+
 # setup paths to directories
 HOME = '/home/pi/'
 APP_PATH = HOME + '/wxcapture/'
@@ -119,6 +162,14 @@ if number_processes('find_files.py') > 1:
 
 # log drive space free to file
 drive_validation()
+
+# validate satellite info
+sat_validation()
+
+# sync the output files
+wxcutils.run_cmd('rsync -rtPv ' + OUTPUT_PATH + 'used-gamma.txt mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
+wxcutils.run_cmd('rsync -rtPv ' + OUTPUT_PATH + 'satellite-receivers.json mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
+
 
 if REBOOT:
     # reboot the Pi

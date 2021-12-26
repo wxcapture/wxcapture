@@ -121,7 +121,7 @@ def validate_server(vs_si):
     return vs_status, vs_text, vs_html, vs_data
 
 
-def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_config_file):
+def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_text4, se_html4, se_config_file):
     """send the email"""
 
     se_ok_status = True
@@ -146,6 +146,7 @@ def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_conf
         se_text + NEWLINE + \
         se_text2 + NEWLINE + \
         se_text3 + NEWLINE + \
+        se_text4 + NEWLINE + \
         'Last status change on ' + ALERT_INFO
     MY_LOGGER.debug('se_text = %s', se_text)
 
@@ -164,14 +165,21 @@ def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_conf
         '<tr><th>Status</th><th>Status Change?</th><th>Server</th><th>Max Used (percent)</th><th>Used (percent)</th><th>Delta (percent)</th></tr>' + \
         se_html2 + \
         '</table>' + NEWLINE +\
-        '<h3>Network </h3>' + \
+        '<h3>Network</h3>' + \
         '<table border="1">' + \
         '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Information</th><th>Date</th></tr>' + \
         se_html3 + \
          '</table>' + NEWLINE +\
+        '<h3>Satellite Lock</h3>' + \
+        '<table border="1">' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Lock?</th><th>Skipped Symbols</th><th>Reed Solomon Errors</th><th>Viterbi Errors</th><th>Date</th></tr>' + \
+        se_html4 + \
+         '</table>' + NEWLINE +\
         '<p>Last status change on ' + ALERT_INFO + '</p>' + \
         '</body></html>'
     MY_LOGGER.debug('se_html = %s', se_html)
+
+
 
     # build email
     message.attach(MIMEText(se_text, "plain"))
@@ -374,7 +382,6 @@ EMAIL_TEXT3 = ''
 EMAIL_HTML3 = ''
 PREVIOUS = ''
 
-
 for key, value in LATESTNETWORK.items():
     if key == 'addresses':
         for nc in LATESTNETWORK[key]:
@@ -405,7 +412,7 @@ for key, value in LATESTNETWORK.items():
                 EMAIL_HTML3 += '<td>' + nc['description'] + '</td>'
 
                 if nc['status'] == 'OK':
-                    EMAIL_TEXT3 += 'OK - network connectivity is good'
+                    EMAIL_TEXT3 += 'OK - network connectivity is good' + ' - '
                     EMAIL_HTML3 += '<td>Good connectivity</td><td>' + \
                         wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>'
                 else:
@@ -419,6 +426,54 @@ MY_LOGGER.debug('txt = ' + EMAIL_TEXT3)
 # save last
 wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
 
+# validate satellite status
+MY_LOGGER.debug('-' * 20)
+LATESTSATSTATUS = wxcutils.load_json(WEB_PATH + 'gk-2a/', 'satellite-receivers.json')
+PREVIOUSSATSTATUS = wxcutils.load_json(CONFIG_PATH, 'satellite-receivers.json')
+
+EMAIL_TEXT4 = ''
+EMAIL_HTML4 = ''
+PREVIOUS = ''
+
+for si1 in LATESTSATSTATUS:
+    MY_LOGGER.debug('-' * 20)
+    MY_LOGGER.debug('Processing - %s', si1['label'])
+    MY_LOGGER.debug('si1 %s', si1)
+    
+    for si2 in PREVIOUSSATSTATUS:
+        if si1['label'] == si2['label']:
+            MY_LOGGER.debug('si2 %s', si2)
+            if si1['ok'] == 1:
+                EMAIL_HTML4 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
+            else:
+                EMAIL_HTML4 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+
+            CHANGE = 'N'
+            if si1['ok'] != si2['ok']:
+                EMAIL_REQUIRED = True
+                CHANGE = 'Y'
+            EMAIL_HTML4 += '<td align = \"center\">' + CHANGE + '</td>'
+
+            link_status = 'Locked'
+            if si1['ok'] != 1:
+                link_status = 'NOT locked'
+
+            EMAIL_TEXT4 +=  si1['label'] + ' - ' + link_status + ' - ' + \
+                str(si1['skipped_symbols']) + ' - ' + \
+                str(si1['reed_solomon_errors']) + ' - ' + str(si1['viterbi_errors']) + \
+                ' - ' + wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + ' - '
+            EMAIL_HTML4 += '<td>' +  si1['label'] + '</td><td>' + link_status + '</td><td>' + \
+                str(si1['skipped_symbols']) + \
+                '</td><td>' + str(si1['reed_solomon_errors']) + '</td><td>' + \
+                str(si1['viterbi_errors']) + '</td><td>' + \
+                wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>'
+
+MY_LOGGER.debug('HTML = ' + EMAIL_HTML4)
+MY_LOGGER.debug('txt = ' + EMAIL_TEXT4)
+
+# save last
+wxcutils.save_json(CONFIG_PATH, 'satellite-receivers.json', LATESTSATSTATUS)
+
 
 MY_LOGGER.debug('-' * 20)
 if EMAIL_REQUIRED:
@@ -426,7 +481,7 @@ if EMAIL_REQUIRED:
 
     MY_LOGGER.debug('Saving updated config')
     MY_LOGGER.debug('Sending Email')
-    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, 'email.json'):
+    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4,'email.json'):
         # try with alternate email
         MY_LOGGER.debug('Sending Email using alternate server')
         if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, 'email2.json'):
@@ -438,6 +493,8 @@ if EMAIL_REQUIRED:
     wxcutils.save_json(CONFIG_PATH, 'config-watchdog.json', SATELLITE_INFO)
     # save the new server info
     wxcutils.save_json(CONFIG_PATH, 'config-watchdog-servers.json', SERVER_INFO)
+
+    
 
 else:
     MY_LOGGER.debug('No status changes so email not required...')

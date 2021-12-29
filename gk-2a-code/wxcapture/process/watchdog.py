@@ -109,11 +109,18 @@ def sat_validation():
                 break
             MY_LOGGER.debug('Sleeping %d seconds', sleep_timer)
             time.sleep(sleep_timer)
-        return op
+        return ok, op
 
-    results = '[' + retries('127.0.0.1', 'gamma') + ',' + retries('203.86.195.49', 'goes') + ']'
-    MY_LOGGER.debug('Results = %s', results)
-    wxcutils.save_file(OUTPUT_PATH, 'satellite-receivers.json', results)
+    ok, op = retries('127.0.0.1', 'gamma')
+
+    MY_LOGGER.debug('ok = %s, op = %s', ok, op)
+
+    # ignore if errors due to time outs
+    if ok != 'ERROR':
+        results = '[' + op + ']'
+        wxcutils.save_file(OUTPUT_PATH, 'satellite-receivers.json', results)
+    else:
+        MY_LOGGER.debug('Skipping due to a time out issue')
 
 
 # setup paths to directories

@@ -178,6 +178,13 @@ if get_image_age(IMAGE) < 3600:
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
+IMAGE = 'goes_16_fd_ch13-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'GOES 16',
+            'Enhanced clean IR longwave band')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
 # GOES 15
 IMAGE = 'goes_15_fd_IR-tn.jpg'
 if get_image_age(IMAGE) < 3600:

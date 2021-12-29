@@ -264,7 +264,13 @@ def do_backup_new():
                                               '/mnt/f/Satellites/goes15/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 16')
-    directories = ['fd/ch13', 'fd/ch13_enhanced']
+    directories = ['fd/ch02', 'fd/ch07', 'fd/ch07_enhanced',
+                   'fd/ch08', 'fd/ch08_enhanced', 'fd/ch09',
+                   'fd/ch09_enhanced', 'fd/ch13', 'fd/ch13_enhanced', 'fd/fc',
+                   'm1/ch02', 'm1/ch07', 'm1/ch07_enhanced', 'm1/ch13',
+                   'm1/ch13_enhanced', 'm1/fc', 'm2/ch02', 'm2/ch07',
+                   'm2/ch07_enhanced', 'm2/ch13', 'm2/ch13_enhanced',
+                   'm2/fc']
     # get all dates between the ranges
     for dir in directories:
         MY_LOGGER.debug('Directory = %a', dir)

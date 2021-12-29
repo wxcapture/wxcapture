@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""test code to find main colour in image"""
+"""test code """
 
 
 # import libraries
@@ -7,31 +7,62 @@ import os
 import sys
 import requests
 import cv2
+import numpy as np
 import wxcutils
 
+def find_circle(filename, extension):
+    """find the circle in the image"""
+    MY_LOGGER.debug('=' * 40)
+    MY_LOGGER.debug('Processing file %s%s', filename, extension)
 
-def is_light(filename, threshold):
-    """see if the image is not dark"""
-    try:
-        MY_LOGGER.debug('Reading file from URL')
-        data = requests.get(URL_BASE + filename)
-        MY_LOGGER.debug('Writing file')
-        open(WORKING_PATH + filename, 'wb').write(data.content)
+    x_step = 1
+    x_step_neg = -1 * x_step
+    threshold = 75
 
-        MY_LOGGER.debug('Reading file')
-        img = cv2.imread(WORKING_PATH + filename)
-        mean_components = img.mean(axis=0).mean(axis=0)
-        mean = (mean_components[0] + mean_components[1] + mean_components[2]) / 3
+    MY_LOGGER.debug('Loading file')
+    image = cv2.imread(CODE_PATH + filename + extension)
+    MY_LOGGER.debug('Convert to grayscale')
 
-        if mean > threshold:
-            MY_LOGGER.debug('Light - %f', mean)
-            return True
-    except:
-        MY_LOGGER.critical('is_light exception handler: %s %s %s',
-                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+    x_res = image.shape[1]
+    y_res = image.shape[0]
+    MY_LOGGER.debug('Resolution x = %d, y = %d', x_res, y_res)
+    x_max = x_res - 1
+    x_limit = int(x_max / 8)
+    y_mid = int(y_res / 2)
 
-    MY_LOGGER.debug('Dark - %f', mean)
-    return False
+    x_left = 0
+    MY_LOGGER.debug('Left edge')
+    for x_counter in range(0, x_limit, x_step):
+        pixel = image[y_mid, x_counter][0] + image[y_mid, x_counter][1] + image[y_mid, x_counter][2]
+        cv2.line(image, (x_counter, 0), (x_counter, y_mid -1), (0, 255, 0), 10)
+        if pixel <= threshold:
+            x_left = x_counter
+        else:
+            break
+
+    x_right = x_res - 1
+    MY_LOGGER.debug('Right edge')
+    for x_counter in range(x_max, x_max - x_limit ,x_step_neg):
+        pixel = image[y_mid, x_counter][0] + image[y_mid, x_counter][1] + image[y_mid, x_counter][2]
+        cv2.line(image, (x_counter, 0), (x_counter, y_mid -1), (0, 255, 0), 10)
+        if pixel <= threshold:
+            x_right = x_counter
+        else:
+            break
+
+
+    MY_LOGGER.debug('x_left = %d, x_right = %d', x_left, x_right)
+    radius = int((x_right - x_left) * 0.5)
+    x_centre = x_left + radius
+    MY_LOGGER.debug('x_centre = %s, radius = %d', x_centre, radius)
+
+    # draw circle
+    MY_LOGGER.debug('Drawing circle')
+    cv2.circle(image, (x_centre, y_mid), radius, (0, 255, 0), 2)
+
+    MY_LOGGER.debug('Writing out the image')
+    cv2.imwrite(CODE_PATH + filename + '-processed' + extension, image)
+    MY_LOGGER.debug('=' * 40)
 
 
 # setup paths to directories
@@ -57,13 +88,12 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
-
-URL_BASE = 'https://kiwiweather.com/goes/'
-
-if is_light('goes_17_m1_fc-tn.jpg', 5):
-    MY_LOGGER.debug('is Light')
-else:
-    MY_LOGGER.debug('is Dark')
+MY_LOGGER.debug('Left example - bad circle')
+find_circle('five-left', '.jpg')
+MY_LOGGER.debug('Left example - bad circle')
+find_circle('four-left', '.jpg')
+MY_LOGGER.debug('Right example - good circle')
+find_circle('three-right', '.jpg')
 
 
 MY_LOGGER.debug('Execution end')

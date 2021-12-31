@@ -1,0 +1,15 @@
+[
+	{
+		"server":"server",
+		"directories":
+		[
+			{
+				"title": "wxcapture/process",
+				"exclude": "logs/",
+				"source": "source",
+				"destination": "destination",
+				"cmd": ""
+			}			
+		]
+	}
+]

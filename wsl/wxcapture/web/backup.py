@@ -26,8 +26,10 @@ def do_rsync(dr_params, dr_exclude, dr_source, dr_output):
     # run rsync, waiting for completion
     if not dr_exclude:
         cmd = Popen(['rsync', '-' + dr_params, dr_source, dr_output], stdout=PIPE, stderr=PIPE)
+        MY_LOGGER.debug('rsync -' + dr_params + ' ' + dr_source + ' ' + dr_output)
     else:
-        cmd = Popen(['rsync', '-' + dr_params, '--exclude', '\'' + dr_exclude + '\'', dr_source, dr_output], stdout=PIPE, stderr=PIPE)
+        cmd = Popen(['rsync', '-' + dr_params, '--exclude', dr_exclude, dr_source, dr_output], stdout=PIPE, stderr=PIPE)
+        MY_LOGGER.debug('rsync -' + dr_params + ' --exclude ' + dr_exclude + ' ' + dr_source + ' ' + dr_output)
     stdout, stderr = cmd.communicate()
     errors = stderr.decode('utf-8')
     MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
@@ -116,6 +118,9 @@ def do_backup_all():
     errors.append({'type': 'NOAA / Meteor / ISS - audio', 'errors': do_rsync('caWv', '',
                                                                              'pi@192.168.100.9:/home/pi/wxcapture/audio/',
                                                                              '/mnt/f/Satellites/NOAA-Meteor-ISS/pi/audio/')})
+    # all server code backups are full
+    backup_servers()
+
 
     MY_LOGGER.debug('Website')
     errors.append({'type': 'Website', 'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/', '/mnt/f/kiwiweather/')})
@@ -150,6 +155,29 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 
+def backup_servers():
+    """backup code and config on servers"""
+    # all server code backups are full
+    servers = wxcutils.load_json(CONFIG_PATH, 'servers.json')
+
+    for server in servers:
+        MY_LOGGER.debug('-' * 40)
+        MY_LOGGER.debug('server = %s', server['server'])
+        for directory in server['directories']:
+            MY_LOGGER.debug('-' * 10)
+            MY_LOGGER.debug(directory['title'])
+            errors.append({'type': server['server'] + ' - ' + directory['title'],
+                           'errors': do_rsync('caWv',
+                                              directory['exclude'],
+                                              directory['source'],
+                                              directory['destination'])
+                           })
+            if directory['cmd']:
+                MY_LOGGER.debug('cmd = %s', directory['cmd'])
+                wxcutils.run_cmd('rm -rf ' + directory['cmd'])
+    MY_LOGGER.debug('-' * 40)
+
+
 def do_backup_new():
     """backup since the day of the last backup"""
     MY_LOGGER.debug('Backing up since the day of the last backup')
@@ -173,7 +201,7 @@ def do_backup_new():
     # add one day so the date range loops include the last (current) day
     utc_date_now += timedelta(days=1)
     MY_LOGGER.debug('Current UTC date = %s', utc_date_now)
-    errors = []
+
 
     MY_LOGGER.debug('GK-2A - data')
     # get all dates between the ranges
@@ -471,12 +499,12 @@ def do_backup_new():
     errors.append({'type': 'Website - sensors',
                    'errors': do_rsync('caWv', '', 'mike@192.168.100.18:/home/websites/wxcapture/sensors/', '/mnt/f/kiwiweather/sensors/')})
 
-    # remove images from the sensors/images folder as no need to back these up
-    MY_LOGGER.debug('Remove images from sensor images folder')
-    filelist = glob.glob('/mnt/f/kiwiweather/sensors/images/*')
-    for filename in filelist:
-        MY_LOGGER.debug('  removing %s', filename)
-        os.remove(filename)
+    # # remove images from the sensors/images folder as no need to back these up
+    # MY_LOGGER.debug('Remove images from sensor images folder')
+    # filelist = glob.glob('/mnt/f/kiwiweather/sensors/images/*')
+    # for filename in filelist:
+    #     MY_LOGGER.debug('  removing %s', filename)
+    #     os.remove(filename)
 
     # not backed up are:
     # wp-admin
@@ -489,6 +517,12 @@ def do_backup_new():
     # do_rsync('caWv', '2*',
     #          'mike@192.168.100.18:/home/websites/wxcapture/', '/mnt/f/kiwiweather/')
     # DO NOT USE
+
+    # Doing full backups, not incremental due to low volume of files / data
+    MY_LOGGER.debug('=' * 50)
+    MY_LOGGER.debug('Servers')
+    # all server code backups are full
+    backup_servers()
 
     if show_errors('NEW backup', errors):
         MY_LOGGER.debug('errors detected')
@@ -530,6 +564,8 @@ except IndexError as exc:
     MY_LOGGER.critical('Must use ALL or NEW as a parameter')
     # re-throw it as this is fatal
     raise
+
+errors = []
 
 if BACKUP_TYPE == 'ALL':
     LAST_BACKUP_DATA = get_last_backup_data()

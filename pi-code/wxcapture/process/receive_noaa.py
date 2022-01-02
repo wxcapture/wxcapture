@@ -723,7 +723,10 @@ try:
                         MY_TIME = ''
                         MY_PASS_MERIDIAN = ''
                         MY_SATELLITE = ''
-                        PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json')
+                        # need to include PM passes from yesterday as some pre-2am passes will
+                        # align with the previous evening
+                        PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json') +\
+                                 wxcutils.load_json(WORKING_PATH, 'passes_pm_yesterday.json')
 
                         for sat_pass in PASSES:
                             if sat_pass['sat type'] == 'NOAA':

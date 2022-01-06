@@ -17,7 +17,7 @@
 			},
 			"web doc root location": {
 				"required": "yes",
-				"valid values": "-pasttern-",
+				"valid values": "-pattern-",
 				"description": "Absolute path to the directory used for the web document root, e.g. /media/hdd/wxcapture/.",
 				"hidden": "yes"
 			},
@@ -59,13 +59,13 @@
 		"field validation": {
 		"Start Month": {
 			"required": "yes",
-			"valid values": "-pasttern-",
+			"valid values": "-pattern-",
 			"description": "Start month number for the captures page links, e.g. 05.",
 			"hidden": "no"
 		},
 		"Start Year": {
 			"required": "yes",
-			"valid values": "-pasttern-",
+			"valid values": "-pattern-",
 			"description": "Start year for the captures page links, e.g. 2019.",
 			"hidden": "no"
 			}

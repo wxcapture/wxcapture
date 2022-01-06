@@ -109,7 +109,7 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
         image = cv2.putText(image, sat['acknowledge2'], (x_offset, yborder + (y_offset * 2)),
-                            cv2.FONT_HERSHEY_SIMPLEX, font_size - 1,
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size - 2,
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
 
@@ -140,17 +140,65 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
         image = cv2.putText(image, channel['desc'], (x_offset, image.shape[0] - yborder),
-                            cv2.FONT_HERSHEY_SIMPLEX, font_size,
+                            cv2.FONT_HERSHEY_SIMPLEX, font_size - 1,
                             (channel['font colour'][0], channel['font colour'][1], channel['font colour'][2]),
                             font_size, cv2.LINE_AA)
 
+    def centre_image():
+        """centre the planet in the image"""
+        def get_pixel_intensity(pi_x, pi_y):
+            """get the pixel intensity"""
+            # note range will be 0 - (255*3)
+            return image[pi_y, pi_x][0] + image[pi_y, pi_x][1] + image[pi_y, pi_x][2]
+
+        nonlocal image
+        x_res = image.shape[1]
+        y_res = image.shape[0]
+        MY_LOGGER.debug('x_res = %d, y_res = %d', x_res, y_res)
+
+        x_border = int(x_res * (456 / 5206))
+        MY_LOGGER.debug('x_border = %d', x_border)
+
+        # detect border via sampling
+        MY_LOGGER.debug('Sampling test - left')
+        left_int = 0
+        for x in range(0, x_border, 20):
+            for y in range(0, y_res - 1, 20):
+                left_int += get_pixel_intensity(x, y)
+        MY_LOGGER.debug('left_int = %d', left_int)
+
+        MY_LOGGER.debug('Sampling test - right')
+        right_int = 0
+        for x in range(x_res - x_border - 1, x_res - 1, 20):
+            for y in range(0, y_res - 1, 20):
+                right_int += get_pixel_intensity(x, y)
+        MY_LOGGER.debug('right_int = %d', right_int)
+
+        if left_int > right_int:
+            MY_LOGGER.debug('Left aligned')
+            image = image[0:y_res-1, 0:x_res-x_border]
+        else:
+            MY_LOGGER.debug('Right aligned')
+            image = image[0:y_res-1, x_border:x_res-1]
+
 
     MY_LOGGER.debug('=' * 30)
-    MY_LOGGER.debug('sat_type = %s, sat = %s, type = %s, channel = %s, dir = %s, file = %s, extension = %s', cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb_extension)
+    MY_LOGGER.debug('sat_type = %s, sat = %s, type = %s, channel = %s, dir = %s, file = %s, extension = %s',
+                     cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb_extension)
 
     # load the image
     MY_LOGGER.debug('Reading file - %s', cb_dir + '/' + cb_file + cb_extension)
     image = cv2.imread(cb_dir + '/' + cb_file + cb_extension)
+
+    # if GOES 13, then need to trim the image
+    # as it is off centre to the left / right
+    if cb_sat_type + cb_sat == 'goes13':
+        MY_LOGGER.debug('GOES 13 - need to centre the image')
+        centre_image()
+    else:
+        MY_LOGGER.debug('No need to centre image')
+
+
     font_size = int(image.shape[0] / 900)
     if font_size == 0:
         font_size = 1
@@ -170,7 +218,8 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                             # MY_LOGGER.debug('desc = %s', channel['desc'])
                             y_offset = 26 * font_size
                             MY_LOGGER.debug('font size = %s, offset = %d', font_size, y_offset)
-                            MY_LOGGER.debug('font colour = %d, %d, %d', channel['font colour'][0], channel['font colour'][1], channel['font colour'][2])
+                            MY_LOGGER.debug('font colour = %d, %d, %d', channel['font colour'][0],
+                                            channel['font colour'][1], channel['font colour'][2])
 
                             xborder = int(image.shape[1] / 55)
                             yborder = int(image.shape[0] / 55)
@@ -188,7 +237,9 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
                             add_sat_info()
 
                             # create directory (if needed)
-                            MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] + '/' + cb_dir.split('/')[-3])
+                            MY_LOGGER.debug('Making directories for %s', WEB_PATH + cb_sat_type + cb_sat +\
+                                             '/' + cb_type + '/' + cb_channel + '/' + cb_dir.split('/')[-1] +\
+                                                 '/' + cb_dir.split('/')[-3])
                             mk_dir(WEB_PATH + cb_sat_type + cb_sat)
                             mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type)
                             mk_dir(WEB_PATH + cb_sat_type + cb_sat + '/' + cb_type + '/' + cb_channel)

@@ -5,65 +5,55 @@
 # import libraries
 import os
 import sys
-import requests
-import cv2
+import math
 import numpy as np
+import cv2
 import wxcutils
 
-def find_circle(filename, extension):
+
+def centre_image(filename, extension):
     """find the circle in the image"""
+    def get_pixel_intensity(pi_x, pi_y):
+        """get the pixel intensity"""
+        # note range will be 0 - (255*3)
+        return image[pi_y, pi_x][0] + image[pi_y, pi_x][1] + image[pi_y, pi_x][2]
+
     MY_LOGGER.debug('=' * 40)
     MY_LOGGER.debug('Processing file %s%s', filename, extension)
 
-    x_step = 1
-    x_step_neg = -1 * x_step
-    threshold = 75
-
-    MY_LOGGER.debug('Loading file')
-    image = cv2.imread(CODE_PATH + filename + extension)
-    MY_LOGGER.debug('Convert to grayscale')
+    image = cv2.imread(filename + extension)
 
     x_res = image.shape[1]
     y_res = image.shape[0]
-    MY_LOGGER.debug('Resolution x = %d, y = %d', x_res, y_res)
-    x_max = x_res - 1
-    x_limit = int(x_max / 8)
-    y_mid = int(y_res / 2)
+    MY_LOGGER.debug('x_res = %d, y_res = %d', x_res, y_res)
 
-    x_left = 0
-    MY_LOGGER.debug('Left edge')
-    for x_counter in range(0, x_limit, x_step):
-        pixel = image[y_mid, x_counter][0] + image[y_mid, x_counter][1] + image[y_mid, x_counter][2]
-        cv2.line(image, (x_counter, 0), (x_counter, y_mid -1), (0, 255, 0), 10)
-        if pixel <= threshold:
-            x_left = x_counter
-        else:
-            break
+    x_border = int(x_res * (456 / 5206))
+    MY_LOGGER.debug('x_border = %d', x_border)
 
-    x_right = x_res - 1
-    MY_LOGGER.debug('Right edge')
-    for x_counter in range(x_max, x_max - x_limit ,x_step_neg):
-        pixel = image[y_mid, x_counter][0] + image[y_mid, x_counter][1] + image[y_mid, x_counter][2]
-        cv2.line(image, (x_counter, 0), (x_counter, y_mid -1), (0, 255, 0), 10)
-        if pixel <= threshold:
-            x_right = x_counter
-        else:
-            break
+    # detect border via sampling
+    MY_LOGGER.debug('Sampling test - left')
+    left_int = 0
+    for x in range(0, x_border, 20):
+        for y in range(0, y_res - 1, 20):
+            left_int += get_pixel_intensity(x, y)
+    MY_LOGGER.debug('left_int = %d', left_int)
 
+    MY_LOGGER.debug('Sampling test - right')
+    right_int = 0
+    for x in range(x_res - x_border - 1, x_res - 1, 20):
+        for y in range(0, y_res - 1, 20):
+            right_int += get_pixel_intensity(x, y)
+    MY_LOGGER.debug('right_int = %d', right_int)
 
-    MY_LOGGER.debug('x_left = %d, x_right = %d', x_left, x_right)
-    radius = int((x_right - x_left) * 0.5)
-    x_centre = x_left + radius
-    MY_LOGGER.debug('x_centre = %s, radius = %d', x_centre, radius)
+    if left_int > right_int:
+        MY_LOGGER.debug('Left aligned')
+        new_image = image[0:y_res-1, 0:x_res-x_border]
+    else:
+        MY_LOGGER.debug('Right aligned')
+        new_image = image[0:y_res-1, x_border:x_res-1]
 
-    # draw circle
-    MY_LOGGER.debug('Drawing circle')
-    cv2.circle(image, (x_centre, y_mid), radius, (0, 255, 0), 2)
-
-    MY_LOGGER.debug('Writing out the image')
-    cv2.imwrite(CODE_PATH + filename + '-processed' + extension, image)
-    MY_LOGGER.debug('=' * 40)
-
+    MY_LOGGER.debug('write out image')
+    cv2.imwrite(filename + '-centred' +  extension, new_image)   
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -88,12 +78,17 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
-MY_LOGGER.debug('Left example - bad circle')
-find_circle('five-left', '.jpg')
-MY_LOGGER.debug('Left example - bad circle')
-find_circle('four-left', '.jpg')
-MY_LOGGER.debug('Right example - good circle')
-find_circle('three-right', '.jpg')
+
+centre_image('5-1', '.jpg')
+centre_image('5-2', '.jpg')
+centre_image('5-3', '.jpg')
+centre_image('5-4', '.jpg')
+centre_image('5-5', '.jpg')
+centre_image('FC-1', '.jpg')
+centre_image('FC-2', '.jpg')
+centre_image('FC-3', '.jpg')
+centre_image('FC-4', '.jpg')
+centre_image('FC-5', '.jpg')
 
 
 MY_LOGGER.debug('Execution end')

@@ -116,6 +116,9 @@ def sat_validation():
 
     MY_LOGGER.debug('result = %s', result)
 
+    # close the socket now we've finished with it
+    sub0.close()
+
     wxcutils.save_json(OUTPUT_PATH, 'satellite-receivers.json', result)
 
 

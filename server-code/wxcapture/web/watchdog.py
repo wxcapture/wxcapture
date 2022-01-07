@@ -443,7 +443,7 @@ for si1 in LATESTSATSTATUS:
     for si2 in PREVIOUSSATSTATUS:
         if si1['label'] == si2['label']:
             MY_LOGGER.debug('si2 %s', si2)
-            if si1['ok'] == 1:
+            if si1['ok'] == 'Locked':
                 EMAIL_HTML4 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
             else:
                 EMAIL_HTML4 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
@@ -454,17 +454,13 @@ for si1 in LATESTSATSTATUS:
                 CHANGE = 'Y'
             EMAIL_HTML4 += '<td align = \"center\">' + CHANGE + '</td>'
 
-            link_status = 'Locked'
-            if si1['ok'] != 1:
-                link_status = 'NOT locked'
-
-            EMAIL_TEXT4 +=  si1['label'] + ' - ' + link_status + ' - ' + \
+            EMAIL_TEXT4 +=  si1['label'] + ' - ' + si1['ok'] + ' - ' + \
                 str(si1['skipped_symbols']) + ' - ' + \
                 str(si1['reed_solomon_errors']) + ' - ' + str(si1['viterbi_errors']) + \
                 ' - ' + wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + ' - '
-            EMAIL_HTML4 += '<td>' +  si1['label'] + '</td><td>' + link_status + '</td><td>' + \
+            EMAIL_HTML4 += '<td>' +  si1['label'] + '</td><td>' + si1['ok'] + '</td><td align=\"center\">' + \
                 str(si1['skipped_symbols']) + \
-                '</td><td>' + str(si1['reed_solomon_errors']) + '</td><td>' + \
+                '</td><td align=\"center\">' + str(si1['reed_solomon_errors']) + '</td><td align=\"center\">' + \
                 str(si1['viterbi_errors']) + '</td><td>' + \
                 wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>'
 

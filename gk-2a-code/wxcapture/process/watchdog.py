@@ -80,47 +80,43 @@ def drive_validation():
 def sat_validation():
     """validate satellite info"""
 
-    def try_server(ip_address, label):
-        """test the server"""
-        MY_LOGGER.debug('server = %s, ip = %s', label, ip_address)
-        try:
-            with Sub0(dial= 'tcp://' + ip_address + ':6002', recv_timeout=100, topics="") as sub0:
-                    op = sub0.recv().decode("utf-8").replace('}', ',"label":"' + label + '","exception":"", "when":' + str(time.time()) + '}')
-                    MY_LOGGER.debug('op = %s', op)
-                    return 'OK', op
-        except Exception as err:
-            MY_LOGGER.debug('Unexpected error connecting to %s : 0 %s 1 %s 2 %s', ip_address,
-                            sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-            MY_LOGGER.debug('issue connecting to %s', ip_address)
-            return 'ERROR', '{"timestamp": "", "skipped_symbols": 0, "viterbi_errors": 0, "reed_solomon_errors": 0, "ok": 0, "label":"' + label + '","exception":"' + str(sys.exc_info()[1]) + '", "when":' + str(time.time()) + '}'
+    sat_servers = wxcutils.load_json(CONFIG_PATH, 'sat-servers.json')
 
+    result = []
+    for sat_server in sat_servers:
+        MY_LOGGER.debug('Processing %s', sat_server)
+        address = 'tcp://' + sat_server['ip'] + ':' + sat_server['port']
 
-    def retries(ip_address, label):
-        """work around intermittent errors"""
-        max_attempt = 10
-        attempt = 0
-        sleep_timer = 2
-        MY_LOGGER.debug('Trying up to %d attempts', max_attempt)
-        while attempt < max_attempt:
-            attempt += 1
-            ok, op = try_server(ip_address, label)
-            MY_LOGGER.debug('Attempt %d, result = %s', attempt, ok)
-            if ok == 'OK':
+        sub0 = Sub0(dial=address, recv_timeout=100, topics="")
+
+        # make sure everyone is connected
+        time.sleep(0.1)
+
+        retry_counter = 1
+        while retry_counter <= 10:
+            try:
+                op = json.loads(sub0.recv().decode("utf-8"))
                 break
-            MY_LOGGER.debug('Sleeping %d seconds', sleep_timer)
-            time.sleep(sleep_timer)
-        return ok, op
+            except:
+                MY_LOGGER.debug('Attempt %d', retry_counter)
+                MY_LOGGER.debug('Unexpected error connecting to %s : 0 %s 1 %s 2 %s', address,
+                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                retry_counter += 1
+                MY_LOGGER.debug('Sleeping 2 seconds...')
+                time.sleep(2)
 
-    ok, op = retries('127.0.0.1', 'gamma')
+        MY_LOGGER.debug('op %s', op)
+        result.append({'timestamp' : op['timestamp'],
+                       'skipped_symbols' : op['skipped_symbols'],
+                       'viterbi_errors' : op['viterbi_errors'],
+                       'reed_solomon_errors' : op['reed_solomon_errors'],
+                       'ok' : 'Locked' if op['ok'] else 'Unlocked',
+                       'label' : sat_server['label'],
+                       'when' : str(time.time())})
 
-    MY_LOGGER.debug('ok = %s, op = %s', ok, op)
+    MY_LOGGER.debug('result = %s', result)
 
-    # ignore if errors due to time outs
-    if ok != 'ERROR':
-        results = '[' + op + ']'
-        wxcutils.save_file(OUTPUT_PATH, 'satellite-receivers.json', results)
-    else:
-        MY_LOGGER.debug('Skipping due to a time out issue')
+    wxcutils.save_json(OUTPUT_PATH, 'satellite-receivers.json', result)
 
 
 # setup paths to directories

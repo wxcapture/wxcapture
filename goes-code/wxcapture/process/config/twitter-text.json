@@ -302,6 +302,34 @@
          ]
       },
       {
+         "Filename":"web-goes13-fd-3-144-800x800.mp4",
+         "Textlines":[
+            "Latest GOES 13 weather satellite 3 day video covering Africa, Asia and Indian ocean showing water vapour",
+            "Watch water vapour in motion for 3 days across Africa, Asian and the Indian Ocean",
+            "Amazing weather satellite 3 day video showing water vapour in action"
+         ],
+         "hashtags":[
+            "#GOES13",
+            "#GOES",
+            "#Africa",
+            "#EWS-G1"
+         ]
+      },
+      {
+         "Filename":"web-goes13-fd-FC-144-800x800.mp4",
+         "Textlines":[
+            "Latest GOES 13 weather satellite 3 day video covering Africa, Asia and Indian ocean in full colour",
+            "Watch the weather in motion for 3 days across Africa, Asian and the Indian Ocean",
+            "Amazing weather satellite 3 day video showing full colour views of weather in action"
+         ],
+         "hashtags":[
+            "#GOES13",
+            "#GOES",
+            "#Africa",
+            "#EWS-G1"
+         ]
+      },
+      {
          "Filename":"himawari_8_fd_IR-tn.jpg",
          "Textlines":[
             "Latest Himawari 8 weather satellite enhanced IR image - Asia, Pacific, Australia, New Zealand",

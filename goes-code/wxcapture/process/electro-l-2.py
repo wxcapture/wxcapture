@@ -139,19 +139,20 @@ last_time = ''
 year_list = get_directory_list()
 
 for year in year_list:
-    # MY_LOGGER.debug('year = %s', year)
+    MY_LOGGER.debug('year = %s', year)
     # if year is >= last year processed
     if int(year) >= int(CONFIG_INFO['Last Year']):
         MY_LOGGER.debug('Process year = %s', year)
         year_only = False
         if int(year) > int(CONFIG_INFO['Last Year']):
             year_only = True
-            MY_LOGGER.debug('year only')
+            MY_LOGGER.debug('year only - new year!')
         # change directory to the year
         ftp.cwd(year)
         MY_LOGGER.debug('current directory = %s', ftp.pwd())
         month_list = get_directory_list()
         for month in month_list:
+            MY_LOGGER.debug('month = %s', month)
             # ensure it is a valid month directory - to avoid random directory names
             if month[:3].lower() in ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']:
                 month_number = month_string_to_number(month)
@@ -160,7 +161,7 @@ for year in year_list:
                 if month_number >= int(CONFIG_INFO['Last Month']) or year_only:
                     MY_LOGGER.debug('Process month = %s', month_number)
                     month_only = False
-                    if month_number > int(CONFIG_INFO['Last Month']):
+                    if month_number > int(CONFIG_INFO['Last Month']) or year_only:
                         month_only = True
                         MY_LOGGER.debug('month only')
                     # change directory to the month
@@ -168,12 +169,12 @@ for year in year_list:
                     MY_LOGGER.debug('current directory = %s', ftp.pwd())
                     day_list = get_directory_list()
                     for day in day_list:
-                        # MY_LOGGER.debug('day = %s', day)
+                        MY_LOGGER.debug('day = %s', day)
                         # process day if in current month and >= last day processed
                         if int(day) >= int(CONFIG_INFO['Last Day']) or month_only:
                             MY_LOGGER.debug('Process day = %s', day)
                             day_only = False
-                            if int(day) > int(CONFIG_INFO['Last Day']):
+                            if int(day) > int(CONFIG_INFO['Last Day']) or month_only:
                                 day_only = True
                                 MY_LOGGER.debug('day only')
                             # create directories, if it does not exist

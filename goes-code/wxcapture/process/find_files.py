@@ -921,64 +921,6 @@ def create_animation(ca_directory, ca_file_match, ca_frames, ca_duration, ca_res
     MY_LOGGER.debug('Writing out last generated date file')
     wxcutils.save_file(OUTPUT_PATH, ca_filename + '.txt', get_last_generated_text(ca_filename))
 
-# create_animation2('goes13', 'FC', '*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
-def create_animation2(ca_directory, ca_channel, ca_file_match, ca_frames, ca_duration, ca_resolution, ca_selection, ca_min_size):
-    """create animation from images - date channel / format directories"""
-
-    MY_LOGGER.debug('create_animation2 directory = %s, channel = %s, file_match = %s, frames = %s, duration = %s, resolution = %s',
-                    ca_directory, ca_channel, ca_file_match, ca_frames, ca_duration, ca_resolution)
-
-    # filename
-    ca_filename = ca_directory + '-' + ca_channel + '-' + str(ca_frames) + '-' + ca_resolution.replace(':', 'x')
-    MY_LOGGER.debug('ca_filename = %s', ca_filename)
-
-    # generate animation file
-
-    # get list of all directories, sorted by date
-    # reverse order so can get the last ca_frames
-    ca_directories = find_directories(BASEDIR + ca_directory)
-    ca_directories.sort(reverse=True)
-    MY_LOGGER.debug('ca_directories = %s', ca_directories)
-
-    # loop through directories until we get required
-    # number of frames or run out of directories
-    ca_text = ''
-    ca_frame_counter = 0
-    ca_duration_text = 'duration ' + str(ca_duration) + os.linesep
-    for ca_dir in ca_directories:
-        # loop through files in each directory
-        MY_LOGGER.debug('looking in %s', BASEDIR + ca_directory + '/' + ca_dir + '/' + ca_channel + '/' + ca_file_match)
-        ca_frame_list = glob.glob(BASEDIR + ca_directory + '/' + ca_dir + '/' + ca_channel + '/' + ca_file_match)
-        ca_frame_list.sort(reverse=True)
-        MY_LOGGER.debug('ca_frame_list = %s', ca_frame_list)
-        for ca_line in ca_frame_list:
-            MY_LOGGER.debug('ca_line = %s', ca_line)
-            if ca_selection == 'ALL' or (ca_selection == 'LIGHT' and os.path.getsize(ca_line) >= ca_min_size):
-                ca_entry = 'file \'' + ca_line + '\'' + os.linesep
-                if ca_frame_counter == 0:
-                    ca_text = ca_entry + ca_duration_text + ca_entry
-                else:
-                    ca_text = ca_entry + ca_duration_text + ca_text
-                ca_frame_counter += 1
-                if ca_frame_counter >= ca_frames:
-                    MY_LOGGER.debug('got enough frames - inner loop')
-                    break
-        if ca_frame_counter >= ca_frames:
-            MY_LOGGER.debug('got enough frames - outer loop')
-            break
-
-    # save text to file
-    wxcutils.save_file(WORKING_PATH, ca_filename + '.txt', ca_text)
-
-    # animate the frame list
-    wxcutils.run_cmd('ffmpeg -y -safe 0 -f concat -i ' + WORKING_PATH + ca_filename + '.txt' +
-                     ' -c:v libx264 -pix_fmt yuv420p -vf scale=' + ca_resolution + ' ' + OUTPUT_PATH +
-                     ca_filename + '.mp4')
-
-    # create file with date time info
-    MY_LOGGER.debug('Writing out last generated date file')
-    wxcutils.save_file(OUTPUT_PATH, ca_filename + '.txt', get_last_generated_text(ca_filename))
-
 
 # setup paths to directories
 HOME = os.environ['HOME']
@@ -1051,15 +993,6 @@ if number_processes('find_files.py') == 1:
     SECTION = math.floor(int(time.strftime('%M')) / 10)
     MY_LOGGER.debug('SECTION = %s', SECTION)
 
-    # GOES 13 - Full Colour - 2 frame per hour
-    # currently experimental
-    # create_animation2('goes13', 'FC', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-    # create_animation2('goes13', '1', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-    # create_animation2('goes13', '2', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-    # create_animation2('goes13', '3', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-    # create_animation2('goes13', '4', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-    # create_animation2('goes13', '5', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
     if SECTION == 0:
         # GOES 16 - ch 13 enhanced - 1 frame per hour
         MY_LOGGER.debug('+=' * 40)
@@ -1087,6 +1020,9 @@ if number_processes('find_files.py') == 1:
         MY_LOGGER.debug('+=' * 40)
         create_animation('web/goes17/m1/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'LIGHT', 400 * 1024)
 
+        # GOES 13 - #3 Water Vapour - 2 frame per hour
+        create_animation('web/goes13/fd/3', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+
     if SECTION == 3:
         # GOES 17 - M2 ch 7 IR shortwave - 2 frames per hour
         MY_LOGGER.debug('+=' * 40)
@@ -1100,6 +1036,9 @@ if number_processes('find_files.py') == 1:
         # Himawari 8 - FD IR - 1 frame per hour
         MY_LOGGER.debug('+=' * 40)
         create_animation('web/himawari8/fd/IR', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+
+        # GOES 13 - Full Colour - 2 frame per hour
+        create_animation('web/goes13/fd/FC', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
     if SECTION == 5:
         # combined images - 1 frame per hour

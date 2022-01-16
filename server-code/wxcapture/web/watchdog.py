@@ -480,7 +480,7 @@ if EMAIL_REQUIRED:
     if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4,'email.json'):
         # try with alternate email
         MY_LOGGER.debug('Sending Email using alternate server')
-        if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, 'email2.json'):
+        if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4, 'email2.json'):
             MY_LOGGER.debug('Sending Email using alternate server also failed')
         else:
             MY_LOGGER.debug('Sending Email using alternate server worked')

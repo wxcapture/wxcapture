@@ -133,7 +133,7 @@ def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_text
 
     # setup the message
     message = MIMEMultipart('alternative')
-    message['Subject'] = 'Watchdog - Status Change'
+    message['Subject'] = 'Watchdog - ' + EMAIL_SUBJECT
     message['From'] = email_info['from']
     message['To'] = email_info['notify']
     MY_LOGGER.debug('Sending (header) to = %s', email_info['notify'])
@@ -142,7 +142,7 @@ def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_text
         MY_LOGGER.debug('EMAIL TO -----> %s', email_address)
 
     # plain text
-    se_text = 'Status change - ' + ALERT_INFO + NEWLINE + \
+    se_text = EMAIL_SUBJECT + ' - ' + ALERT_INFO + NEWLINE + \
         se_text + NEWLINE + \
         se_text2 + NEWLINE + \
         se_text3 + NEWLINE + \
@@ -153,8 +153,8 @@ def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_text
     # html text
     se_html = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' + \
         '<html><head>' + \
-        '<title>Watchdog - Status Change</title></head>' + NEWLINE + \
-        '<body><h2>' + 'Status Change - ' + ALERT_INFO + '</h2>' + NEWLINE + \
+        '<title>Watchdog - ' + EMAIL_SUBJECT + '</title></head>' + NEWLINE + \
+        '<body><h2>' + EMAIL_SUBJECT + ' - ' + ALERT_INFO + '</h2>' + NEWLINE + \
         '<h3>Satellites</h3>' + \
         '<table border="1">' + \
         '<tr><th>Status</th><th>Status Change?</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
@@ -294,7 +294,6 @@ MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
 # email and data control info
 STATUS_CHANGE_DETECTED = False
-EMAIL_REQUIRED = False
 EMAIL_TEXT = ''
 EMAIL_HTML = ''
 EMAIL_TEXT2 = ''
@@ -302,6 +301,20 @@ EMAIL_HTML2 = ''
 CSV_DATA = ''
 CSV_DATA2 = ''
 NEWLINE = os.linesep + os.linesep
+
+HOURS = int(time.strftime('%H'))
+MINUTES = int(time.strftime('%M'))
+
+# send status update on first run in a day
+# otherwise only send on a status change
+if (HOURS == 0) and ( 1 < MINUTES < 14):
+    MY_LOGGER.debug('Daily update email')
+    EMAIL_SUBJECT = 'Daily Update'
+    EMAIL_REQUIRED = True
+else:
+    MY_LOGGER.debug('Status change email')
+    EMAIL_SUBJECT = 'Status Change'
+    EMAIL_REQUIRED = False
 
 # load satellite info
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog.json')

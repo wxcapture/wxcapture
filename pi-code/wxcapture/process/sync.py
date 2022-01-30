@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """update weather.tle file hourly"""
 
-
 # import libraries
 import os
 import sys
@@ -13,7 +12,6 @@ import wxcutils
 
 def drive_validation():
     """validate drive space utilisation"""
-    dv_errors_found = False
     dv_space = 'unknown'
 
     dv_cmd = Popen(['df'], stdout=PIPE, stderr=PIPE)
@@ -30,7 +28,9 @@ def drive_validation():
 
     # rsync files to server
     MY_LOGGER.debug('rsync: %s', dv_filename)
-    wxcutils.run_cmd('rsync -t ' + OUTPUT_PATH + dv_filename + ' ' + RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + ':' + RSYNC_CONFIG['remote directory'] + '/' + dv_filename)
+    wxcutils.run_cmd('rsync -t ' + OUTPUT_PATH + dv_filename + ' ' + \
+        RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + \
+            ':' + RSYNC_CONFIG['remote directory'] + '/' + dv_filename)
 
 
 def process_file(pf_file_name):
@@ -63,9 +63,14 @@ def process_file(pf_file_name):
     # iterate through the files
     for pf_file in pf_file_data['files']:
         if pf_file['copied'] == 'no':
-            MY_LOGGER.debug('To copy - %s %s %s %s', pf_file['source path'], pf_file['source file'], pf_file['destination path'], pf_file['copied'])
+            MY_LOGGER.debug('To copy - %s %s %s %s', pf_file['source path'],
+                            pf_file['source file'], pf_file['destination path'],
+                            pf_file['copied'])
             pf_result = do_sync(pf_file['source path'] + '/' + pf_file['source file'],
-                                RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + ':' + RSYNC_CONFIG['remote directory'] + '/' + pf_file['destination path'] + '/' + pf_file['source file'] + '.LOCK.' + pf_lock_id)
+                                RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + \
+                                    ':' + RSYNC_CONFIG['remote directory'] + '/' + \
+                                        pf_file['destination path'] + '/' + \
+                                            pf_file['source file'] + '.LOCK.' + pf_lock_id)
             if pf_result:
                 pf_file['copied'] = 'yes'
 
@@ -84,7 +89,8 @@ def process_file(pf_file_name):
         pf_unlock_file = pf_lock_id  + '.UNLOCK'
         wxcutils.run_cmd('touch ' + QUEUE_PATH + pf_unlock_file)
         pf_result = do_sync(QUEUE_PATH + pf_unlock_file,
-                            RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + ':' + RSYNC_CONFIG['remote directory'] + '/' + pf_unlock_file)
+                            RSYNC_CONFIG['remote user'] + '@' + RSYNC_CONFIG['remote host'] + \
+                                ':' + RSYNC_CONFIG['remote directory'] + '/' + pf_unlock_file)
         if pf_result:
             MY_LOGGER.debug('lock file copied over successfully')
             wxcutils.run_cmd('rm ' + QUEUE_PATH + pf_unlock_file)
@@ -128,13 +134,13 @@ try:
     drive_validation()
 
     # check for files to process
-    no_files_to_process = True
+    NO_FILES_TO_PROCESS = True
     for file_name in glob.glob(QUEUE_PATH + '*.json'):
-        no_files_to_process = False
+        NO_FILES_TO_PROCESS = False
         MY_LOGGER.debug('File to process - %s', file_name.replace(QUEUE_PATH, ''))
         process_file(file_name.replace(QUEUE_PATH, ''))
 
-    if no_files_to_process:
+    if NO_FILES_TO_PROCESS:
         MY_LOGGER.debug('No file(s) to process')
 
 except:

@@ -8,7 +8,6 @@ from logging.handlers import TimedRotatingFileHandler
 import sys
 import os
 import time
-import random
 from rtlsdr import RtlSdr
 import tweepy
 from discord_webhook import DiscordWebhook, DiscordEmbed

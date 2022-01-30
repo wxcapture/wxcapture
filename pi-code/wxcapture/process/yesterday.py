@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
+"""find passes in yesterdays last 12 hours"""
 
 import os
 import time
-import calendar
-from datetime import datetime
 import wxcutils
 
 
@@ -12,7 +11,7 @@ import wxcutils
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
 CODE_PATH = APP_PATH + 'process/'
-LOG_PATH = CODE_PATH + 'logs/' 
+LOG_PATH = CODE_PATH + 'logs/'
 OUTPUT_PATH = APP_PATH + 'output/'
 IMAGE_PATH = OUTPUT_PATH + 'images/'
 WORKING_PATH = CODE_PATH + 'working/'
@@ -48,7 +47,8 @@ MY_LOGGER.debug('Finding all passes in the last 10 hours')
 PREVIOUS = []
 for sat_pass in PASSES:
     pass_age = TIME_NOW - int(sat_pass['time'])
-    MY_LOGGER.debug('Pass epoch time = %d, age = %d (sec) [%f hours]', int(sat_pass['time']), pass_age, pass_age / 3600)
+    MY_LOGGER.debug('Pass epoch time = %d, age = %d (sec) [%f hours]',
+                    int(sat_pass['time']), pass_age, pass_age / 3600)
     if pass_age < MAX_AGE:
         MY_LOGGER.debug('Including this pass')
         PREVIOUS.append(sat_pass)

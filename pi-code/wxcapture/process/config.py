@@ -22,7 +22,8 @@ def migrate_files():
     """migrate files to server"""
     MY_LOGGER.debug('migrating files')
     files_to_copy = []
-    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': 'config.html', 'destination path': '', 'copied': 'no'})
+    files_to_copy.append({'source path': OUTPUT_PATH, 'source file': 'config.html',
+                          'destination path': '', 'copied': 'no'})
     MY_LOGGER.debug('Files to copy = %s', files_to_copy)
     wxcutils.migrate_files(files_to_copy)
     MY_LOGGER.debug('Completed migrating files')
@@ -56,7 +57,8 @@ def config_validation():
     cv_results = ''
 
     cv_files_info = wxcutils.load_json(CONFIG_PATH, 'config-validation.json')
-    cv_results += '<h3>File Level Checks</h3><table><tr><th>Filename</th><th>Description</th><th>Required</th><th>Found</th><th>Valid JSON</th><th>Errors</th></tr>'
+    cv_results += '<h3>File Level Checks</h3><table><tr><th>Filename</th><th>Description</th>' +\
+        '<th>Required</th><th>Found</th><th>Valid JSON</th><th>Errors</th></tr>'
     for cv_filename in cv_files_info:
         MY_LOGGER.debug('cv_filename = %s', cv_filename)
         MY_LOGGER.debug('description %s', cv_files_info[cv_filename]['description'])
@@ -65,7 +67,8 @@ def config_validation():
         cv_files_info[cv_filename]['exists'] = 'no'
         if os.path.isfile(CONFIG_PATH + cv_filename):
             cv_files_info[cv_filename]['exists'] = 'yes'
-        if cv_files_info[cv_filename]['exists'] != 'yes' and cv_files_info[cv_filename]['required'] == 'yes':
+        if cv_files_info[cv_filename]['exists'] != 'yes' and \
+            cv_files_info[cv_filename]['required'] == 'yes':
             cv_error = 'Required file is missing'
         cv_files_info[cv_filename]['valid json'] = 'no'
         if valid_json_file(cv_filename):
@@ -76,13 +79,17 @@ def config_validation():
         else:
             cv_results += '<tr class=\"row-highlight\">'
             cv_errors_found = True
-        cv_results += '<td>' + cv_filename + '</td><td>' + cv_files_info[cv_filename]['description'] + '</td><td>' + \
-            cv_files_info[cv_filename]['required'] + '</td><td>' + cv_files_info[cv_filename]['exists'] + '</td><td>' + \
+        cv_results += '<td>' + cv_filename + '</td><td>' + \
+            cv_files_info[cv_filename]['description'] + \
+            '</td><td>' + cv_files_info[cv_filename]['required'] + '</td><td>' + \
+            cv_files_info[cv_filename]['exists'] + '</td><td>' + \
             cv_files_info[cv_filename]['valid json'] + '</td><td>' + cv_error + '</td></tr>'
     cv_results += '</table>'
 
     for cv_filename in cv_files_info:
-        cv_results += '<h3>Content Checks - ' + cv_filename + '</h3><table><tr><th>Key</th><th>Value</th><th>Description</th><th>Required</th><th>Found</th><th>Valid Values</th><th>Errors</th></tr>'
+        cv_results += '<h3>Content Checks - ' + cv_filename + \
+            '</h3><table><tr><th>Key</th><th>Value</th><th>Description</th>' + \
+            '<th>Required</th><th>Found</th><th>Valid Values</th><th>Errors</th></tr>'
         cv_test_file = wxcutils.load_json(CONFIG_PATH, cv_filename)
 
         MY_LOGGER.debug('Parse = %s', cv_files_info[cv_filename])
@@ -286,7 +293,8 @@ try:
         html.write('<html lang=\"en\"><head>'
                    '<meta charset=\"UTF-8\">'
                    '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">'
-                   '<meta name=\"description\" content=\"Satellite transmission status for Meteor-M and NOAA weather satellites, International Space Station (ISS) SSTV and WxCapture Twitter Feed\">'
+                   '<meta name=\"description\" content=\"Satellite transmission status for Meteor-M and' +\
+                       ' NOAA weather satellites, International Space Station (ISS) SSTV and WxCapture Twitter Feed\">'
                    '<meta name=\"keywords\" content=\"' + CONFIG_INFO['webpage keywords'] + '\">'
                    '<meta name=\"author\" content=\"WxCapture\">'
                    '<title>configuration Status</title>'

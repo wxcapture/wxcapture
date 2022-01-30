@@ -7,9 +7,8 @@ import os
 from os import path
 import sys
 import time
-import requests
-from TwitterAPI import TwitterAPI
 import random
+import requests
 import tweepy
 import cv2
 import wxcutils
@@ -130,7 +129,7 @@ def get_tweet_text(image):
             random_pick = random.randint(1, len(value)) - 1
             MY_LOGGER.debug('pick = %d, text = %s', random_pick, value[random_pick])
             see_more = value[random_pick] + '. '
-        
+
         # select a random additional
         if key == 'additional':
             # MY_LOGGER.debug('key = %s, value = %s', key, value)
@@ -245,7 +244,7 @@ for key, value in TWEETS.items():
     # MY_LOGGER.debug('key = %s, value = %s', key, value)
     if key == 'Tweets':
         for tweet in value:
-            TWEET_COUNT+= 1
+            TWEET_COUNT += 1
 MY_LOGGER.debug('TWEET_COUNT = %d', TWEET_COUNT)
 TWEET_SLEEP = ((3600 * HOURS) - 500) / TWEET_COUNT
 MY_LOGGER.debug('TWEET_SLEEP = %d', TWEET_SLEEP)
@@ -287,7 +286,7 @@ for key, value in TWEETS.items():
                                 sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
             # sleep to spread out tweets randomly over the time period
-            SLEEP_TIME = TWEET_SLEEP * (1 + (random.random() - 0.5)) 
+            SLEEP_TIME = TWEET_SLEEP * (1 + (random.random() - 0.5))
             MY_LOGGER.debug('Sleeping for %d seconds', SLEEP_TIME)
             time.sleep(SLEEP_TIME)
             MY_LOGGER.debug('waking up again!')

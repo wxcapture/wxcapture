@@ -4,11 +4,7 @@
 
 # import libraries
 import os
-from os import path
 import sys
-import glob
-from datetime import date, timedelta
-import time
 import csv
 import wxcutils
 
@@ -39,47 +35,48 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 try:
     # extract parameters
-    station = sys.argv[1]
-    base_dir = sys.argv[2]
+    STATION = sys.argv[1]
+    BASE_DIR = sys.argv[2]
 
 except:
     MY_LOGGER.critical('Exception whilst parsing command line parameters: %s %s %s',
-                        sys.argv[1], sys.argv[2], sys.argv[3])
+                       sys.argv[1], sys.argv[2], sys.argv[3])
     # re-throw it as this is fatal
     raise
 
-MY_LOGGER.debug('station = %s', station)
+MY_LOGGER.debug('station = %s', STATION)
 
 # load current master
 MASTER = wxcutils.load_json(WORKING_PATH, 'master.json')
 
 # load new set
-NEW = wxcutils.load_json(WORKING_PATH, station + '-filefound.json')
+NEW = wxcutils.load_json(WORKING_PATH, STATION + '-filefound.json')
 
 # find what is in the master but not in the new one
 # DELTA = [x for x in MASTER + NEW if x not in MASTER or x not in NEW]
 DELTA = [_dict for _dict in NEW if _dict not in MASTER]
-num_differences = len(DELTA)
-MY_LOGGER.debug('Number of differences = %d', num_differences)
+NUM_DIFFERENCES = len(DELTA)
+MY_LOGGER.debug('Number of differences = %d', NUM_DIFFERENCES)
 
 # save out request from station list
-wxcutils.save_json(WORKING_PATH, station + '-filerequest.json', DELTA)
+wxcutils.save_json(WORKING_PATH, STATION + '-filerequest.json', DELTA)
 
-if num_differences >0:
-    keys = DELTA[0].keys()
-    with open(WORKING_PATH + station + '-filerequest.csv', 'w', newline='')  as output_file:
-        dict_writer = csv.DictWriter(output_file, keys)
-        dict_writer.writeheader()
-        dict_writer.writerows(DELTA)
+if NUM_DIFFERENCES > 0:
+    KEYS = DELTA[0].KEYS()
+    with open(WORKING_PATH + STATION + '-filerequest.csv', 'w', newline='')  as output_file:
+        DICT_WRITER = csv.DictWriter(output_file, KEYS)
+        DICT_WRITER.writeheader()
+        DICT_WRITER.writerows(DELTA)
 else:
     MY_LOGGER.debug('No differences to write to a csv file, writing empty file')
-    wxcutils.save_file(WORKING_PATH, station + '-filerequest.csv', '')
+    wxcutils.save_file(WORKING_PATH, STATION + '-filerequest.csv', '')
 
 # create zip command
-cmd = 'zip ' + station + '-GK-2a.zip '
+CMD = 'zip ' + STATION + '-GK-2a.zip '
 for line in DELTA:
-    cmd += ' ' + base_dir + line['date'] + '/' + line['type'] + '/' + line['filename'] + line['extension']
-wxcutils.save_file(WORKING_PATH, station + '-zip-command.txt', cmd)
+    CMD += ' ' + BASE_DIR + line['date'] + '/' + line['type'] + '/' + \
+        line['filename'] + line['extension']
+wxcutils.save_file(WORKING_PATH, STATION + '-zip-command.txt', CMD)
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

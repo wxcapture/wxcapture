@@ -39,7 +39,11 @@ def test_connection(network_connection, attempt, timeout):
             MY_LOGGER.critical('test_connection - Connection refused - exception handler: %s | %s | %s',
                         sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
             tc_status = 'Connection refused'
-        
+        except OSError as error_message:
+            MY_LOGGER.error('Connection OS error %s - ERROR', error_message)
+            MY_LOGGER.critical('test_connection - OS Error - exception handler: %s | %s | %s',
+                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+            tc_status = 'Connection OS Error'
         MY_LOGGER.debug('-' * 4)
         return tc_status
 

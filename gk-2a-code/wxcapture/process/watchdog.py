@@ -93,9 +93,17 @@ def sat_validation():
         time.sleep(0.1)
 
         retry_counter = 1
+        op = 'unset'
         while retry_counter <= 10:
             try:
                 op = json.loads(sub0.recv().decode("utf-8"))
+                result.append({'timestamp' : op['timestamp'],
+                               'skipped_symbols' : op['skipped_symbols'],
+                               'viterbi_errors' : op['viterbi_errors'],
+                               'reed_solomon_errors' : op['reed_solomon_errors'],
+                               'ok' : 'Locked' if op['ok'] else 'Unlocked',
+                               'label' : sat_server['label'],
+                               'when' : str(time.time())})
                 break
             except:
                 MY_LOGGER.debug('Attempt %d', retry_counter)
@@ -106,13 +114,6 @@ def sat_validation():
                 time.sleep(2)
 
         MY_LOGGER.debug('op %s', op)
-        result.append({'timestamp' : op['timestamp'],
-                       'skipped_symbols' : op['skipped_symbols'],
-                       'viterbi_errors' : op['viterbi_errors'],
-                       'reed_solomon_errors' : op['reed_solomon_errors'],
-                       'ok' : 'Locked' if op['ok'] else 'Unlocked',
-                       'label' : sat_server['label'],
-                       'when' : str(time.time())})
 
     MY_LOGGER.debug('result = %s', result)
 

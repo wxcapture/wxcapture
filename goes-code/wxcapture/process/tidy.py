@@ -302,7 +302,7 @@ def process_electro_l_2():
                 file_age = TIME_NOW - os.path.getmtime(os.path.join(images_directory, filename))
                 if file_age > MIN_AGE:
                     MY_LOGGER.debug('DELETE - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
-                    # wxcutils.run_cmd('rm ' + images_directory + '/' + filename)
+                    wxcutils.run_cmd('rm ' + images_directory + '/' + filename)
                 else:
                     MY_LOGGER.debug('keep   - %s %f %f %f', images_directory + '/' + filename, file_age, MIN_AGE, MIN_AGE - file_age)
 
@@ -402,8 +402,8 @@ MY_LOGGER.debug('BASEDIR = %s', BASEDIR)
 
 SANCHEZ_PATH = BASEDIR + 'sanchez/'
 
-# minumum age for files to be deleted > 21 days
-MIN_AGE = 21 * 24 * 60 * 60
+# minumum age for files to be deleted > 15 days
+MIN_AGE = 15 * 24 * 60 * 60
 MY_LOGGER.debug('MIN_AGE = %s', MIN_AGE)
 
 # get current epoch time

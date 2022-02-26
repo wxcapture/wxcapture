@@ -121,7 +121,7 @@ def validate_server(vs_si):
     return vs_status, vs_text, vs_html, vs_data
 
 
-def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_text4, se_html4, se_config_file):
+def send_email(se_text0, se_html0, se_text1, se_html1, se_text2, se_html2, se_text3, se_html3, se_text4, se_html4, se_config_file):
     """send the email"""
 
     se_ok_status = True
@@ -143,7 +143,8 @@ def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_text
 
     # plain text
     se_text = EMAIL_SUBJECT + ' - ' + ALERT_INFO + NEWLINE + \
-        se_text + NEWLINE + \
+        se_text0 + NEWLINE + \
+        se_text1 + NEWLINE + \
         se_text2 + NEWLINE + \
         se_text3 + NEWLINE + \
         se_text4 + NEWLINE + \
@@ -155,10 +156,15 @@ def send_email(se_text, se_html, se_text2, se_html2, se_text3, se_html3, se_text
         '<html><head>' + \
         '<title>Watchdog - ' + EMAIL_SUBJECT + '</title></head>' + NEWLINE + \
         '<body><h2>' + EMAIL_SUBJECT + ' - ' + ALERT_INFO + '</h2>' + NEWLINE + \
-        '<h3>Satellites</h3>' + \
+        '<h3>Satellites - Web Server</h3>' + \
         '<table border="1">' + \
         '<tr><th>Status</th><th>Status Change?</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
-        se_html + \
+        se_html0 + \
+        '</table>' + NEWLINE + \
+        '<h3>Satellites - Data Server</h3>' + \
+        '<table border="1">' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Satellite</th><th>Threshold (min)</th><th>Age (min)</th><th>Delta (min)</th></tr>' + \
+        se_html1 + \
         '</table>' + NEWLINE + \
         '<h3>Servers</h3>' + \
         '<table border="1">' + \
@@ -318,6 +324,7 @@ else:
 
 # load satellite info
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog.json')
+SATELLITE_DATA = wxcutils.load_json(WEB_PATH + 'goes/', 'last-received.json')
 # MY_LOGGER.debug('current SATELLITE_INFO = %s', SATELLITE_INFO)
 
 # get the run time, to use for status update date time
@@ -325,9 +332,9 @@ ALERT_INFO = get_local_date_time() + ' ' +  LOCAL_TIME_ZONE + \
         ' [' + get_utc_date_time() + ' UTC].'
 MY_LOGGER.debug('ALERT_INFO = %s', ALERT_INFO)
 
-# iterate through satellites
+# iterate through satellites on this server
 MY_LOGGER.debug('-' * 20)
-MY_LOGGER.debug('Iterate through satellites')
+MY_LOGGER.debug('Iterate through satellites on this server')
 for si in SATELLITE_INFO:
     MY_LOGGER.debug('-' * 20)
     MY_LOGGER.debug('Processing - %s', si['Display Name'])
@@ -350,6 +357,35 @@ for si in SATELLITE_INFO:
 
 MY_LOGGER.debug('-' * 20)
 
+# iterate through satellites on data server
+MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('Iterate through satellites on data server')
+EMAIL_TEXT1 = ''
+EMAIL_HTML1 = ''
+for sd in SATELLITE_DATA:
+    MY_LOGGER.debug('Satellite = %s', sd['Display Name'])
+    if sd['Last Status'] == 'OK':
+        msg = ' is within the receiving threshold ('
+        sat_status = '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>' 
+    else:
+        msg = ' has exceeded the receiving threshold ('
+        sat_status = '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+    if sd['Current Age'] != 'n/a':
+        margin = str(int(sd['Max Age']) - int(sd['Current Age']))
+    else:
+        margin = 'n/a'
+    EMAIL_TEXT1 += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
+            sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
+            ' min - safety margin ' + margin + ' min' + \
+            NEWLINE
+    EMAIL_HTML1 += sat_status + \
+        '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
+        '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
+        '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
+        '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
+        '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
+
+MY_LOGGER.debug('-' * 20)
 
 # validate space left on servers
 SERVER_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog-servers.json')
@@ -490,10 +526,10 @@ if EMAIL_REQUIRED:
 
     MY_LOGGER.debug('Saving updated config')
     MY_LOGGER.debug('Sending Email')
-    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4,'email.json'):
+    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT1, EMAIL_HTML1, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4,'email.json'):
         # try with alternate email
         MY_LOGGER.debug('Sending Email using alternate server')
-        if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4, 'email2.json'):
+        if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT1, EMAIL_HTML1, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4, 'email2.json'):
             MY_LOGGER.debug('Sending Email using alternate server also failed')
         else:
             MY_LOGGER.debug('Sending Email using alternate server worked')

@@ -1,0 +1,83 @@
+[
+	{
+		"Display Name": "GK-2A",
+		"Location": "gk-2a",
+		"Current Age": "",
+		"Max Age": "40",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 17",
+		"Location": "goes17",
+		"Current Age": "",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 16",
+		"Location": "goes16",
+		"Current Age": "",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 15",
+		"Location": "goes15",
+		"Current Age": "",
+		"Max Age": "720",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 15 GVAR",
+		"Location": "goes15gvar",
+		"Current Age": "",
+		"Max Age": "240",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 14",
+		"Location": "goes14",
+		"Current Age": "",
+		"Max Age": "240",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "GOES 13",
+		"Location": "goes13",
+		"Current Age": "",
+		"Max Age": "240",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "Himawari 8",
+		"Location": "himawari8",
+		"Current Age": "",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
+		"Display Name": "Electro-L 2",
+		"Location": "electro-l-2",
+		"Current Age": "",
+		"Max Age": "300",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	}
+]

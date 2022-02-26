@@ -7,10 +7,42 @@ import os
 import sys
 import subprocess
 import time
+import glob
 import platform
 from subprocess import Popen, PIPE
 from tcping import Ping
 import wxcutils
+
+
+def validate_sat(vs):
+    """validate if sat files received"""
+    new_status = 'ERROR'
+    status_change = '???'
+    current_age = "n/a"
+
+    search = FILE_BASE + vs['Location'] + '/**/*'
+    MY_LOGGER.debug('search = %s', search)
+
+    try:
+        list_of_files = glob.glob(search, recursive=True)
+        latest_file = max(list_of_files, key=os.path.getctime)
+        MY_LOGGER.debug('latest_file = %s', latest_file)
+        current_age = str(int((time.time() - os.path.getctime(latest_file)) / 60))
+        MY_LOGGER.debug('age = %s', current_age)
+        MY_LOGGER.debug('max age = %s', vs['Max Age'])
+        if int(current_age) > int(vs['Max Age']):
+            new_status = 'ERROR'
+        else:
+            new_status = 'OK'
+    except:
+        MY_LOGGER.debug('Exception whilst searching, using defaults')
+
+    if new_status != vs['Last Status']:
+        status_change = 'Y'
+    else:
+        status_change = 'N'
+
+    return new_status, status_change, current_age
 
 
 def test_connection(network_connection, attempt, timeout):
@@ -76,7 +108,7 @@ def is_running(process_name):
 
 def is_processing(process_name, minutes):
     """see if images are being created in last defined number of minutes"""
-    cmd = Popen(['find', '/home/pi/goes/goes17', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
+    cmd = Popen(['find', FILE_BASE + 'goes17', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
     MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
     MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
@@ -137,6 +169,9 @@ NETCONFIG = wxcutils.load_json(OUTPUT_PATH, 'network.json')
 MY_LOGGER.debug('attempt = %s', NETCONFIG['attempt'])
 MY_LOGGER.debug('timeout = %s', NETCONFIG['timeout'])
 
+FILE_BASE = '/home/pi/goes/'
+MY_LOGGER.debug('FILE_BASE = %s', FILE_BASE)
+
 # test for network connectivity
 for key, value in NETCONFIG.items():
     if key == 'addresses':
@@ -170,6 +205,22 @@ if not is_running('tweet.py'):
     wxcutils.run_cmd(CODE_PATH + 'tweet.py &')
 else:
     MY_LOGGER.debug('tweet.py is running')
+
+# test if images received for all sats
+SATCONFIG = wxcutils.load_json(CONFIG_PATH, 'last-received.json')
+# iterate through satellites
+for sc in SATCONFIG:
+    MY_LOGGER.debug('-' * 20)
+    MY_LOGGER.debug('Processing - %s', sc['Display Name'])
+    if sc['Active'] == 'yes':
+        MY_LOGGER.debug('Active - Validation processing')
+        # do the validation
+        sc['Last Status'], sc['Status Change'], sc['Current Age'] = validate_sat(sc)
+        MY_LOGGER.debug('sc = %s', sc)
+# save results
+wxcutils.save_json(CONFIG_PATH, 'last-received.json', SATCONFIG)
+wxcutils.save_json(OUTPUT_PATH, 'last-received.json', SATCONFIG)
+
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

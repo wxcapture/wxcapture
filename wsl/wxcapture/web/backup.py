@@ -38,7 +38,11 @@ def do_rsync(dr_params, dr_exclude, dr_source, dr_output):
     # remove expected errors
     # no such directory happens with difference between UTC and local date, so can ignore
     # similarly if the file has vanished
-    if 'No such file or directory' in errors or 'vanished' in errors:
+    if 'No such file or directory' in errors:
+        MY_LOGGER.debug('Ignoring errors - no such file or directory')
+        errors = ''
+    if 'file has vanished' in errors:
+        MY_LOGGER.debug('Ignoring errors - file has vanished')
         errors = ''
 
     MY_LOGGER.debug('reported errors:%s', errors)

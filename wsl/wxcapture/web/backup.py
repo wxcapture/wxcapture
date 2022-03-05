@@ -25,11 +25,11 @@ def do_rsync(dr_params, dr_exclude, dr_source, dr_output):
                     dr_params, dr_exclude, dr_source, dr_output)
     # run rsync, waiting for completion
     if not dr_exclude:
-        cmd = Popen(['rsync', '-' + dr_params, dr_source, dr_output], stdout=PIPE, stderr=PIPE)
-        MY_LOGGER.debug('rsync -' + dr_params + ' ' + dr_source + ' ' + dr_output)
+        cmd = Popen(['/home/mike/wxcapture/web/rs.sh', '-' + dr_params, dr_source, dr_output], stdout=PIPE, stderr=PIPE)
+        MY_LOGGER.debug('/home/mike/wxcapture/web/rs.sh -' + dr_params + ' ' + dr_source + ' ' + dr_output)
     else:
-        cmd = Popen(['rsync', '-' + dr_params, '--exclude', dr_exclude, dr_source, dr_output], stdout=PIPE, stderr=PIPE)
-        MY_LOGGER.debug('rsync -' + dr_params + ' --exclude ' + dr_exclude + ' ' + dr_source + ' ' + dr_output)
+        cmd = Popen(['/home/mike/wxcapture/web/rs.sh', '-' + dr_params, '--exclude', dr_exclude, dr_source, dr_output], stdout=PIPE, stderr=PIPE)
+        MY_LOGGER.debug('/home/mike/wxcapture/web/rs.sh -' + dr_params + ' --exclude ' + dr_exclude + ' ' + dr_source + ' ' + dr_output)
     stdout, stderr = cmd.communicate()
     errors = stderr.decode('utf-8')
     MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))

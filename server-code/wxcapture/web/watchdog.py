@@ -16,6 +16,18 @@ from email.mime.multipart import MIMEMultipart
 import wxcutils
 
 
+def check_ip(address):
+    """Check if IP address responds to pings"""
+    cmd = Popen(['ping', address, '-c', '1', '-W', '1']
+                , stdout=PIPE, stderr=PIPE)
+    stdout, stderr = cmd.communicate()
+    MY_LOGGER.debug('stdout = %s', stdout.decode('utf-8'))
+    MY_LOGGER.debug('stderr = %s', stderr.decode('utf-8'))
+    if '100% packet loss' in stdout.decode('utf-8'):
+        return False
+    return True
+
+
 def validate_file(vf_si):
     """see if an image was created in a suitable
     time period"""
@@ -121,7 +133,7 @@ def validate_server(vs_si):
     return vs_status, vs_text, vs_html, vs_data
 
 
-def send_email(se_text0, se_html0, se_text1, se_html1, se_text2, se_html2, se_text3, se_html3, se_text4, se_html4, se_config_file):
+def send_email(se_text0, se_html0, se_text1, se_html1, se_text2, se_html2, se_text3, se_html3, se_text4, se_html4, se_text5, se_html5, se_config_file):
     """send the email"""
 
     se_ok_status = True
@@ -148,6 +160,7 @@ def send_email(se_text0, se_html0, se_text1, se_html1, se_text2, se_html2, se_te
         se_text2 + NEWLINE + \
         se_text3 + NEWLINE + \
         se_text4 + NEWLINE + \
+        se_text5 + NEWLINE + \
         'Last status change on ' + ALERT_INFO
     MY_LOGGER.debug('se_text = %s', se_text)
 
@@ -180,6 +193,11 @@ def send_email(se_text0, se_html0, se_text1, se_html1, se_text2, se_html2, se_te
         '<table border="1">' + \
         '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Lock?</th><th>Skipped Symbols</th><th>Reed Solomon Errors</th><th>Viterbi Errors</th><th>Date</th></tr>' + \
         se_html4 + \
+         '</table>' + NEWLINE +\
+        '<h3>Pings</h3>' + \
+        '<table border="1">' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Information</th><th>Date</th></tr>' + \
+        se_html5 + \
          '</table>' + NEWLINE +\
         '<p>Last status change on ' + ALERT_INFO + '</p>' + \
         '</body></html>'
@@ -412,7 +430,7 @@ for si in SERVER_INFO:
             si['Last Status'] = status
             si['Status Change'] = ALERT_INFO
         EMAIL_TEXT2 += text
-        EMAIL_HTML2 += html
+        EMAIL_HTML2 += html + NEWLINE
         CSV_DATA2 += data
     else:
         MY_LOGGER.debug('Server is not active')
@@ -463,11 +481,11 @@ for key, value in LATESTNETWORK.items():
                 if nc['status'] == 'OK':
                     EMAIL_TEXT3 += 'OK - network connectivity is good' + ' - '
                     EMAIL_HTML3 += '<td>Good connectivity</td><td>' + \
-                        wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>'
+                        wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
                 else:
                     EMAIL_TEXT3 = 'Error - network connecitivity issue - ' + nc['status'] + ''
                     EMAIL_HTML3 += '<td>' + nc['status'] + '</td><td>' + \
-                        wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>'
+                        wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
 
 MY_LOGGER.debug('HTML = ' + EMAIL_HTML3)
 MY_LOGGER.debug('txt = ' + EMAIL_TEXT3)
@@ -511,13 +529,64 @@ for si1 in LATESTSATSTATUS:
                 str(si1['skipped_symbols']) + \
                 '</td><td align=\"center\">' + str(si1['reed_solomon_errors']) + '</td><td align=\"center\">' + \
                 str(si1['viterbi_errors']) + '</td><td>' + \
-                wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>'
+                wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
 
 MY_LOGGER.debug('HTML = ' + EMAIL_HTML4)
 MY_LOGGER.debug('txt = ' + EMAIL_TEXT4)
 
 # save last
 wxcutils.save_json(CONFIG_PATH, 'satellite-receivers.json', LATESTSATSTATUS)
+
+# validate ping connectivity
+MY_LOGGER.debug('-**' * 20)
+PINGS = wxcutils.load_json(CONFIG_PATH, 'pings.json')
+MY_LOGGER.debug('Testing Pings')
+MY_LOGGER.debug(PINGS)
+EMAIL_TEXT5 = ''
+EMAIL_HTML5 = ''
+PREVIOUS = ''
+
+for key, value in PINGS.items():
+    if key == 'addresses':
+        for ping in PINGS[key]:
+            if ping['Active'] == 'yes':
+                new_status = 'ERROR'
+                if check_ip(ping['ip']):
+                    new_status = 'OK'
+                MY_LOGGER.debug('-' * 20)
+                MY_LOGGER.debug(ping)
+                MY_LOGGER.debug('new_status = %s', new_status)
+                if new_status == 'OK':
+                    EMAIL_HTML5 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
+                else:
+                    EMAIL_HTML5 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+
+                # get the previous state
+                MY_LOGGER.debug('Previous status = %s', ping['status'])
+                CHANGE = 'N'
+                if new_status != ping['status']:
+                    EMAIL_REQUIRED = True
+                    CHANGE = 'Y'
+                EMAIL_HTML5 += '<td align = \"center\">' + CHANGE + '</td>'
+                ping['status'] = new_status
+
+                EMAIL_TEXT5 += ping['description'] + ' - '
+                EMAIL_HTML5 += '<td>' + ping['description'] + '</td>'
+
+                if new_status == 'OK':
+                    EMAIL_TEXT5 += 'OK - network connectivity is good' + NEWLINE
+                    EMAIL_HTML5 += '<td>Good connectivity</td><td>' + \
+                        wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                else:
+                    EMAIL_TEXT5 = 'Error - network connecitivity issue  is bad' + NEWLINE
+                    EMAIL_HTML5 += '<td>Bad connectivity</td><td>' + \
+                        wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+
+MY_LOGGER.debug('HTML = ' + EMAIL_HTML5)
+MY_LOGGER.debug('txt = ' + EMAIL_TEXT5)
+
+# save last
+wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
 
 
 MY_LOGGER.debug('-' * 20)
@@ -526,10 +595,10 @@ if EMAIL_REQUIRED:
 
     MY_LOGGER.debug('Saving updated config')
     MY_LOGGER.debug('Sending Email')
-    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT1, EMAIL_HTML1, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4,'email.json'):
+    if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT1, EMAIL_HTML1, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4, EMAIL_TEXT5, EMAIL_HTML5, 'email.json'):
         # try with alternate email
         MY_LOGGER.debug('Sending Email using alternate server')
-        if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT1, EMAIL_HTML1, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4, 'email2.json'):
+        if not send_email(EMAIL_TEXT, EMAIL_HTML, EMAIL_TEXT1, EMAIL_HTML1, EMAIL_TEXT2, EMAIL_HTML2, EMAIL_TEXT3, EMAIL_HTML3, EMAIL_TEXT4, EMAIL_HTML4, EMAIL_TEXT5, EMAIL_HTML5, 'email2.json'):
             MY_LOGGER.debug('Sending Email using alternate server also failed')
         else:
             MY_LOGGER.debug('Sending Email using alternate server worked')
@@ -539,7 +608,7 @@ if EMAIL_REQUIRED:
     # save the new server info
     wxcutils.save_json(CONFIG_PATH, 'config-watchdog-servers.json', SERVER_INFO)
 
-    
+
 
 else:
     MY_LOGGER.debug('No status changes so email not required...')

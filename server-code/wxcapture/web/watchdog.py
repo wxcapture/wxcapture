@@ -18,12 +18,17 @@ import wxcutils
 
 def check_ip(address):
     """Check if IP address responds to pings"""
+    MY_LOGGER.debug('-' * 30)
     cmd = Popen(['ping', address, '-c', '1', '-W', '1']
                 , stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('stdout = %s', stdout.decode('utf-8'))
-    MY_LOGGER.debug('stderr = %s', stderr.decode('utf-8'))
+    MY_LOGGER.debug('%s stdout = %s', address, stdout.decode('utf-8'))
+    MY_LOGGER.debug('%s stderr = %s', address, stderr.decode('utf-8'))
     if '100% packet loss' in stdout.decode('utf-8'):
+        return False
+    if 'Destination Host Unreachable' in stdout.decode('utf-8'):
+        return False
+    if 'No route to host' in stdout.decode('utf-8'):
         return False
     return True
 

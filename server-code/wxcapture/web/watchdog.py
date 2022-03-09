@@ -9,6 +9,7 @@ import smtplib
 import platform
 import ssl
 import sys
+import time
 import subprocess
 from subprocess import Popen, PIPE
 from email.mime.text import MIMEText
@@ -550,15 +551,24 @@ MY_LOGGER.debug(PINGS)
 EMAIL_TEXT5 = ''
 EMAIL_HTML5 = ''
 PREVIOUS = ''
+MY_LOGGER.debug('Retries = %s', PINGS['retries'])
+MY_LOGGER.debug('Pause = %s', PINGS['pause'])
 
 for key, value in PINGS.items():
     if key == 'addresses':
         for ping in PINGS[key]:
             if ping['Active'] == 'yes':
+                MY_LOGGER.debug('Testing - %s', ping['description'])
                 new_status = 'ERROR'
-                if check_ip(ping['ip']):
-                    new_status = 'OK'
-                MY_LOGGER.debug('-' * 20)
+                loop = 0
+                while loop < int(PINGS['retries']):
+                    if check_ip(ping['ip']):
+                        new_status = 'OK'
+                        break
+                    loop +=1
+                    MY_LOGGER.debug('Retry %d of %s', loop, PINGS['retries'])
+                    MY_LOGGER.debug('Sleep %s seconds', PINGS['pause'])
+                    time.sleep(int(PINGS['pause']))
                 MY_LOGGER.debug(ping)
                 MY_LOGGER.debug('new_status = %s', new_status)
                 if new_status == 'OK':

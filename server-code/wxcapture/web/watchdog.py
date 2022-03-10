@@ -17,10 +17,9 @@ from email.mime.multipart import MIMEMultipart
 import wxcutils
 
 
-def check_ip(address):
+def check_ip(address, attempts):
     """Check if IP address responds to pings"""
-    MY_LOGGER.debug('-' * 30)
-    cmd = Popen(['ping', address, '-c', '1', '-W', '1']
+    cmd = Popen(['ping', address, '-c', str(attempts), '-W', '1']
                 , stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
     MY_LOGGER.debug('%s stdout = %s', address, stdout.decode('utf-8'))
@@ -553,16 +552,18 @@ EMAIL_HTML5 = ''
 PREVIOUS = ''
 MY_LOGGER.debug('Retries = %s', PINGS['retries'])
 MY_LOGGER.debug('Pause = %s', PINGS['pause'])
+MY_LOGGER.debug('Attempts = %s', PINGS['attempts'])
 
 for key, value in PINGS.items():
     if key == 'addresses':
         for ping in PINGS[key]:
+            MY_LOGGER.debug('-' * 60)
             if ping['Active'] == 'yes':
                 MY_LOGGER.debug('Testing - %s', ping['description'])
                 new_status = 'ERROR'
                 loop = 0
                 while loop < int(PINGS['retries']):
-                    if check_ip(ping['ip']):
+                    if check_ip(ping['ip'], PINGS['attempts']):
                         new_status = 'OK'
                         break
                     loop +=1
@@ -596,7 +597,8 @@ for key, value in PINGS.items():
                     EMAIL_TEXT5 = 'Error - network connecitivity issue  is bad' + NEWLINE
                     EMAIL_HTML5 += '<td>Bad connectivity</td><td>' + \
                         wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
-
+            else:
+                MY_LOGGER.debug('Skipping - %s (%s) - inactive', ping['description'], ping['ip'])
 MY_LOGGER.debug('HTML = ' + EMAIL_HTML5)
 MY_LOGGER.debug('txt = ' + EMAIL_TEXT5)
 

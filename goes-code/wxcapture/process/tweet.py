@@ -90,7 +90,7 @@ def get_tweet_text(image):
         MY_LOGGER.debug('length exceeded, not adding')
         return base
 
-    main_text = 'Satellite image'
+    main_text = 'Satellite image '
     main_hashtag = ''
     base_hashtag = ''
     see_more = ''

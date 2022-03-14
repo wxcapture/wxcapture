@@ -194,6 +194,12 @@
 							"desc":"Water vapour",
 							"font colour": [0, 0, 0],
 							"logo":"white"
+						},
+						{
+							"channel":"IRsanchez",
+							"desc":"Infrared",
+							"font colour": [255, 255, 255],
+							"logo":"white"
 						}
 					]	
 				}

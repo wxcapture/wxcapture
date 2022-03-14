@@ -349,7 +349,7 @@ def create_branded(cb_sat_type, cb_sat, cb_type, cb_channel, cb_dir, cb_file, cb
 
                                 MY_LOGGER.debug('=' * 30)
                                 return output_file
-                            elif cb_type in ('m1', 'm2') or cb_channel in ('fcsanchez', 'ch13sanchez'):
+                            elif cb_type in ('m1', 'm2') or cb_channel in ('fcsanchez', 'ch13sanchez', 'IRsanchez'):
                                 MY_LOGGER.debug('M1 / M2 image or sanchez reprojection')
                                 
                                 # add data to header / footer
@@ -730,35 +730,62 @@ def process_himawari(sat_num):
 
             MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
 
-            if stored_timestamp != int(latest):
-                # new file found which hasn't yet been copied over
+            # date / time info
+            bits = filename.split('_')
+            # for bit in bits:
+            #     MY_LOGGER.debug('bit %s', bit)
+            year = bits[-1][:4]
+            month = calendar.month_abbr[int(bits[-1][4:6])]
+            day = bits[-1][6:8]
+            hour = bits[-1][9:11]
+            min = bits[-1][11:13]
+            MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
+            im_date = day + '-' + month + '-' + year
+            im_time = hour + ':' + min + ' UTC'
 
-                # date / time info
-                bits = filename.split('_')
-                # for bit in bits:
-                #     MY_LOGGER.debug('bit %s', bit)
-                year = bits[-1][:4]
-                month = calendar.month_abbr[int(bits[-1][4:6])]
-                day = bits[-1][6:8]
-                hour = bits[-1][9:11]
-                min = bits[-1][11:13]
-                MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
-                im_date = day + '-' + month + '-' + year
-                im_time = hour + ':' + min + ' UTC'
+            web_file = create_branded('himawari', '8', type_directory, bits[2], latest_dir, filename, extenstion, im_date, im_time)
 
-                web_file = create_branded('himawari', '8', type_directory, bits[2], latest_dir, filename, extenstion, im_date, im_time)
+            # copy to output directory
+            MY_LOGGER.debug('new_filename = %s', new_filename)
+            wxcutils.copy_file(web_file,
+                                os.path.join(OUTPUT_PATH,
+                                            new_filename + extenstion))
+
+            # create thumbnail
+            create_thumbnail(new_filename, extenstion)
+
+                # create file with date time info
+            wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
+
+            # update latest
+            LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+
+            # for IR full disc images, create a projected image
+            if image_type == 'IR' and type_directory  == 'fd':
+                sanchez_dir = SANCHEZ_PATH + 'himawari8/' + type_directory + '/' + image_type + '/'
+                MY_LOGGER.debug('sanchez_dir = %s', sanchez_dir)
+
+                # create directory (if needed)
+                mk_dir(sanchez_dir + latest_directory)
+                san_file_dir = sanchez_dir + latest_directory
+
+                # create sanchez image
+                do_sanchez(os.path.join(latest_dir, latest_file),
+                            san_file_dir + '/' + latest_file.replace('.jpg', '-sanchez.jpg'),
+                            image_type)
+                
+                web_file = create_branded('himawari', sat_num, type_directory, image_type + 'sanchez', san_file_dir, latest_file.replace('.jpg', '-sanchez'), '.jpg', im_date, im_time)
 
                 # copy to output directory
                 MY_LOGGER.debug('new_filename = %s', new_filename)
                 wxcutils.copy_file(web_file,
-                                   os.path.join(OUTPUT_PATH,
-                                                new_filename + extenstion))
+                                   os.path.join(OUTPUT_PATH, new_filename + '-sanchez' + extenstion))
 
                 # create thumbnail
-                create_thumbnail(new_filename, extenstion)
+                create_thumbnail(new_filename + '-sanchez', extenstion)
 
-                 # create file with date time info
-                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
+                # create file with date time info
+                wxcutils.save_file(OUTPUT_PATH, new_filename + '-sanchez' + '.txt', get_last_generated_text(new_filename))
 
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)

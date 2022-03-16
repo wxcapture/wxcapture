@@ -455,10 +455,12 @@ LOGOWHITE = cv2.imread(CONFIG_PATH + 'logo-white.jpg')
 BRANDING = wxcutils.load_json(CONFIG_PATH, 'branding.json')
 
 # get the last directory name used for a sync
+MY_LOGGER.debug('Loading config')
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'web.json')
 
 # loop through active satellites
 for key, value in SATELLITE_INFO.items():
+        MY_LOGGER.debug('key = %s, value = %s', key, value)
         for si in SATELLITE_INFO[key]:
             if si['Active'] == 'yes':
                 MY_LOGGER.debug('-' * 20)

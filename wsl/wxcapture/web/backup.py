@@ -439,7 +439,7 @@ def do_backup_new():
                                           '/mnt/f/Satellites/himawari8/fd/' + date_dir + '/')})
 
     MY_LOGGER.debug('Himawari 8 web Data')
-    directories = ['fd/IR', 'fd/VS', 'fd/WV']
+    directories = ['fd/IR', 'fd/VS', 'fd/WV', 'fd/IRsanchez']
 
     for dir in directories:
         MY_LOGGER.debug('Directory = %a', dir)
@@ -447,10 +447,24 @@ def do_backup_new():
         for single_date in daterange(utc_date_last, utc_date_now):
             date_dir = single_date.strftime("%Y-%m-%d")
             MY_LOGGER.debug('date = %s', date_dir)
-            errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
+            errors.append({'type': 'Himawari 17 web - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
                                               'pi@192.168.100.15:/home/pi/goes/web/himawari8/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/himawari8/' + dir + '/' + date_dir + '/')})
+
+    MY_LOGGER.debug('Himawari 8 Sanchez Data')
+    directories = ['fd/IR']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'Himawari 17 Sanchez - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.15:/home/pi/goes/sanchez/himawari8/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/sanchez/himawari8/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')
     # no date selectivity

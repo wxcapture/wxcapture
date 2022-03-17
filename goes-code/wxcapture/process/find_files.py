@@ -1041,6 +1041,10 @@ if number_processes('find_files.py') == 1:
         MY_LOGGER.debug('+=' * 40)
         create_animation('GOES17', 'web/goes17/fd/ch13sanchez', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
+        # Himawari 8 - FD IR sanchez projected - 1 frame per hour
+        MY_LOGGER.debug('+=' * 40)
+        create_animation('HIMAWARI8', 'web/himawari8/fd/IRsanchez', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+
     if SECTION == 2:
         # GOES 17 - M1 ch 7 IR shortwave - 2 frames per hour
         MY_LOGGER.debug('+=' * 40)

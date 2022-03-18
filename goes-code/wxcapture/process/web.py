@@ -16,6 +16,30 @@ from bs4 import BeautifulSoup
 import wxcutils
 
 
+def number_processes(process_name):
+    """see how many processes are running"""
+    try:
+        cmd = subprocess.Popen(('ps', '-ef'), stdout=subprocess.PIPE)
+        output = subprocess.check_output(('grep', process_name), stdin=cmd.stdout)
+        cmd.wait()
+        MY_LOGGER.debug('output = %s', output.decode('utf-8'))
+        process_count = 0
+        lines = output.decode('utf-8').splitlines()
+        for line in lines:
+            if 'grep' in line or '/bin/bash' in line:
+                # ignore grep or cron lines
+                process_count += 0
+            else:
+                process_count += 1
+        MY_LOGGER.debug('%d process(es) are running', process_count)
+        return process_count
+    except:
+        # note this should not be possible!
+        MY_LOGGER.debug('%s is NOT running', process_name)
+    MY_LOGGER.debug('%s is NOT running', process_name)
+    return 0
+
+
 def listFD(url, ext=''):
     page = requests.get(url).text
     # print(page)
@@ -439,41 +463,49 @@ MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
-# get local time zone
-LOCAL_TIME_ZONE = subprocess.check_output("date"). \
-    decode('utf-8').split(' ')[-2]
-MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
-FILE_BASE = '/home/pi/goes/'
-MY_LOGGER.debug('FILE_BASE = %s', FILE_BASE)
+# check if web is already running, if so exit this code
+if number_processes('web.py') == 1:
 
-WEB_PATH = FILE_BASE + 'web/'
+    # get local time zone
+    LOCAL_TIME_ZONE = subprocess.check_output("date"). \
+        decode('utf-8').split(' ')[-2]
+    MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
-# load logo and branding info
-LOGOBLACK = cv2.imread(CONFIG_PATH + 'logo-black.jpg')
-LOGOWHITE = cv2.imread(CONFIG_PATH + 'logo-white.jpg')
-BRANDING = wxcutils.load_json(CONFIG_PATH, 'branding.json')
+    FILE_BASE = '/home/pi/goes/'
+    MY_LOGGER.debug('FILE_BASE = %s', FILE_BASE)
 
-# get the last directory name used for a sync
-MY_LOGGER.debug('Loading config')
-SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'web.json')
+    WEB_PATH = FILE_BASE + 'web/'
 
-# loop through active satellites
-for key, value in SATELLITE_INFO.items():
-        MY_LOGGER.debug('key = %s, value = %s', key, value)
-        for si in SATELLITE_INFO[key]:
-            if si['Active'] == 'yes':
-                MY_LOGGER.debug('-' * 20)
-                MY_LOGGER.debug(si)
-                try:
-                    proccess_satellite(si)
-                except:
-                    MY_LOGGER.debug('Exception whilst processing satellite %s', si['Name'])
-                    MY_LOGGER.error('Loop exception handler: %s %s %s',
-                                    sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+    # load logo and branding info
+    LOGOBLACK = cv2.imread(CONFIG_PATH + 'logo-black.jpg')
+    LOGOWHITE = cv2.imread(CONFIG_PATH + 'logo-white.jpg')
+    BRANDING = wxcutils.load_json(CONFIG_PATH, 'branding.json')
 
-# save updated config
-wxcutils.save_json(CONFIG_PATH, 'web.json', SATELLITE_INFO)
+    # get the last directory name used for a sync
+    MY_LOGGER.debug('Loading config')
+    SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'web.json')
+
+    # loop through active satellites
+    for key, value in SATELLITE_INFO.items():
+            MY_LOGGER.debug('key = %s, value = %s', key, value)
+            for si in SATELLITE_INFO[key]:
+                if si['Active'] == 'yes':
+                    MY_LOGGER.debug('-' * 20)
+                    MY_LOGGER.debug(si)
+                    try:
+                        proccess_satellite(si)
+                    except:
+                        MY_LOGGER.debug('Exception whilst processing satellite %s', si['Name'])
+                        MY_LOGGER.error('Loop exception handler: %s %s %s',
+                                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+
+    # save updated config
+    wxcutils.save_json(CONFIG_PATH, 'web.json', SATELLITE_INFO)
+
+else:
+    MY_LOGGER.debug('Another instance of web.py is already running')
+    MY_LOGGER.debug('Skip running this instance to allow the existing one to complete')
 
 
 MY_LOGGER.debug('Execution end')

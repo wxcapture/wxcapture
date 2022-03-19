@@ -298,144 +298,147 @@ def proccess_satellite(sat_info):
 
     # loop through directories
     for directory in directories:
-        # MY_LOGGER.debug('directory = %s', directory)
+        MY_LOGGER.debug('directory = %s', directory)
         directory_datetime = directory.split('/')[5]
+        MY_LOGGER.debug('directory_datetime = %s', directory_datetime)
 
-        # MY_LOGGER.debug('directory_datetime = %s', directory_datetime)
+        # skip where getting a website (Cloudflare)
+        if directory_datetime == 'https:':
+            MY_LOGGER.debug('Skipping invalid directory %s', directory_datetime)
+        else:
+            if directory_datetime >= sat_info['Last Directory']:
+                MY_LOGGER.debug('-' * 5)
+                MY_LOGGER.debug('Need to process %s', directory_datetime)
+                elements = directory_datetime.split('_')
+                date_element = elements[0]
+                MY_LOGGER.debug('date_element = %s', date_element)
 
-        if directory_datetime >= sat_info['Last Directory']:
-            MY_LOGGER.debug('-' * 5)
-            MY_LOGGER.debug('Need to process %s', directory_datetime)
-            elements = directory_datetime.split('_')
-            date_element = elements[0]
-            MY_LOGGER.debug('date_element = %s', date_element)
+                image_files = listFD(directory, 'png')
+                channel_locator = len(sat_info['File in prefix']) + 1
+                MY_LOGGER.debug('channel_locator = %s', channel_locator)
 
-            image_files = listFD(directory, 'png')
-            channel_locator = len(sat_info['File in prefix']) + 1
-            MY_LOGGER.debug('channel_locator = %s', channel_locator)
+                # create directories
+                MY_LOGGER.debug('file_directory = %s', file_directory)
+                mk_dir(file_directory + '/' +  date_element)
+                mk_dir(file_directory + '/' +  date_element + '/1')
+                mk_dir(file_directory + '/' +  date_element + '/2')
+                mk_dir(file_directory + '/' +  date_element + '/3')
+                mk_dir(file_directory + '/' +  date_element + '/4')
+                mk_dir(file_directory + '/' +  date_element + '/5')
+                mk_dir(file_directory + '/' +  date_element + '/FC')
 
-            # create directories
-            MY_LOGGER.debug('file_directory = %s', file_directory)
-            mk_dir(file_directory + '/' +  date_element)
-            mk_dir(file_directory + '/' +  date_element + '/1')
-            mk_dir(file_directory + '/' +  date_element + '/2')
-            mk_dir(file_directory + '/' +  date_element + '/3')
-            mk_dir(file_directory + '/' +  date_element + '/4')
-            mk_dir(file_directory + '/' +  date_element + '/5')
-            mk_dir(file_directory + '/' +  date_element + '/FC')
+                # make directory for web files (goes13 only)
+                if sat_info['Name'] == 'GOES 13':
+                    mk_dir(WEB_PATH + '/goes13/fd/1/' +  date_element)
+                    mk_dir(WEB_PATH + '/goes13/fd/2/' +  date_element)
+                    mk_dir(WEB_PATH + '/goes13/fd/3/' +  date_element)
+                    mk_dir(WEB_PATH + '/goes13/fd/4/' +  date_element)
+                    mk_dir(WEB_PATH + '/goes13/fd/5/' +  date_element)
+                    mk_dir(WEB_PATH + '/goes13/fd/FC/' +  date_element)
 
-            # make directory for web files (goes13 only)
-            if sat_info['Name'] == 'GOES 13':
-                mk_dir(WEB_PATH + '/goes13/fd/1/' +  date_element)
-                mk_dir(WEB_PATH + '/goes13/fd/2/' +  date_element)
-                mk_dir(WEB_PATH + '/goes13/fd/3/' +  date_element)
-                mk_dir(WEB_PATH + '/goes13/fd/4/' +  date_element)
-                mk_dir(WEB_PATH + '/goes13/fd/5/' +  date_element)
-                mk_dir(WEB_PATH + '/goes13/fd/FC/' +  date_element)
+                existsCount = 0
 
-            existsCount = 0
-
-            for file in image_files:
-                filename = file.split('/')[-1]
-                if sat_info['File in prefix'] in filename:
-                    MY_LOGGER.debug('filename = %s', filename)
-                    channel = '?'
-                    if filename[channel_locator] == 'F':
-                        file_location = file_directory + '/' + date_element + '/FC/'
-                        channel = 'FC'
-                    else:
-                        file_location = file_directory + '/' + date_element + '/' + filename[channel_locator] + '/'
-                        channel = filename[channel_locator]
-
-                    MY_LOGGER.debug('file_location = %s', file_location)
-                    MY_LOGGER.debug('channel = %s', channel)
-
-                    # see if file exists, if not, get it
-                    if not os.path.exists(file_location + filename.replace('.png', '.jpg')):
-                        # get file
-                        MY_LOGGER.debug('Getting file %s', filename)
-
-                        data = requests.get(file)
-                        MY_LOGGER.debug('Writing file %s', filename)
-                        open(file_location + filename, 'wb').write(data.content)
-                        # non-channel 1 and FC images are ~5k x 5k pixels
-                        # channel 1 and FC images are 20832 x 18956 ~190MB each
-                        # convert all to jpg images, aligned with GOES images size, which are 5424x5424
-                        # keeping  the correct aspect ratio so 5424 x 4936
-                        if channel not in ('1', 'FC'):
-                            ratio = ' 1'
+                for file in image_files:
+                    filename = file.split('/')[-1]
+                    if sat_info['File in prefix'] in filename:
+                        MY_LOGGER.debug('filename = %s', filename)
+                        channel = '?'
+                        if filename[channel_locator] == 'F':
+                            file_location = file_directory + '/' + date_element + '/FC/'
+                            channel = 'FC'
                         else:
-                            ratio = ' 0.2604'
+                            file_location = file_directory + '/' + date_element + '/' + filename[channel_locator] + '/'
+                            channel = filename[channel_locator]
 
-                        cmd = 'vips resize ' + file_location + filename + ' ' + file_location + filename.replace('.png', '.jpg') + ratio
-                        MY_LOGGER.debug('cmd %s', cmd)
-                        wxcutils.run_cmd(cmd)
+                        MY_LOGGER.debug('file_location = %s', file_location)
+                        MY_LOGGER.debug('channel = %s', channel)
 
-                        # can now delete the original image to save space
-                        wxcutils.run_cmd('rm ' + file_location + filename)
+                        # see if file exists, if not, get it
+                        if not os.path.exists(file_location + filename.replace('.png', '.jpg')):
+                            # get file
+                            MY_LOGGER.debug('Getting file %s', filename)
 
-                        if sat_info['Name'] == 'GOES 13':
-                            bits = filename.split('_')
-                            for bit in bits:
-                                MY_LOGGER.debug('bit %s', bit)
-                            year = bits[-1][:4]
-                            month = calendar.month_abbr[int(bits[-1][4:6])]
-                            day = bits[-1][6:8]
-                            hour = bits[-1][9:11]
-                            min = bits[-1][11:13]
-                            MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
-                            im_date = day + '-' + month + '-' + year
-                            im_time = hour + ':' + min + ' UTC'
+                            data = requests.get(file)
+                            MY_LOGGER.debug('Writing file %s', filename)
+                            open(file_location + filename, 'wb').write(data.content)
+                            # non-channel 1 and FC images are ~5k x 5k pixels
+                            # channel 1 and FC images are 20832 x 18956 ~190MB each
+                            # convert all to jpg images, aligned with GOES images size, which are 5424x5424
+                            # keeping  the correct aspect ratio so 5424 x 4936
+                            if channel not in ('1', 'FC'):
+                                ratio = ' 1'
+                            else:
+                                ratio = ' 0.2604'
 
-                            MY_LOGGER.debug('Creating branded image - %s, date %s, time %s', channel, im_date, im_time)
+                            cmd = 'vips resize ' + file_location + filename + ' ' + file_location + filename.replace('.png', '.jpg') + ratio
+                            MY_LOGGER.debug('cmd %s', cmd)
+                            wxcutils.run_cmd(cmd)
 
-                            web_file = create_branded('goes', '13', 'fd', channel, file_location, filename.replace('.png', ''), '.jpg', im_date, im_time)
+                            # can now delete the original image to save space
+                            wxcutils.run_cmd('rm ' + file_location + filename)
 
-                            # copy to output directory
-                            new_filename = 'goes13-' + channel + '.jpg'
-                            MY_LOGGER.debug('new_filename = %s', new_filename)
-                            wxcutils.copy_file(web_file,
-                                               os.path.join(OUTPUT_PATH,
-                                                            new_filename))
+                            if sat_info['Name'] == 'GOES 13':
+                                bits = filename.split('_')
+                                for bit in bits:
+                                    MY_LOGGER.debug('bit %s', bit)
+                                year = bits[-1][:4]
+                                month = calendar.month_abbr[int(bits[-1][4:6])]
+                                day = bits[-1][6:8]
+                                hour = bits[-1][9:11]
+                                min = bits[-1][11:13]
+                                MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
+                                im_date = day + '-' + month + '-' + year
+                                im_time = hour + ':' + min + ' UTC'
+
+                                MY_LOGGER.debug('Creating branded image - %s, date %s, time %s', channel, im_date, im_time)
+
+                                web_file = create_branded('goes', '13', 'fd', channel, file_location, filename.replace('.png', ''), '.jpg', im_date, im_time)
+
+                                # copy to output directory
+                                new_filename = 'goes13-' + channel + '.jpg'
+                                MY_LOGGER.debug('new_filename = %s', new_filename)
+                                wxcutils.copy_file(web_file,
+                                                os.path.join(OUTPUT_PATH,
+                                                                new_filename))
+                            else:
+                                # non-GOES 13
+                                # copy file to output folder
+                                wxcutils.copy_file(file_location + filename.replace('.png', '.jpg'), OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg')
+
+                            # create thumbnail and txt file
+                            cmd = 'vips resize ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg' + ' ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '-tn.jpg' + ' 0.1'
+                            MY_LOGGER.debug('cmd %s', cmd)
+                            wxcutils.run_cmd(cmd)
+
+                            # create file with date time info
+                            MY_LOGGER.debug('Writing out last generated date file')
+                            wxcutils.save_file(OUTPUT_PATH, sat_info['File out prefix'] + '-' + channel + '.txt', get_last_generated_text(filename.replace('.png', '.jpg')))
+
                         else:
-                            # non-GOES 13
-                            # copy file to output folder
-                            wxcutils.copy_file(file_location + filename.replace('.png', '.jpg'), OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg')
+                            MY_LOGGER.debug('Already exists %s', file_location + filename)
+                            existsCount += 1
 
-                        # create thumbnail and txt file
-                        cmd = 'vips resize ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg' + ' ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '-tn.jpg' + ' 0.1'
-                        MY_LOGGER.debug('cmd %s', cmd)
-                        wxcutils.run_cmd(cmd)
-
-                        # create file with date time info
-                        MY_LOGGER.debug('Writing out last generated date file')
-                        wxcutils.save_file(OUTPUT_PATH, sat_info['File out prefix'] + '-' + channel + '.txt', get_last_generated_text(filename.replace('.png', '.jpg')))
-
-                    else:
-                        MY_LOGGER.debug('Already exists %s', file_location + filename)
-                        existsCount += 1
-
-                # check age of directory to skip over "OLD" directories
-                # 2021-08-11_16-56
-                directory_datetime_dt = datetime.datetime.strptime(directory_datetime, '%Y-%m-%d_%H-%M')
-                directory_datetime_epoch = wxcutils.utc_datetime_to_epoch(directory_datetime_dt)
-                current_epoch = time.time()
-                directory_age= current_epoch - float(directory_datetime_epoch)
-                MY_LOGGER.debug('current_epoch = %f', current_epoch)
-                MY_LOGGER.debug('directory_datetime_epoch = %f', float(directory_datetime_epoch))
-                MY_LOGGER.debug('age = %f', directory_age)
+                    # check age of directory to skip over "OLD" directories
+                    # 2021-08-11_16-56
+                    directory_datetime_dt = datetime.datetime.strptime(directory_datetime, '%Y-%m-%d_%H-%M')
+                    directory_datetime_epoch = wxcutils.utc_datetime_to_epoch(directory_datetime_dt)
+                    current_epoch = time.time()
+                    directory_age= current_epoch - float(directory_datetime_epoch)
+                    MY_LOGGER.debug('current_epoch = %f', current_epoch)
+                    MY_LOGGER.debug('directory_datetime_epoch = %f', float(directory_datetime_epoch))
+                    MY_LOGGER.debug('age = %f', directory_age)
 
 
-                if existsCount == 6 or directory_age > (6 * 60 * 60):
-                    if existsCount == 6:
-                        MY_LOGGER.debug('all 6 files exist - update last directory')
-                    else:
-                        MY_LOGGER.debug('Directory age is too old, assuming files will not appear - 6 hours')
-                    if directory_datetime > sat_info['Last Directory']:
-                        MY_LOGGER.debug('Old last directory = %s, new last directory = %s', sat_info['Last Directory'], directory_datetime)
-                        sat_info['Last Directory'] = directory_datetime
-                    else:
-                        MY_LOGGER.debug('No change required - Old last directory = %s, new last directory = %s', sat_info['Last Directory'], directory_datetime)
+                    if existsCount == 6 or directory_age > (6 * 60 * 60):
+                        if existsCount == 6:
+                            MY_LOGGER.debug('all 6 files exist - update last directory')
+                        else:
+                            MY_LOGGER.debug('Directory age is too old, assuming files will not appear - 6 hours')
+                        if directory_datetime > sat_info['Last Directory']:
+                            MY_LOGGER.debug('Old last directory = %s, new last directory = %s', sat_info['Last Directory'], directory_datetime)
+                            sat_info['Last Directory'] = directory_datetime
+                        else:
+                            MY_LOGGER.debug('No change required - Old last directory = %s, new last directory = %s', sat_info['Last Directory'], directory_datetime)
 
 
 

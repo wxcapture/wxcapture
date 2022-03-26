@@ -913,6 +913,7 @@ def create_animation(ca_satellite, ca_directory, ca_file_match, ca_frames, ca_du
     # number of frames or run out of directories
     ca_text = ''
     ca_frame_counter = 0
+    ca_end_frame = 'file \'' + CONFIG_PATH + 'end-frame.jpg' + '\'' + os.linesep
     ca_duration_text = 'duration ' + str(ca_duration) + os.linesep
     for ca_dir in ca_directories:
         # loop through files in each directory
@@ -928,7 +929,8 @@ def create_animation(ca_satellite, ca_directory, ca_file_match, ca_frames, ca_du
                     MY_LOGGER.debug('Skipping GOES 13 offcentre frame')
                 else:
                     if ca_frame_counter == 0:
-                        ca_text = ca_entry + ca_duration_text + ca_entry
+                        # this is the last frame to render, to also add end frame
+                        ca_text = ca_entry + ca_duration_text + ca_end_frame
                     else:
                         ca_text = ca_entry + ca_duration_text + ca_text
                     ca_frame_counter += 1

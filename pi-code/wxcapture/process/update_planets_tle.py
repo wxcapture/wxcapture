@@ -14,6 +14,8 @@ def backup_tle(filename):
     # back up the old tle file, only if non-zero size and it exists
     if os.path.isfile(WORKING_PATH + filename):
         if os.path.getsize(WORKING_PATH + filename) != 0:
+            MY_LOGGER.debug('backing up %s to %s', WORKING_PATH + filename,
+                            WORKING_PATH + filename + '.old')
             wxcutils.move_file(WORKING_PATH, filename,
                                WORKING_PATH, filename + '.old')
         else:
@@ -79,7 +81,6 @@ try:
     # backup old tle files
     MY_LOGGER.debug('Backing up old files')
     backup_tle('de421.bsp')
-
 
     # update planets info
     MY_LOGGER.debug('Loading new files')

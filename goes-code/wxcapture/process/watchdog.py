@@ -14,6 +14,26 @@ from tcping import Ping
 import wxcutils
 
 
+def long_check(lc_process):
+    """kill any overly long running processes"""
+    MY_LOGGER.debug('-' * 30)
+    MY_LOGGER.debug('process = %s, max age = %s', lc_process['Process Name'], lc_process['Max Age'])
+
+    cmd = subprocess.Popen(('ps', '-eo', 'pid,etimes,cmd'), stdout=subprocess.PIPE, stderr=PIPE)
+    stdout, stderr = cmd.communicate()
+    MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
+    MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
+
+    rows = stdout.decode('utf-8').splitlines()
+    for row in rows:
+        if 'python' in row and lc_process['Process Name'] in row:
+            MY_LOGGER.debug('row = %s', row)
+            bits = row.split()
+            if int(bits[1]) > int(lc_process['Max Age']) * 60:
+                MY_LOGGER.debug('Process too old, need to kill')
+                wxcutils.run_cmd('kill '+ bits[0])
+
+
 def validate_sat(vs):
     """validate if sat files received"""
     new_status = 'ERROR'
@@ -86,7 +106,7 @@ def test_connection(network_connection, attempt, timeout):
     ping = Ping(network_connection['ip'], network_connection['port'], timeout)
 
     status = try_connect()
-    
+
     return status
 
 
@@ -199,6 +219,7 @@ if not is_running('goesproc') or not is_processing('goesproc', 10):
 drive_validation()
 
 # test if tweet.py is running, if not kick it off
+MY_LOGGER.debug('=' * 20)
 if not is_running('tweet.py'):
     # need to kick off the code
     MY_LOGGER.debug('tweet.py not running - kicking it off')
@@ -221,6 +242,10 @@ for sc in SATCONFIG:
 wxcutils.save_json(CONFIG_PATH, 'last-received.json', SATCONFIG)
 wxcutils.save_json(OUTPUT_PATH, 'last-received.json', SATCONFIG)
 
+# find overly long running processes to kill them
+PSCONFIG = wxcutils.load_json(CONFIG_PATH, 'running.json')
+for process in PSCONFIG:
+    long_check(process)
 
 MY_LOGGER.debug('Execution end')
 MY_LOGGER.debug('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')

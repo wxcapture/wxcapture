@@ -79,7 +79,14 @@ def tweet_text_image(tt_config_path, tt_config_file, tt_text, tt_image_file):
 
     # send tweet
     MY_UTIL_LOGGER.debug('Sending tweet with text = %s, image = %s', tt_text, tt_image_file)
-    tt_status = tt_api.update_with_media(tt_image_file, tt_text)
+
+    # upload file
+    tt_media = tt_api.media_upload(tt_image_file)
+
+    # send tweet
+    MY_UTIL_LOGGER.debug('Sending tweet with text = %s, image = %s', tt_text, tt_image_file)
+    tt_status = tt_api.update_status(status=tt_text, media_ids=[tt_media.media_id])
+
     MY_UTIL_LOGGER.debug('Tweet sent with status = %s', tt_status)
 
 

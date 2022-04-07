@@ -386,27 +386,30 @@ MY_LOGGER.debug('Iterate through satellites on data server')
 EMAIL_TEXT1 = ''
 EMAIL_HTML1 = ''
 for sd in SATELLITE_DATA:
-    MY_LOGGER.debug('Satellite = %s', sd['Display Name'])
-    if sd['Last Status'] == 'OK':
-        msg = ' is within the receiving threshold ('
-        sat_status = '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>' 
+    if sd['Active'] == 'yes':
+        MY_LOGGER.debug('Satellite = %s', sd['Display Name'])
+        if sd['Last Status'] == 'OK':
+            msg = ' is within the receiving threshold ('
+            sat_status = '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>' 
+        else:
+            msg = ' has exceeded the receiving threshold ('
+            sat_status = '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+        if sd['Current Age'] != 'n/a':
+            margin = str(int(sd['Max Age']) - int(sd['Current Age']))
+        else:
+            margin = 'n/a'
+        EMAIL_TEXT1 += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
+                sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
+                ' min - safety margin ' + margin + ' min' + \
+                NEWLINE
+        EMAIL_HTML1 += sat_status + \
+            '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
+            '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
+            '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
+            '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
+            '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
     else:
-        msg = ' has exceeded the receiving threshold ('
-        sat_status = '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
-    if sd['Current Age'] != 'n/a':
-        margin = str(int(sd['Max Age']) - int(sd['Current Age']))
-    else:
-        margin = 'n/a'
-    EMAIL_TEXT1 += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
-            sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
-            ' min - safety margin ' + margin + ' min' + \
-            NEWLINE
-    EMAIL_HTML1 += sat_status + \
-        '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
-        '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
-        '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
-        '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
-        '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
+        MY_LOGGER.debug('Skipping satellite = %s as inactive', sd['Display Name'])
 
 MY_LOGGER.debug('-' * 20)
 

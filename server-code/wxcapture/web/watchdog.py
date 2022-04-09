@@ -307,6 +307,17 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 WEB_PATH = '/home/websites/wxcapture/'
 MY_LOGGER.debug('WEB_PATH = %s', WEB_PATH)
 
+EMAIL_OVERIDE = False
+try:
+    # extract parameters
+    if sys.argv[1] == 'Y':
+        EMAIL_OVERIDE = True
+        MY_LOGGER.debug('Forcing email to be sent')
+except IndexError as exc:
+    MY_LOGGER.debug('Exception whilst parsing command line parameters: %s %s %s',
+                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+    MY_LOGGER.debug('Most likely due to no args being passed - fairly safe to ignore')
+
 CSV_FILENAME = 'satstatus.csv'
 MY_LOGGER.debug('CSV_FILENAME = %s', CSV_FILENAME)
 CSV_FILENAME2 = 'serverstatus.csv'
@@ -610,7 +621,7 @@ wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
 
 
 MY_LOGGER.debug('-' * 20)
-if EMAIL_REQUIRED:
+if EMAIL_REQUIRED or EMAIL_OVERIDE:
     MY_LOGGER.debug('Email required...')
 
     MY_LOGGER.debug('Saving updated config')

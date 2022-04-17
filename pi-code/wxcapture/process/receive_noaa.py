@@ -33,8 +33,8 @@ def brand_image(bi_filename,
     if bi_projection:
         MY_LOGGER.debug('projection = True')
     else:
-        MY_LOGGER.debug('projection = False')    
-  
+        MY_LOGGER.debug('projection = False')
+
     try:
         # load the image
         MY_LOGGER.debug('load image')
@@ -100,11 +100,11 @@ def brand_image(bi_filename,
         if 'channel A' in bi_processing:
             bi_processing = bi_processing.replace('channel A', PASS_INFO['NOAA Channel A'][14:-1])
             output_image = cv2.putText(output_image, bi_processing, (20, 300),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)        
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         elif 'channel B' in bi_processing:
             bi_processing = bi_processing.replace('channel B', PASS_INFO['NOAA Channel B'][14:-1])
             output_image = cv2.putText(output_image, bi_processing, (20, 300),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA) 
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
         else:
             output_image = cv2.putText(output_image, bi_processing, (20, 300),
                                        cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
@@ -720,13 +720,21 @@ try:
                         MY_LOGGER.debug(stdout)
                         MY_LOGGER.debug('===')
                         MY_LOGGER.debug('find pass(es) to include, if 2+ exist')
-                        MY_TIME = ''
-                        MY_PASS_MERIDIAN = ''
-                        MY_SATELLITE = ''
+                        MY_TIME = int(PASS_INFO['time'])
+                        MY_PASS_MERIDIAN = PASS_INFO['pass meridian']
+                        MY_SATELLITE = PASS_INFO['satellite']
+
                         # need to include PM passes from yesterday as some pre-2am passes will
                         # align with the previous evening
-                        PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json') +\
-                                 wxcutils.load_json(WORKING_PATH, 'passes_pm_yesterday.json')
+                        # But only if the current pass is a morning pass to avoid where
+                        # we combine evening passes from the previous day
+                        if int(PASS_INFO['start_date_local'][16:18]) < 3:
+                            MY_LOGGER.debug('Loading passes for today and yesterday - am pass')
+                            PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json') +\
+                                    wxcutils.load_json(WORKING_PATH, 'passes_pm_yesterday.json')
+                        else:
+                            MY_LOGGER.debug('Loading passes for today only - pm pass')
+                            PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json')
 
                         for sat_pass in PASSES:
                             if sat_pass['sat type'] == 'NOAA':

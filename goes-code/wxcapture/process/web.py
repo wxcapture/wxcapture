@@ -373,6 +373,8 @@ def proccess_satellite(sat_info):
                             # test file size, must be non-zero
                             if os.path.getsize(file_location + filename) == 0:
                                 MY_LOGGER.debug('File %s is zero bytes long, skipping', file_location + filename)
+                                MY_LOGGER.debug('Removing zero bytes file')
+                                wxcutils.run_cmd('rm ' + file_location + filename)
                             else:
                                 MY_LOGGER.debug('File %s is not zero bytes long, processing', file_location + filename)
                                 cmd = 'vips resize ' + file_location + filename + ' ' + file_location + filename.replace('.png', '.jpg') + ratio

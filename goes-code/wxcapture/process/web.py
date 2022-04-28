@@ -370,49 +370,54 @@ def proccess_satellite(sat_info):
                             else:
                                 ratio = ' 0.2604'
 
-                            cmd = 'vips resize ' + file_location + filename + ' ' + file_location + filename.replace('.png', '.jpg') + ratio
-                            MY_LOGGER.debug('cmd %s', cmd)
-                            wxcutils.run_cmd(cmd)
-
-                            # can now delete the original image to save space
-                            wxcutils.run_cmd('rm ' + file_location + filename)
-
-                            if sat_info['Name'] == 'GOES 13':
-                                bits = filename.split('_')
-                                for bit in bits:
-                                    MY_LOGGER.debug('bit %s', bit)
-                                year = bits[-1][:4]
-                                month = calendar.month_abbr[int(bits[-1][4:6])]
-                                day = bits[-1][6:8]
-                                hour = bits[-1][9:11]
-                                min = bits[-1][11:13]
-                                MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
-                                im_date = day + '-' + month + '-' + year
-                                im_time = hour + ':' + min + ' UTC'
-
-                                MY_LOGGER.debug('Creating branded image - %s, date %s, time %s', channel, im_date, im_time)
-
-                                web_file = create_branded('goes', '13', 'fd', channel, file_location, filename.replace('.png', ''), '.jpg', im_date, im_time)
-
-                                # copy to output directory
-                                new_filename = 'goes13-' + channel + '.jpg'
-                                MY_LOGGER.debug('new_filename = %s', new_filename)
-                                wxcutils.copy_file(web_file,
-                                                os.path.join(OUTPUT_PATH,
-                                                                new_filename))
+                            # test file size, must be non-zero
+                            if os.path.getsize(file_location + filename) == 0:
+                                MY_LOGGER.debug('File %s is zero bytes long, skipping', file_location + filename)
                             else:
-                                # non-GOES 13
-                                # copy file to output folder
-                                wxcutils.copy_file(file_location + filename.replace('.png', '.jpg'), OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg')
+                                MY_LOGGER.debug('File %s is not zero bytes long, processing', file_location + filename)
+                                cmd = 'vips resize ' + file_location + filename + ' ' + file_location + filename.replace('.png', '.jpg') + ratio
+                                MY_LOGGER.debug('cmd %s', cmd)
+                                wxcutils.run_cmd(cmd)
 
-                            # create thumbnail and txt file
-                            cmd = 'vips resize ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg' + ' ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '-tn.jpg' + ' 0.1'
-                            MY_LOGGER.debug('cmd %s', cmd)
-                            wxcutils.run_cmd(cmd)
+                                # can now delete the original image to save space
+                                wxcutils.run_cmd('rm ' + file_location + filename)
 
-                            # create file with date time info
-                            MY_LOGGER.debug('Writing out last generated date file')
-                            wxcutils.save_file(OUTPUT_PATH, sat_info['File out prefix'] + '-' + channel + '.txt', get_last_generated_text(filename.replace('.png', '.jpg')))
+                                if sat_info['Name'] == 'GOES 13':
+                                    bits = filename.split('_')
+                                    for bit in bits:
+                                        MY_LOGGER.debug('bit %s', bit)
+                                    year = bits[-1][:4]
+                                    month = calendar.month_abbr[int(bits[-1][4:6])]
+                                    day = bits[-1][6:8]
+                                    hour = bits[-1][9:11]
+                                    min = bits[-1][11:13]
+                                    MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
+                                    im_date = day + '-' + month + '-' + year
+                                    im_time = hour + ':' + min + ' UTC'
+
+                                    MY_LOGGER.debug('Creating branded image - %s, date %s, time %s', channel, im_date, im_time)
+
+                                    web_file = create_branded('goes', '13', 'fd', channel, file_location, filename.replace('.png', ''), '.jpg', im_date, im_time)
+
+                                    # copy to output directory
+                                    new_filename = 'goes13-' + channel + '.jpg'
+                                    MY_LOGGER.debug('new_filename = %s', new_filename)
+                                    wxcutils.copy_file(web_file,
+                                                    os.path.join(OUTPUT_PATH,
+                                                                    new_filename))
+                                else:
+                                    # non-GOES 13
+                                    # copy file to output folder
+                                    wxcutils.copy_file(file_location + filename.replace('.png', '.jpg'), OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg')
+
+                                # create thumbnail and txt file
+                                cmd = 'vips resize ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '.jpg' + ' ' + OUTPUT_PATH + sat_info['File out prefix'] + '-' + channel + '-tn.jpg' + ' 0.1'
+                                MY_LOGGER.debug('cmd %s', cmd)
+                                wxcutils.run_cmd(cmd)
+
+                                # create file with date time info
+                                MY_LOGGER.debug('Writing out last generated date file')
+                                wxcutils.save_file(OUTPUT_PATH, sat_info['File out prefix'] + '-' + channel + '.txt', get_last_generated_text(filename.replace('.png', '.jpg')))
 
                         else:
                             MY_LOGGER.debug('Already exists %s', file_location + filename)

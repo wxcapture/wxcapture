@@ -725,8 +725,15 @@ try:
                         MY_SATELLITE = ''
                         # need to include PM passes from yesterday as some pre-2am passes will
                         # align with the previous evening
-                        PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json') +\
-                                 wxcutils.load_json(WORKING_PATH, 'passes_pm_yesterday.json')
+                        # But only if the current pass is a morning pass to avoid where
+                        # we combine evening passes from the previous day
+                        if int(PASS_INFO['start_date_local'][16:18]) < 2:
+                            MY_LOGGER.debug('Loading passes for today and yesterday - early am pass')
+                            PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json') +\
+                                    wxcutils.load_json(WORKING_PATH, 'passes_pm_yesterday.json')
+                        else:
+                            MY_LOGGER.debug('Loading passes for today only - late am or pm pass')
+                            PASSES = wxcutils.load_json(WORKING_PATH, 'passes_today.json')
 
                         for sat_pass in PASSES:
                             if sat_pass['sat type'] == 'NOAA':

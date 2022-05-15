@@ -3,14 +3,45 @@
 
 
 # import libraries
+from distutils.log import debug
 import os
+import sys
 import glob
 import time
 import subprocess
 import calendar
 from datetime import datetime
+from tkinter import Y
 import cv2
 import wxcutils
+
+
+def kill_old_process(pa_text, pa_age):
+    """kill old processes over an threshold age"""
+
+    MY_LOGGER.debug('pa_text = %s', pa_text)
+    pa_pid = pa_text.split()[1]
+    MY_LOGGER.debug('pa_pid = %s', pa_pid)
+
+    pa_time = 0
+    try:
+        cmd = subprocess.Popen(('ps', '-p', pa_pid, '-o', 'etimes'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = cmd.communicate()
+        MY_LOGGER.debug('output = %s', stdout.decode('utf-8'))
+        pa_time = stdout.decode('utf-8').splitlines()[1]
+        MY_LOGGER.debug('pa_time = %s', pa_time)
+    except:
+        # note this unlikely unless process has completed very recently
+        MY_LOGGER.debug('%s is NOT running???', pa_text)
+
+    if int(pa_time) > int(pa_age):
+        # kill process
+        MY_LOGGER.debug('Killing process as running too long - %s', pa_text)
+        wxcutils.run_cmd('kill ' + str(pa_pid))
+        return True
+    else:
+        MY_LOGGER.debug('Process is young enough - %s', pa_text)
+        return False
 
 
 def number_processes(process_name):
@@ -23,15 +54,20 @@ def number_processes(process_name):
         process_count = 0
         lines = output.decode('utf-8').splitlines()
         for line in lines:
-            if 'grep' in line or '/bin/bash' in line:
-                # ignore grep or cron lines
+            if 'grep' in line:
                 process_count += 0
             else:
-                process_count += 1
+                # get age and kill if too old (20 minutes)
+                if kill_old_process(line, 1200):
+                    process_count += 0
+                else:
+                    process_count += 1
         MY_LOGGER.debug('%d process(es) are running', process_count)
         return process_count
     except:
         # note this should not be possible!
+        MY_LOGGER.critical('Exception handler: %s %s %s',
+                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
         MY_LOGGER.debug('%s is NOT running', process_name)
     MY_LOGGER.debug('%s is NOT running', process_name)
     return 0

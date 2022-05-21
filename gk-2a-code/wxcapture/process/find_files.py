@@ -3,15 +3,14 @@
 
 
 # import libraries
-from distutils.log import debug
 import os
 import sys
+import math
 import glob
 import time
 import subprocess
 import calendar
 from datetime import datetime
-from tkinter import Y
 import cv2
 import wxcutils
 
@@ -25,7 +24,8 @@ def kill_old_process(pa_text, pa_age):
 
     pa_time = 0
     try:
-        cmd = subprocess.Popen(('ps', '-p', pa_pid, '-o', 'etimes'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = subprocess.Popen(('ps', '-p', pa_pid, '-o', 'etimes'),
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = cmd.communicate()
         MY_LOGGER.debug('output = %s', stdout.decode('utf-8'))
         pa_time = stdout.decode('utf-8').splitlines()[1]
@@ -39,9 +39,9 @@ def kill_old_process(pa_text, pa_age):
         MY_LOGGER.debug('Killing process as running too long - %s', pa_text)
         wxcutils.run_cmd('kill ' + str(pa_pid))
         return True
-    else:
-        MY_LOGGER.debug('Process is young enough - %s', pa_text)
-        return False
+
+    MY_LOGGER.debug('Process is young enough - %s', pa_text)
+    return False
 
 
 def number_processes(process_name):
@@ -54,7 +54,8 @@ def number_processes(process_name):
         process_count = 0
         lines = output.decode('utf-8').splitlines()
         for line in lines:
-            if 'grep' in line:
+            if 'grep' in line or '/bin/bash' in line:
+                # ignore grep or cron lines
                 process_count += 0
             else:
                 # get age and kill if too old (20 minutes)
@@ -94,11 +95,11 @@ def crawl_images(ci_directory):
     """crawl directory structure for all images
     of the data type directory"""
     # start at base, get list of all dates
-    date_directories = find_directories(base_dir)
+    date_directories = find_directories(BASE_DIR)
 
     # go through the right directory, find the files
     for dir in date_directories:
-        dir_dir = os.path.join(os.path.join(base_dir, dir), ci_directory)
+        dir_dir = os.path.join(os.path.join(BASE_DIR, dir), ci_directory)
         for file in glob.glob(os.path.join(dir_dir, '*.*')):
             bits = os.path.split(file)
             l_filename, l_extenstion = os.path.splitext(bits[1])
@@ -376,28 +377,28 @@ if number_processes('find_files.py') == 1:
     LOCAL_TIME_ZONE = subprocess.check_output("date"). \
         decode('utf-8').split(' ')[-2]
 
-    base_dir = '/home/pi/gk-2a/xrit-rx/received/LRIT/'
-    MY_LOGGER.debug('base_dir = %s', base_dir)
+    BASE_DIR = '/home/pi/gk-2a/xrit-rx/received/LRIT/'
+    MY_LOGGER.debug('BASE_DIR = %s', BASE_DIR)
 
     # load latest times data
-    latest_timestamps = wxcutils.load_json(OUTPUT_PATH, 'gk2a_info.json')
+    LATEST_TIMESTAMPS = wxcutils.load_json(OUTPUT_PATH, 'gk2a_info.json')
 
     # find latest directory
-    date_directory = find_latest_directory(base_dir)
-    MY_LOGGER.debug('latest directory = %s', date_directory)
+    DATE_DIRECTORY = find_latest_directory(BASE_DIR)
+    MY_LOGGER.debug('latest directory = %s', DATE_DIRECTORY)
 
-    date_base_dir = os.path.join(base_dir, date_directory)
-    data_directories = find_directories(date_base_dir)
+    DATE_BASE_DIR = os.path.join(BASE_DIR, DATE_DIRECTORY)
+    DATA_DIRECTORIES = find_directories(DATE_BASE_DIR)
 
     # data store for files list
     # currently just for FD
     FILES = []
 
     # find latest file in each directory and copy to output directory
-    for directory in data_directories:
+    for directory in DATA_DIRECTORIES:
         MY_LOGGER.debug('---------------------------------------------')
         MY_LOGGER.debug('directory = %s', directory)
-        location = os.path.join(date_base_dir, directory)
+        location = os.path.join(DATE_BASE_DIR, directory)
         MY_LOGGER.debug('location = %s', location)
         latest_file = find_latest_file(location)
         MY_LOGGER.debug('latest_file = %s', latest_file)
@@ -412,7 +413,7 @@ if number_processes('find_files.py') == 1:
 
         stored_timestamp = 0.0
         try:
-            stored_timestamp = latest_timestamps[directory + extenstion]
+            stored_timestamp = LATEST_TIMESTAMPS[directory + extenstion]
         except NameError:
             pass
         except KeyError:
@@ -429,7 +430,7 @@ if number_processes('find_files.py') == 1:
         if delta > 0:
             MY_LOGGER.debug('New %s file added, previous latest = %f, current latest = %f',
                             directory, stored_timestamp, latest)
-            latest_timestamps[directory + extenstion] = int(latest)
+            LATEST_TIMESTAMPS[directory + extenstion] = int(latest)
             date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
                 LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
 
@@ -445,10 +446,21 @@ if number_processes('find_files.py') == 1:
                 # create branded images
                 if create_branded('GK-2A'):
                     MY_LOGGER.debug('Creating animations')
-                    # do the animations - only if new images created
-                    animate(directory, filename, extenstion, 143 * 3, '')
-                    animate(directory, filename, extenstion, 143 * 3, 'sanchez')
-                    animate(directory, filename, extenstion, 143 * 3, 'clahe')
+                    # create videos twice per hour, based on the value of the
+                    # tens of minutes for the current time
+                    # this is to minimise the load on the server and the runtime for this code
+                    SECTION = math.floor(int(time.strftime('%M')) / 10)
+                    MY_LOGGER.debug('SECTION = %s', SECTION)
+
+                    if SECTION in (0, 3):
+                        MY_LOGGER.debug('+=' * 40)
+                        animate(directory, filename, extenstion, 143 * 3, '')
+                    if SECTION in (1, 4):
+                        MY_LOGGER.debug('+=' * 40)
+                        animate(directory, filename, extenstion, 143 * 3, 'sanchez')
+                    if SECTION in (2, 5):
+                        MY_LOGGER.debug('+=' * 40)
+                        animate(directory, filename, extenstion, 143 * 3, 'clahe')
 
                     wxcutils.save_file(OUTPUT_PATH, 'FD.txt', date_time)
                     wxcutils.save_file(OUTPUT_PATH, 'clahe.txt', date_time)
@@ -492,13 +504,14 @@ if number_processes('find_files.py') == 1:
             MY_LOGGER.debug('File unchanged')
 
     # save latest times data
-    wxcutils.save_json(OUTPUT_PATH, 'gk2a_info.json', latest_timestamps)
+    wxcutils.save_json(OUTPUT_PATH, 'gk2a_info.json', LATEST_TIMESTAMPS)
 
-    # rsync files to servers
+  # rsync files to servers
     wxcutils.run_cmd('rsync -rtPv ' + OUTPUT_PATH +
                      ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
-    wxcutils.run_cmd('rsync -rtPv ' + base_dir +
+    wxcutils.run_cmd('rsync -rtPv ' + BASE_DIR +
                      ' --exclude *_sanchez* --exclude *web* pi@192.168.100.15:/home/pi/goes/gk-2a')
+
 
 else:
     MY_LOGGER.debug('Another instance of find_files.py is already running')

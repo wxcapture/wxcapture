@@ -1019,71 +1019,100 @@ if number_processes('find_files.py') == 1:
 
     # create animations
     # calculation = hours per day x frames per hour x number of days
-    # create videos once per hour, based on the value of the tens of minutes for the current time
+    # create videos split over 3 hours
+    # based on the value of the tens of minutes for the current time
     # this is to minimise the load on the server and the runtime for this code
 
-    SECTION = math.floor(int(time.strftime('%M')) / 10)
-    MY_LOGGER.debug('SECTION = %s', SECTION)
+    MIN_SECTION = math.floor(int(time.strftime('%M')) / 10)
+    MY_LOGGER.debug('MIN_SECTION = %s', MIN_SECTION)
+    HOUR_SECTION = int(time.strftime('%H')) % 3
+    MY_LOGGER.debug('HOUR_SECTION = %s', HOUR_SECTION)
 
-    if SECTION == 0:
-        # GOES 16 - ch 13 enhanced - 1 frame per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES16', 'web/goes16/fd/ch13_enhanced', '*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+    if HOUR_SECTION == 0:
+        if MIN_SECTION == 0:
+            # GOES 16 - ch 13 enhanced - 1 frame per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES16', 'web/goes16/fd/ch13_enhanced', '*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
 
-        # GOES 17 - FD visible - 2 frames per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES17', 'web/goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 1:
+            # GOES 17 - FD visible Projected - 2 frames per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES17', 'web/goes17/fd/fcsanchez', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
-    if SECTION == 1:
-        # GOES 17 - FD visible Projected - 2 frames per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES17', 'web/goes17/fd/fcsanchez', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 2:
+            # GOES 17 - M1 ch 7 IR shortwave - 2 frames per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES17', 'web/goes17/m1/ch07', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
-        # GOES 17 - ch13 visible Projected - 2 frames per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES17', 'web/goes17/fd/ch13sanchez', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 3:
+            # GOES 17 - M2 ch 7 IR shortwave - 2 frames per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES17', 'web/goes17/m2/ch07', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
-        # Himawari 8 - FD IR sanchez projected - 1 frame per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('HIMAWARI8', 'web/himawari8/fd/IRsanchez', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 4:
+            # Himawari 8 - FD IR - 1 frame per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('HIMAWARI8', 'web/himawari8/fd/IR', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
 
-    if SECTION == 2:
-        # GOES 17 - M1 ch 7 IR shortwave - 2 frames per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES17', 'web/goes17/m1/ch07', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 5:
+            # combined images - 1 frame per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('COMBINED', 'web/combined/fd/ir', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+    elif HOUR_SECTION == 1:
+        if MIN_SECTION == 0:
+            # GOES 17 - FD visible - 2 frames per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES17', 'web/goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
-        # GOES 17 - M1 fc - 2 frames per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES17', 'web/goes17/m1/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'LIGHT', 400 * 1024)
+        if MIN_SECTION == 1:
+            # GOES 17 - ch13 visible Projected - 2 frames per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES17', 'web/goes17/fd/ch13sanchez', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
-        # GOES 13 - #3 Water Vapour - 2 frame per hour
-        create_animation('GOES13', 'web/goes13/fd/3', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 2:
+            # GOES 17 - M1 fc - 2 frames per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES17', 'web/goes17/m1/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'LIGHT', 400 * 1024)
 
-    if SECTION == 3:
-        # GOES 17 - M2 ch 7 IR shortwave - 2 frames per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES17', 'web/goes17/m2/ch07', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 3:
+            # GOES 17 - M2 fc - 2 frames per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES17', 'web/goes17/m2/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'LIGHT', 400 * 1024)
 
-        # GOES 17 - M2 fc - 2 frames per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES17', 'web/goes17/m2/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'LIGHT', 400 * 1024)
+        if MIN_SECTION == 4:
+            # GOES 13 - Full Colour - 2 frame per hour
+            create_animation('GOES13', 'web/goes13/fd/FC', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
-    if SECTION == 4:
-        # Himawari 8 - FD IR - 1 frame per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('HIMAWARI8', 'web/himawari8/fd/IR', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 5:
+            # GOES 16 - ch 13 enhanced - 1 frame per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES16', 'web/goes16/fd/ch13', '*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+    else:
+        if MIN_SECTION == 0:
+            # GOES 13 - #3 Water Vapour - 2 frame per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('GOES13', 'web/goes13/fd/3', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
 
-        # GOES 13 - Full Colour - 2 frame per hour
-        create_animation('GOES13', 'web/goes13/fd/FC', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 1:
+            # Himawari 8 - FD IR sanchez projected - 1 frame per hour
+            MY_LOGGER.debug('+=' * 40)
+            create_animation('HIMAWARI8', 'web/himawari8/fd/IRsanchez', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
 
-    if SECTION == 5:
-        # combined images - 1 frame per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('COMBINED', 'web/combined/fd/ir', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 2:
+            # nothing
+            MY_LOGGER.debug('+=' * 40)
 
-        # GOES 16 - ch 13 enhanced - 1 frame per hour
-        MY_LOGGER.debug('+=' * 40)
-        create_animation('GOES16', 'web/goes16/fd/ch13', '*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+        if MIN_SECTION == 3:
+            # nothing
+            MY_LOGGER.debug('+=' * 40)
+
+        if MIN_SECTION == 4:
+            # nothing
+            MY_LOGGER.debug('+=' * 40)
+
+        if MIN_SECTION == 5:
+            # nothing
+            MY_LOGGER.debug('+=' * 40)
 
     # save latest times data
     wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', LATESTTIMESTAMPS)

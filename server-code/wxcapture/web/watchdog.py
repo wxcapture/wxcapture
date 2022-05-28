@@ -369,258 +369,258 @@ ALERT_INFO = get_local_date_time() + ' ' +  LOCAL_TIME_ZONE + \
         ' [' + get_utc_date_time() + ' UTC].'
 MY_LOGGER.debug('ALERT_INFO = %s', ALERT_INFO)
 
-# # iterate through satellites on this server
-# MY_LOGGER.debug('-' * 20)
-# MY_LOGGER.debug('Iterate through satellites on this server')
-# for si in SATELLITE_INFO:
-#     MY_LOGGER.debug('-' * 20)
-#     MY_LOGGER.debug('Processing - %s', si['Display Name'])
-#     if si['Active'] == 'yes':
-#         MY_LOGGER.debug('Active - Validation processing')
-#         # do the validation
-#         status, text, html, data = validate_file(si)
-#         if status != si['Last Status']:
-#             STATUS_CHANGE_DETECTED = True
-#             EMAIL_REQUIRED = True
-#             MY_LOGGER.debug('Status change detected - old = %s, new = %s',
-#                             si['Last Status'], status)
-#             si['Last Status'] = status
-#             si['Status Change'] = ALERT_INFO
-#         EMAIL_TEXT += text
-#         EMAIL_HTML += html
-#         CSV_DATA += data
-#     else:
-#         MY_LOGGER.debug('Satellite is not active')
+# iterate through satellites on this server
+MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('Iterate through satellites on this server')
+for si in SATELLITE_INFO:
+    MY_LOGGER.debug('-' * 20)
+    MY_LOGGER.debug('Processing - %s', si['Display Name'])
+    if si['Active'] == 'yes':
+        MY_LOGGER.debug('Active - Validation processing')
+        # do the validation
+        status, text, html, data = validate_file(si)
+        if status != si['Last Status']:
+            STATUS_CHANGE_DETECTED = True
+            EMAIL_REQUIRED = True
+            MY_LOGGER.debug('Status change detected - old = %s, new = %s',
+                            si['Last Status'], status)
+            si['Last Status'] = status
+            si['Status Change'] = ALERT_INFO
+        EMAIL_TEXT += text
+        EMAIL_HTML += html
+        CSV_DATA += data
+    else:
+        MY_LOGGER.debug('Satellite is not active')
 
-# MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('-' * 20)
 
-# # iterate through satellites on data server
-# MY_LOGGER.debug('-' * 20)
-# MY_LOGGER.debug('Iterate through satellites on data server')
-# EMAIL_TEXT1 = ''
-# EMAIL_HTML1 = ''
-# for sd in SATELLITE_DATA:
-#     if sd['Active'] == 'yes':
-#         MY_LOGGER.debug('Satellite = %s', sd['Display Name'])
-#         if sd['Last Status'] == 'OK':
-#             msg = ' is within the receiving threshold ('
-#             sat_status = '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>' 
-#         else:
-#             msg = ' has exceeded the receiving threshold ('
-#             sat_status = '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
-#         if sd['Current Age'] != 'n/a':
-#             margin = str(int(sd['Max Age']) - int(sd['Current Age']))
-#         else:
-#             margin = 'n/a'
-#         EMAIL_TEXT1 += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
-#                 sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
-#                 ' min - safety margin ' + margin + ' min' + \
-#                 NEWLINE
-#         EMAIL_HTML1 += sat_status + \
-#             '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
-#             '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
-#             '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
-#             '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
-#             '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
-#     else:
-#         MY_LOGGER.debug('Skipping satellite = %s as inactive', sd['Display Name'])
+# iterate through satellites on data server
+MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('Iterate through satellites on data server')
+EMAIL_TEXT1 = ''
+EMAIL_HTML1 = ''
+for sd in SATELLITE_DATA:
+    if sd['Active'] == 'yes':
+        MY_LOGGER.debug('Satellite = %s', sd['Display Name'])
+        if sd['Last Status'] == 'OK':
+            msg = ' is within the receiving threshold ('
+            sat_status = '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>' 
+        else:
+            msg = ' has exceeded the receiving threshold ('
+            sat_status = '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+        if sd['Current Age'] != 'n/a':
+            margin = str(int(sd['Max Age']) - int(sd['Current Age']))
+        else:
+            margin = 'n/a'
+        EMAIL_TEXT1 += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
+                sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
+                ' min - safety margin ' + margin + ' min' + \
+                NEWLINE
+        EMAIL_HTML1 += sat_status + \
+            '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
+            '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
+            '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
+            '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
+            '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
+    else:
+        MY_LOGGER.debug('Skipping satellite = %s as inactive', sd['Display Name'])
 
-# MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('-' * 20)
 
-# # validate space left on servers
-# SERVER_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog-servers.json')
-# MY_LOGGER.debug('current SERVER_INFO = %s', SERVER_INFO)
+# validate space left on servers
+SERVER_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog-servers.json')
+MY_LOGGER.debug('current SERVER_INFO = %s', SERVER_INFO)
 
-# # create file for this server
-# drive_validation()
+# create file for this server
+drive_validation()
 
-# # iterate through servers
-# MY_LOGGER.debug('-' * 20)
-# MY_LOGGER.debug('Iterate through servers')
-# for si in SERVER_INFO:
-#     MY_LOGGER.debug('-' * 20)
-#     MY_LOGGER.debug('Processing - %s', si['Display Name'])
-#     if si['Active'] == 'yes':
-#         MY_LOGGER.debug('Active - Validation processing')
-#         # do the validation
-#         status, text, html, data = validate_server(si)
-#         if status != si['Last Status']:
-#             STATUS_CHANGE_DETECTED = True
-#             EMAIL_REQUIRED = True
-#             MY_LOGGER.debug('Status change detected - old = %s, new = %s',
-#                             si['Last Status'], status)
-#             si['Last Status'] = status
-#             si['Status Change'] = ALERT_INFO
-#         EMAIL_TEXT2 += text
-#         EMAIL_HTML2 += html + NEWLINE
-#         CSV_DATA2 += data
-#     else:
-#         MY_LOGGER.debug('Server is not active')
+# iterate through servers
+MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('Iterate through servers')
+for si in SERVER_INFO:
+    MY_LOGGER.debug('-' * 20)
+    MY_LOGGER.debug('Processing - %s', si['Display Name'])
+    if si['Active'] == 'yes':
+        MY_LOGGER.debug('Active - Validation processing')
+        # do the validation
+        status, text, html, data = validate_server(si)
+        if status != si['Last Status']:
+            STATUS_CHANGE_DETECTED = True
+            EMAIL_REQUIRED = True
+            MY_LOGGER.debug('Status change detected - old = %s, new = %s',
+                            si['Last Status'], status)
+            si['Last Status'] = status
+            si['Status Change'] = ALERT_INFO
+        EMAIL_TEXT2 += text
+        EMAIL_HTML2 += html + NEWLINE
+        CSV_DATA2 += data
+    else:
+        MY_LOGGER.debug('Server is not active')
 
-# MY_LOGGER.debug('-' * 20)
+MY_LOGGER.debug('-' * 20)
 
-# # write data to the csv files
-# write_data()
+# write data to the csv files
+write_data()
 
-# # validate network connectivity
-# MY_LOGGER.debug('-' * 20)
-# LATESTNETWORK = wxcutils.load_json(WEB_PATH + 'goes/', 'network.json')
-# PREVIOUSTNETWORK = wxcutils.load_json(CONFIG_PATH, 'network.json')
+# validate network connectivity
+MY_LOGGER.debug('-' * 20)
+LATESTNETWORK = wxcutils.load_json(WEB_PATH + 'goes/', 'network.json')
+PREVIOUSTNETWORK = wxcutils.load_json(CONFIG_PATH, 'network.json')
 
-# EMAIL_TEXT3 = ''
-# EMAIL_HTML3 = ''
-# PREVIOUS = ''
+EMAIL_TEXT3 = ''
+EMAIL_HTML3 = ''
+PREVIOUS = ''
 
-# for key, value in LATESTNETWORK.items():
-#     if key == 'addresses':
-#         for nc in LATESTNETWORK[key]:
-#             if nc['Active'] == 'yes':
-#                 MY_LOGGER.debug('-' * 20)
-#                 MY_LOGGER.debug(nc)
-#                 if nc['status'] == 'OK':
-#                     EMAIL_HTML3 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
-#                 else:
-#                     EMAIL_HTML3 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+for key, value in LATESTNETWORK.items():
+    if key == 'addresses':
+        for nc in LATESTNETWORK[key]:
+            if nc['Active'] == 'yes':
+                MY_LOGGER.debug('-' * 20)
+                MY_LOGGER.debug(nc)
+                if nc['status'] == 'OK':
+                    EMAIL_HTML3 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
+                else:
+                    EMAIL_HTML3 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
 
-#                 # get the previous state
-#                 for key2, value2 in PREVIOUSTNETWORK.items():
-#                     if key2 == 'addresses':
-#                         for nc2 in PREVIOUSTNETWORK[key]:
-#                             if nc['description'] == nc2['description']:
-#                                 PREVIOUS = nc2
-#                                 MY_LOGGER.debug('Previous = %s', PREVIOUS)
+                # get the previous state
+                for key2, value2 in PREVIOUSTNETWORK.items():
+                    if key2 == 'addresses':
+                        for nc2 in PREVIOUSTNETWORK[key]:
+                            if nc['description'] == nc2['description']:
+                                PREVIOUS = nc2
+                                MY_LOGGER.debug('Previous = %s', PREVIOUS)
 
 
-#                 CHANGE = 'N'
-#                 if nc['status'] != PREVIOUS['status']:
-#                     EMAIL_REQUIRED = True
-#                     CHANGE = 'Y'
-#                 EMAIL_HTML3 += '<td align = \"center\">' + CHANGE + '</td>'
+                CHANGE = 'N'
+                if nc['status'] != PREVIOUS['status']:
+                    EMAIL_REQUIRED = True
+                    CHANGE = 'Y'
+                EMAIL_HTML3 += '<td align = \"center\">' + CHANGE + '</td>'
 
-#                 EMAIL_TEXT3 += nc['description'] + ' - '
-#                 EMAIL_HTML3 += '<td>' + nc['description'] + '</td>'
+                EMAIL_TEXT3 += nc['description'] + ' - '
+                EMAIL_HTML3 += '<td>' + nc['description'] + '</td>'
 
-#                 if nc['status'] == 'OK':
-#                     EMAIL_TEXT3 += 'OK - network connectivity is good' + ' - '
-#                     EMAIL_HTML3 += '<td>Good connectivity</td><td>' + \
-#                         wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
-#                 else:
-#                     EMAIL_TEXT3 = 'Error - network connecitivity issue - ' + nc['status'] + ''
-#                     EMAIL_HTML3 += '<td>' + nc['status'] + '</td><td>' + \
-#                         wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                if nc['status'] == 'OK':
+                    EMAIL_TEXT3 += 'OK - network connectivity is good' + ' - '
+                    EMAIL_HTML3 += '<td>Good connectivity</td><td>' + \
+                        wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                else:
+                    EMAIL_TEXT3 = 'Error - network connecitivity issue - ' + nc['status'] + ''
+                    EMAIL_HTML3 += '<td>' + nc['status'] + '</td><td>' + \
+                        wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
 
-# MY_LOGGER.debug('HTML = ' + EMAIL_HTML3)
-# MY_LOGGER.debug('txt = ' + EMAIL_TEXT3)
+MY_LOGGER.debug('HTML = ' + EMAIL_HTML3)
+MY_LOGGER.debug('txt = ' + EMAIL_TEXT3)
 
-# # save last
-# wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
+# save last
+wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
 
-# # validate satellite status
-# MY_LOGGER.debug('-' * 20)
-# LATESTSATSTATUS = wxcutils.load_json(WEB_PATH + 'gk-2a/', 'satellite-receivers.json')
-# PREVIOUSSATSTATUS = wxcutils.load_json(CONFIG_PATH, 'satellite-receivers.json')
+# validate satellite status
+MY_LOGGER.debug('-' * 20)
+LATESTSATSTATUS = wxcutils.load_json(WEB_PATH + 'gk-2a/', 'satellite-receivers.json')
+PREVIOUSSATSTATUS = wxcutils.load_json(CONFIG_PATH, 'satellite-receivers.json')
 
-# EMAIL_TEXT4 = ''
-# EMAIL_HTML4 = ''
-# PREVIOUS = ''
+EMAIL_TEXT4 = ''
+EMAIL_HTML4 = ''
+PREVIOUS = ''
 
-# for si1 in LATESTSATSTATUS:
-#     MY_LOGGER.debug('-' * 20)
-#     MY_LOGGER.debug('Processing - %s', si1['label'])
-#     MY_LOGGER.debug('si1 %s', si1)
+for si1 in LATESTSATSTATUS:
+    MY_LOGGER.debug('-' * 20)
+    MY_LOGGER.debug('Processing - %s', si1['label'])
+    MY_LOGGER.debug('si1 %s', si1)
     
-#     for si2 in PREVIOUSSATSTATUS:
-#         if si1['label'] == si2['label']:
-#             MY_LOGGER.debug('si2 %s', si2)
-#             if si1['ok'] == 'Locked':
-#                 EMAIL_HTML4 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
-#             else:
-#                 EMAIL_HTML4 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+    for si2 in PREVIOUSSATSTATUS:
+        if si1['label'] == si2['label']:
+            MY_LOGGER.debug('si2 %s', si2)
+            if si1['ok'] == 'Locked':
+                EMAIL_HTML4 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
+            else:
+                EMAIL_HTML4 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
 
-#             CHANGE = 'N'
-#             if si1['ok'] != si2['ok']:
-#                 EMAIL_REQUIRED = True
-#                 CHANGE = 'Y'
-#             EMAIL_HTML4 += '<td align = \"center\">' + CHANGE + '</td>'
+            CHANGE = 'N'
+            if si1['ok'] != si2['ok']:
+                EMAIL_REQUIRED = True
+                CHANGE = 'Y'
+            EMAIL_HTML4 += '<td align = \"center\">' + CHANGE + '</td>'
 
-#             EMAIL_TEXT4 +=  si1['label'] + ' - ' + si1['ok'] + ' - ' + \
-#                 str(si1['skipped_symbols']) + ' - ' + \
-#                 str(si1['reed_solomon_errors']) + ' - ' + str(si1['viterbi_errors']) + \
-#                 ' - ' + wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + ' - '
-#             EMAIL_HTML4 += '<td>' +  si1['label'] + '</td><td>' + si1['ok'] + '</td><td align=\"center\">' + \
-#                 str(si1['skipped_symbols']) + \
-#                 '</td><td align=\"center\">' + str(si1['reed_solomon_errors']) + '</td><td align=\"center\">' + \
-#                 str(si1['viterbi_errors']) + '</td><td>' + \
-#                 wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+            EMAIL_TEXT4 +=  si1['label'] + ' - ' + si1['ok'] + ' - ' + \
+                str(si1['skipped_symbols']) + ' - ' + \
+                str(si1['reed_solomon_errors']) + ' - ' + str(si1['viterbi_errors']) + \
+                ' - ' + wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + ' - '
+            EMAIL_HTML4 += '<td>' +  si1['label'] + '</td><td>' + si1['ok'] + '</td><td align=\"center\">' + \
+                str(si1['skipped_symbols']) + \
+                '</td><td align=\"center\">' + str(si1['reed_solomon_errors']) + '</td><td align=\"center\">' + \
+                str(si1['viterbi_errors']) + '</td><td>' + \
+                wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
 
-# MY_LOGGER.debug('HTML = ' + EMAIL_HTML4)
-# MY_LOGGER.debug('txt = ' + EMAIL_TEXT4)
+MY_LOGGER.debug('HTML = ' + EMAIL_HTML4)
+MY_LOGGER.debug('txt = ' + EMAIL_TEXT4)
 
-# # save last
-# wxcutils.save_json(CONFIG_PATH, 'satellite-receivers.json', LATESTSATSTATUS)
+# save last
+wxcutils.save_json(CONFIG_PATH, 'satellite-receivers.json', LATESTSATSTATUS)
 
-# # validate ping connectivity
-# MY_LOGGER.debug('-**' * 20)
-# PINGS = wxcutils.load_json(CONFIG_PATH, 'pings.json')
-# MY_LOGGER.debug('Testing Pings')
-# MY_LOGGER.debug(PINGS)
-# EMAIL_TEXT5 = ''
-# EMAIL_HTML5 = ''
-# PREVIOUS = ''
-# MY_LOGGER.debug('Retries = %s', PINGS['retries'])
-# MY_LOGGER.debug('Pause = %s', PINGS['pause'])
-# MY_LOGGER.debug('Attempts = %s', PINGS['attempts'])
+# validate ping connectivity
+MY_LOGGER.debug('-**' * 20)
+PINGS = wxcutils.load_json(CONFIG_PATH, 'pings.json')
+MY_LOGGER.debug('Testing Pings')
+MY_LOGGER.debug(PINGS)
+EMAIL_TEXT5 = ''
+EMAIL_HTML5 = ''
+PREVIOUS = ''
+MY_LOGGER.debug('Retries = %s', PINGS['retries'])
+MY_LOGGER.debug('Pause = %s', PINGS['pause'])
+MY_LOGGER.debug('Attempts = %s', PINGS['attempts'])
 
-# for key, value in PINGS.items():
-#     if key == 'addresses':
-#         for ping in PINGS[key]:
-#             MY_LOGGER.debug('-' * 60)
-#             if ping['Active'] == 'yes':
-#                 MY_LOGGER.debug('Testing - %s', ping['description'])
-#                 new_status = 'ERROR'
-#                 loop = 0
-#                 while loop < int(PINGS['retries']):
-#                     if check_ip(ping['ip'], PINGS['attempts']):
-#                         new_status = 'OK'
-#                         break
-#                     loop +=1
-#                     MY_LOGGER.debug('Retry %d of %s', loop, PINGS['retries'])
-#                     MY_LOGGER.debug('Sleep %s seconds', PINGS['pause'])
-#                     time.sleep(int(PINGS['pause']))
-#                 MY_LOGGER.debug(ping)
-#                 MY_LOGGER.debug('new_status = %s', new_status)
-#                 if new_status == 'OK':
-#                     EMAIL_HTML5 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
-#                 else:
-#                     EMAIL_HTML5 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+for key, value in PINGS.items():
+    if key == 'addresses':
+        for ping in PINGS[key]:
+            MY_LOGGER.debug('-' * 60)
+            if ping['Active'] == 'yes':
+                MY_LOGGER.debug('Testing - %s', ping['description'])
+                new_status = 'ERROR'
+                loop = 0
+                while loop < int(PINGS['retries']):
+                    if check_ip(ping['ip'], PINGS['attempts']):
+                        new_status = 'OK'
+                        break
+                    loop +=1
+                    MY_LOGGER.debug('Retry %d of %s', loop, PINGS['retries'])
+                    MY_LOGGER.debug('Sleep %s seconds', PINGS['pause'])
+                    time.sleep(int(PINGS['pause']))
+                MY_LOGGER.debug(ping)
+                MY_LOGGER.debug('new_status = %s', new_status)
+                if new_status == 'OK':
+                    EMAIL_HTML5 += '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
+                else:
+                    EMAIL_HTML5 += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
 
-#                 # get the previous state
-#                 MY_LOGGER.debug('Previous status = %s', ping['status'])
-#                 CHANGE = 'N'
-#                 if new_status != ping['status']:
-#                     EMAIL_REQUIRED = True
-#                     CHANGE = 'Y'
-#                 EMAIL_HTML5 += '<td align = \"center\">' + CHANGE + '</td>'
-#                 ping['status'] = new_status
+                # get the previous state
+                MY_LOGGER.debug('Previous status = %s', ping['status'])
+                CHANGE = 'N'
+                if new_status != ping['status']:
+                    EMAIL_REQUIRED = True
+                    CHANGE = 'Y'
+                EMAIL_HTML5 += '<td align = \"center\">' + CHANGE + '</td>'
+                ping['status'] = new_status
 
-#                 EMAIL_TEXT5 += ping['description'] + ' - '
-#                 EMAIL_HTML5 += '<td>' + ping['description'] + '</td>'
+                EMAIL_TEXT5 += ping['description'] + ' - '
+                EMAIL_HTML5 += '<td>' + ping['description'] + '</td>'
 
-#                 if new_status == 'OK':
-#                     EMAIL_TEXT5 += 'OK - network connectivity is good' + NEWLINE
-#                     EMAIL_HTML5 += '<td>Good connectivity</td><td>' + \
-#                         wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
-#                 else:
-#                     EMAIL_TEXT5 = 'Error - network connecitivity issue  is bad' + NEWLINE
-#                     EMAIL_HTML5 += '<td>Bad connectivity</td><td>' + \
-#                         wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
-#             else:
-#                 MY_LOGGER.debug('Skipping - %s (%s) - inactive', ping['description'], ping['ip'])
-# MY_LOGGER.debug('HTML = ' + EMAIL_HTML5)
-# MY_LOGGER.debug('txt = ' + EMAIL_TEXT5)
+                if new_status == 'OK':
+                    EMAIL_TEXT5 += 'OK - network connectivity is good' + NEWLINE
+                    EMAIL_HTML5 += '<td>Good connectivity</td><td>' + \
+                        wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                else:
+                    EMAIL_TEXT5 = 'Error - network connecitivity issue  is bad' + NEWLINE
+                    EMAIL_HTML5 += '<td>Bad connectivity</td><td>' + \
+                        wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+            else:
+                MY_LOGGER.debug('Skipping - %s (%s) - inactive', ping['description'], ping['ip'])
+MY_LOGGER.debug('HTML = ' + EMAIL_HTML5)
+MY_LOGGER.debug('txt = ' + EMAIL_TEXT5)
 
-# # save last
-# wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
+# save last
+wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
 
 
 # website test

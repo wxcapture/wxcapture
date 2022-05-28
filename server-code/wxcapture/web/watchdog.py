@@ -9,7 +9,6 @@ import smtplib
 import platform
 import ssl
 import sys
-import time
 import subprocess
 from subprocess import Popen, PIPE
 from urllib.request import urlopen
@@ -239,7 +238,6 @@ def send_email(se_text0, se_html0, se_text1, se_html1, se_text2, se_html2, se_te
 
 def drive_validation():
     """validate drive space utilisation"""
-    dv_errors_found = False
     dv_space = 'unknown'
 
     dv_cmd = Popen(['df'], stdout=PIPE, stderr=PIPE)
@@ -318,7 +316,7 @@ try:
         MY_LOGGER.debug('Forcing email to be sent')
 except IndexError as exc:
     MY_LOGGER.debug('Exception whilst parsing command line parameters: %s %s %s',
-                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+                    sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
     MY_LOGGER.debug('Most likely due to no args being passed - fairly safe to ignore')
 
 CSV_FILENAME = 'satstatus.csv'
@@ -350,7 +348,7 @@ MINUTES = int(time.strftime('%M'))
 
 # send status update on first run in a day
 # otherwise only send on a status change
-if (HOURS == 0) and ( 1 < MINUTES < 14):
+if (HOURS == 0) and (1 < MINUTES < 14):
     MY_LOGGER.debug('Daily update email')
     EMAIL_SUBJECT = 'Daily Update'
     EMAIL_REQUIRED = True
@@ -404,7 +402,7 @@ for sd in SATELLITE_DATA:
         MY_LOGGER.debug('Satellite = %s', sd['Display Name'])
         if sd['Last Status'] == 'OK':
             msg = ' is within the receiving threshold ('
-            sat_status = '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>' 
+            sat_status = '<tr><td style=\"background-color:#00FF00\" align=\"center\">OK</td>'
         else:
             msg = ' has exceeded the receiving threshold ('
             sat_status = '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
@@ -509,8 +507,8 @@ for key, value in LATESTNETWORK.items():
                     EMAIL_HTML3 += '<td>' + nc['status'] + '</td><td>' + \
                         wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
 
-MY_LOGGER.debug('HTML = ' + EMAIL_HTML3)
-MY_LOGGER.debug('txt = ' + EMAIL_TEXT3)
+MY_LOGGER.debug('HTML = %s', EMAIL_HTML3)
+MY_LOGGER.debug('txt = %s', EMAIL_TEXT3)
 
 # save last
 wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
@@ -528,7 +526,7 @@ for si1 in LATESTSATSTATUS:
     MY_LOGGER.debug('-' * 20)
     MY_LOGGER.debug('Processing - %s', si1['label'])
     MY_LOGGER.debug('si1 %s', si1)
-    
+
     for si2 in PREVIOUSSATSTATUS:
         if si1['label'] == si2['label']:
             MY_LOGGER.debug('si2 %s', si2)
@@ -543,7 +541,7 @@ for si1 in LATESTSATSTATUS:
                 CHANGE = 'Y'
             EMAIL_HTML4 += '<td align = \"center\">' + CHANGE + '</td>'
 
-            EMAIL_TEXT4 +=  si1['label'] + ' - ' + si1['ok'] + ' - ' + \
+            EMAIL_TEXT4 += si1['label'] + ' - ' + si1['ok'] + ' - ' + \
                 str(si1['skipped_symbols']) + ' - ' + \
                 str(si1['reed_solomon_errors']) + ' - ' + str(si1['viterbi_errors']) + \
                 ' - ' + wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + ' - '
@@ -553,8 +551,8 @@ for si1 in LATESTSATSTATUS:
                 str(si1['viterbi_errors']) + '</td><td>' + \
                 wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
 
-MY_LOGGER.debug('HTML = ' + EMAIL_HTML4)
-MY_LOGGER.debug('txt = ' + EMAIL_TEXT4)
+MY_LOGGER.debug('HTML = %s', EMAIL_HTML4)
+MY_LOGGER.debug('txt = %s', EMAIL_TEXT4)
 
 # save last
 wxcutils.save_json(CONFIG_PATH, 'satellite-receivers.json', LATESTSATSTATUS)
@@ -583,7 +581,7 @@ for key, value in PINGS.items():
                     if check_ip(ping['ip'], PINGS['attempts']):
                         new_status = 'OK'
                         break
-                    loop +=1
+                    loop += 1
                     MY_LOGGER.debug('Retry %d of %s', loop, PINGS['retries'])
                     MY_LOGGER.debug('Sleep %s seconds', PINGS['pause'])
                     time.sleep(int(PINGS['pause']))
@@ -616,8 +614,8 @@ for key, value in PINGS.items():
                         wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
             else:
                 MY_LOGGER.debug('Skipping - %s (%s) - inactive', ping['description'], ping['ip'])
-MY_LOGGER.debug('HTML = ' + EMAIL_HTML5)
-MY_LOGGER.debug('txt = ' + EMAIL_TEXT5)
+MY_LOGGER.debug('HTML = %s', EMAIL_HTML5)
+MY_LOGGER.debug('txt = %s', EMAIL_TEXT5)
 
 # save last
 wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
@@ -629,13 +627,13 @@ MY_LOGGER.debug('website test')
 WEB_START_TIME = time.time()
 try:
     with urlopen("https://kiwiweather.com") as response:
-	    body = response.read()
+        BODY = response.read()
     DURATION = round(time.time() - WEB_START_TIME, 2)
     EMAIL_TEXT6 = str(DURATION) + ' seconds index page load'
     EMAIL_HTML6 = EMAIL_TEXT6
     MY_LOGGER.debug(EMAIL_HTML6)
-except Exception as e:
-    EMAIL_TEXT6 = 'Exception during index page load - ' + str(e)
+except Exception as exc:
+    EMAIL_TEXT6 = 'Exception during index page load - ' + str(exc)
     EMAIL_HTML6 = EMAIL_TEXT6
     MY_LOGGER.debug(EMAIL_HTML6)
 

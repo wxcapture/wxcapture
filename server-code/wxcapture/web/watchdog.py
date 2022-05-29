@@ -624,18 +624,32 @@ wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
 # website test
 MY_LOGGER.debug('-' * 20)
 MY_LOGGER.debug('website test')
+WEBSITE = wxcutils.load_json(CONFIG_PATH, 'website.json')
 WEB_START_TIME = time.time()
+NEW_STATUS = 'OK'
 try:
-    with urlopen("https://kiwiweather.com") as response:
+    with urlopen(WEBSITE['address']) as response:
         BODY = response.read()
     DURATION = round(time.time() - WEB_START_TIME, 2)
-    EMAIL_TEXT6 = str(DURATION) + ' seconds index page load'
-    EMAIL_HTML6 = EMAIL_TEXT6
+    if DURATION > WEBSITE['max time']:
+        NEW_STATUS = 'ERROR'
+        EMAIL_TEXT6 = 'ERROR - ' + str(DURATION) + ' seconds index page load'
+        EMAIL_HTML6 = EMAIL_TEXT6
+    else:
+        EMAIL_TEXT6 = 'OK - ' + str(DURATION) + ' seconds index page load'
+        EMAIL_HTML6 = EMAIL_TEXT6
     MY_LOGGER.debug(EMAIL_HTML6)
 except Exception as exc:
-    EMAIL_TEXT6 = 'Exception during index page load - ' + str(exc)
+    NEW_STATUS = 'ERROR'
+    EMAIL_TEXT6 = 'ERROR - exception during index page load - ' + str(exc)
     EMAIL_HTML6 = EMAIL_TEXT6
     MY_LOGGER.debug(EMAIL_HTML6)
+
+if NEW_STATUS != WEBSITE['status']:
+    EMAIL_REQUIRED = True
+WEBSITE['status'] = NEW_STATUS
+
+wxcutils.save_json(CONFIG_PATH, 'website.json', WEBSITE)
 
 MY_LOGGER.debug('-' * 20)
 

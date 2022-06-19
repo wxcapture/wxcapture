@@ -58,6 +58,7 @@ def find_latest_directory(directory):
     latest = 0
     latest_dir = ''
     for directories in os.listdir(directory):
+        MY_LOGGER.debug('directories %s', directories)
         directories_num = int(directories.replace('-', ''))
         if directories_num > latest:
             latest = directories_num
@@ -796,11 +797,6 @@ def process_himawari(sat_num):
 def process_nws():
     """process nws files"""
 
-    # note that this code is a work around for an issue with goestools
-    # https://github.com/pietern/goestools/issues/100
-    # GOES nws directory / filenames are incorrect #100
-    # once fixed, this code will need to be updated
-
     MY_LOGGER.debug('---------------------------------------------')
     MY_LOGGER.debug('NWS')
     raw_dir = BASEDIR + 'nws/'
@@ -808,84 +804,47 @@ def process_nws():
     fixed_dir = BASEDIR + 'nwsdata/'
     MY_LOGGER.debug('fixed_dir = %s', fixed_dir)
 
-    # move all nws files to the nwsdata directory
-    # fixing the filename and putting into the correct directory
-    # example filename = 19700101T000000Z_20201107060000-pacsfc72_latestBW.gif
-    # remove characters up to and including the _ as these are incorrect
-    raw_directories = find_directories(raw_dir)
-    for raw_directory in raw_directories:
-        # MY_LOGGER.debug('raw_directory = %s', raw_directory)
-        for filename in os.listdir(raw_dir + raw_directory):
-            MY_LOGGER.debug('filename = %s', filename)
-            new_file = filename[17:]
-            # MY_LOGGER.debug('  new_file = %s', new_file)
-            new_date = new_file[:8]
-            MY_LOGGER.debug('    %s', new_date)
-            # create directories (if needed)
-            mk_dir(fixed_dir + new_date)
-            wxcutils.move_file(raw_dir + raw_directory, filename,
-                               fixed_dir + new_date, new_file)
-        # directory should now be empty, if so, remove it
-        if not os.listdir(raw_dir + raw_directory):
-            MY_LOGGER.debug('deleting empty directory - %s', raw_dir + raw_directory)
-            wxcutils.run_cmd('rmdir ' + raw_dir + raw_directory)
+    # get list of directories
+    directories = find_directories(fixed_dir)
 
-    latest_dir = find_latest_directory(fixed_dir)
-    MY_LOGGER.debug('latest_dir = %s', latest_dir)
+    # loop through directories to find files
+    for directory in directories:
+        MY_LOGGER.debug('directory = %s', directory)
+        for filename in os.listdir(fixed_dir + directory):
+                MY_LOGGER.debug('filename = %s', filename)
 
-    # find a list of graphic types in latest directory
-    # example filename = 20201107060000-pacsfc72_latestBW.gif
-    graphic_types = []
-    for filename in os.listdir(fixed_dir + latest_dir):
-        MY_LOGGER.debug('filename = %s', filename)
-        image_type = filename.split('.')[0].split('-')[1]
-        MY_LOGGER.debug('  image_type = %s', image_type)
-        graphic_types.append(image_type)
-    # remove duplicates
-    graphic_types = list(dict.fromkeys(graphic_types))
-    MY_LOGGER.debug('gt = %s', graphic_types)
+                base_filename, extenstion = os.path.splitext(filename)
+                new_filename = 'nws_' + base_filename
 
-    # now go through all images to find the latest of each type using filename
-    for gtype in graphic_types:
-        MY_LOGGER.debug('type = %s', gtype)
-        latest_file = find_latest_filename_contains(fixed_dir + latest_dir, gtype)
+                # see when last saved
+                stored_timestamp = 0.0
+                try:
+                    stored_timestamp = LATESTTIMESTAMPS[new_filename + extenstion]
+                except NameError:
+                    pass
+                except KeyError:
+                    pass
 
-        MY_LOGGER.debug('latest_file = %s', latest_file)
+                # date time for original file
+                latest = os.stat(fixed_dir + directory + '/' + filename).st_mtime
 
-        # process if a file was found
-        if latest_file:
-            filename, extenstion = os.path.splitext(latest_file)
-            new_filename = 'nws_' + gtype
+                MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
 
-            # see when last saved
-            stored_timestamp = 0.0
-            try:
-                stored_timestamp = LATESTTIMESTAMPS[new_filename + extenstion]
-            except NameError:
-                pass
-            except KeyError:
-                pass
+                if stored_timestamp != int(latest):
+                    # new file found which hasn't yet been copied over
+                    # copy to output directory
+                    MY_LOGGER.debug('new_filename = %s', new_filename)
+                    wxcutils.copy_file(fixed_dir + directory + '/' + filename,
+                                       os.path.join(OUTPUT_PATH, new_filename + extenstion))
 
-            # date time for original file
-            latest = (int)(latest_file.split('-')[0])
+                    # create thumbnail
+                    create_thumbnail(new_filename, extenstion)
 
-            MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
+                    # create file with date time info
+                    wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
 
-            if stored_timestamp != int(latest):
-                # new file found which hasn't yet been copied over
-                # copy to output directory
-                MY_LOGGER.debug('new_filename = %s', new_filename)
-                wxcutils.copy_file(os.path.join(fixed_dir + latest_dir, latest_file),
-                                   os.path.join(OUTPUT_PATH, new_filename + extenstion))
-
-                # create thumbnail
-                create_thumbnail(new_filename, extenstion)
-
-                # create file with date time info
-                wxcutils.save_file(OUTPUT_PATH, new_filename + '.txt', get_last_generated_text(new_filename))
-
-                # update latest
-                LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
+                    # update latest
+                    LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
 
 
     MY_LOGGER.debug('---------------------------------------------')

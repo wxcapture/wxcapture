@@ -75,46 +75,46 @@ def do_backup_all():
     errors = []
 
     MY_LOGGER.debug('GK-2A - data')
-    errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '*_sanchez* *web*', 'pi@192.168.100.15:/home/pi/goes/gk-2a/', '/mnt/f/Satellites/gk-2a/LRIT/')})
+    errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '*_sanchez* *web*', 'pi@192.168.100.24:/home/pi/goes/gk-2a/', '/mnt/f/Satellites/gk-2a/LRIT/')})
 
     MY_LOGGER.debug('GK-2A - gamma')
     errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')})
 
     MY_LOGGER.debug('NWS')
-    errors.append({'type': 'NWS', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')})
+    errors.append({'type': 'NWS', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')})
 
     MY_LOGGER.debug('GOES 13')
-    errors.append({'type': 'GOES 13', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes13/', '/mnt/f/Satellites/goes13/')})
+    errors.append({'type': 'GOES 13', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/goes13/', '/mnt/f/Satellites/goes13/')})
 
     MY_LOGGER.debug('GOES 14')
-    errors.append({'type': 'GOES 14', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes14/', '/mnt/f/Satellites/goes14/')})
+    errors.append({'type': 'GOES 14', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/goes14/', '/mnt/f/Satellites/goes14/')})
 
     MY_LOGGER.debug('GOES 15')
-    errors.append({'type': 'GOES 15', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes15/', '/mnt/f/Satellites/goes15/')})
+    errors.append({'type': 'GOES 15', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/goes15/', '/mnt/f/Satellites/goes15/')})
 
     MY_LOGGER.debug('GOES 15 GVAR')
-    errors.append({'type': 'GOES 15 GVAR', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes15gvar/', '/mnt/f/Satellites/goes15gvar/')})
+    errors.append({'type': 'GOES 15 GVAR', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/goes15gvar/', '/mnt/f/Satellites/goes15gvar/')})
 
     MY_LOGGER.debug('GOES 16')
-    errors.append({'type': 'GOES 16', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')})
+    errors.append({'type': 'GOES 16', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/goes16/', '/mnt/f/Satellites/goes16/')})
 
     MY_LOGGER.debug('GOES 17')
-    errors.append({'type': 'GOES 17', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/goes17/', '/mnt/f/Satellites/goes17/')})
+    errors.append({'type': 'GOES 17', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/goes17/', '/mnt/f/Satellites/goes17/')})
 
     MY_LOGGER.debug('Himawari 8')
-    errors.append({'type': 'Himawari 8', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')})
+    errors.append({'type': 'Himawari 8', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')})
 
     MY_LOGGER.debug('EWS-G1')
-    errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/EWS-G1/', '/mnt/f/Satellites/ews-g1/')})
+    errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/EWS-G1/', '/mnt/f/Satellites/ews-g1/')})
 
     MY_LOGGER.debug('Electro-L 2')
-    errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/electro-l-2/', '/mnt/f/Satellites/electro-l-2/')})
+    errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/electro-l-2/', '/mnt/f/Satellites/electro-l-2/')})
 
     MY_LOGGER.debug('Sanchez')
-    errors.append({'type': 'Sanchez', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/sanchez/', '/mnt/f/Satellites/sanchez/')})
+    errors.append({'type': 'Sanchez', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/sanchez/', '/mnt/f/Satellites/sanchez/')})
 
     MY_LOGGER.debug('Web')
-    errors.append({'type': 'WEB', 'errors': do_rsync('caWv', '', 'pi@192.168.100.15:/home/pi/goes/web/', '/mnt/f/Satellites/web/')})
+    errors.append({'type': 'WEB', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/web/', '/mnt/f/Satellites/web/')})
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')
     errors.append({'type': 'NOAA / Meteor / ISS - data', 'errors': do_rsync('caWv', '',
@@ -215,7 +215,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'GK-2A - data - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                         'pi@192.168.100.15:/home/pi/goes/gk-2a/' + date_dir + '/',
+                                         'pi@192.168.100.24:/home/pi/goes/gk-2a/' + date_dir + '/',
                                          '/mnt/f/Satellites/gk-2a/LRIT/' + date_dir + '/')})
 
     # exclude as all GK-2A data goes to data
@@ -236,7 +236,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'NWS - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                          'pi@192.168.100.15:/home/pi/goes/nwsdata/' + date_dir + '/',
+                                          'pi@192.168.100.24:/home/pi/goes/nwsdata/' + date_dir + '/',
                                           '/mnt/f/Satellites/nwsdata/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 13')
@@ -246,7 +246,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'GOES13 - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                         'pi@192.168.100.15:/home/pi/goes/goes13/' + date_dir + '/',
+                                         'pi@192.168.100.24:/home/pi/goes/goes13/' + date_dir + '/',
                                          '/mnt/f/Satellites/goes13/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 13 web Data')
@@ -260,7 +260,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'GOES 13 web - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/web/goes13/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/web/goes13/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/goes13/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 14')
@@ -270,7 +270,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'GOES14 - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                         'pi@192.168.100.15:/home/pi/goes/goes14/' + date_dir + '/',
+                                         'pi@192.168.100.24:/home/pi/goes/goes14/' + date_dir + '/',
                                          '/mnt/f/Satellites/goes14/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 15 GVAR')
@@ -280,7 +280,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'GOES15 GVAR - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                         'pi@192.168.100.15:/home/pi/goes/goes15gvar/' + date_dir + '/',
+                                         'pi@192.168.100.24:/home/pi/goes/goes15gvar/' + date_dir + '/',
                                          '/mnt/f/Satellites/goes15gvar/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 15')
@@ -293,7 +293,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'GOES 15 - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/goes15/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/goes15/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/goes15/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 16')
@@ -312,7 +312,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'GOES 16 - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/goes16/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/goes16/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/goes16/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('EWS-G1')
@@ -322,7 +322,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'EWS-G1 - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                         'pi@192.168.100.15:/home/pi/goes/EWS-G1/' + date_dir + '/',
+                                         'pi@192.168.100.24:/home/pi/goes/EWS-G1/' + date_dir + '/',
                                          '/mnt/f/Satellites/ews-g1/' + date_dir + '/')})
 
     MY_LOGGER.debug('Electro-L 2')
@@ -332,7 +332,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'Electro-L 2 - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                         'pi@192.168.100.15:/home/pi/goes/electro-l-2/' + date_dir + '/',
+                                         'pi@192.168.100.24:/home/pi/goes/electro-l-2/' + date_dir + '/',
                                          '/mnt/f/Satellites/electro-l-2/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 16 Sanchez Data')
@@ -347,7 +347,7 @@ def do_backup_new():
 
             errors.append({'type': 'GOES 16 Sanchez - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/sanchez/goes16/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/sanchez/goes16/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/sanchez/goes16/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 16 web Data')
@@ -362,7 +362,7 @@ def do_backup_new():
 
             errors.append({'type': 'GOES 16 web - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/web/goes16/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/web/goes16/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/goes16/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 17')
@@ -378,7 +378,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'GOES 17 - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/goes17/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/goes17/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/goes17/' + dir + '/' + date_dir + '/')})
 
 
@@ -393,7 +393,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/sanchez/goes17/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/sanchez/goes17/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/sanchez/goes17/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('Combined Sanchez Data')
@@ -407,7 +407,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'GOES 17 Sanchez - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/web/combined/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/web/combined/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/combined/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 17 web Data')
@@ -425,7 +425,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'GOES 17 web - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/web/goes17/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/web/goes17/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/goes17/' + dir + '/' + date_dir + '/')})
 
 
@@ -435,7 +435,7 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'Himawari 8 - ' + dir + ' - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                          'pi@192.168.100.15:/home/pi/goes/himawari8/fd/' + date_dir + '/',
+                                          'pi@192.168.100.24:/home/pi/goes/himawari8/fd/' + date_dir + '/',
                                           '/mnt/f/Satellites/himawari8/fd/' + date_dir + '/')})
 
     MY_LOGGER.debug('Himawari 8 web Data')
@@ -449,7 +449,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'Himawari 17 web - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/web/himawari8/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/web/himawari8/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/himawari8/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('Himawari 8 Sanchez Data')
@@ -463,7 +463,7 @@ def do_backup_new():
             MY_LOGGER.debug('date = %s', date_dir)
             errors.append({'type': 'Himawari 17 Sanchez - ' + dir + ' - ' + date_dir,
                            'errors': do_rsync('caWv', '',
-                                              'pi@192.168.100.15:/home/pi/goes/sanchez/himawari8/' + dir + '/' + date_dir + '/',
+                                              'pi@192.168.100.24:/home/pi/goes/sanchez/himawari8/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/sanchez/himawari8/' + dir + '/' + date_dir + '/')})
 
     MY_LOGGER.debug('NOAA / Meteor / ISS')

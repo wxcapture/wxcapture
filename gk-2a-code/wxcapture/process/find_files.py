@@ -510,7 +510,7 @@ if number_processes('find_files.py') == 1:
     wxcutils.run_cmd('rsync -rtPv ' + OUTPUT_PATH +
                      ' mike@192.168.100.18:/home/mike/wxcapture/gk-2a')
     wxcutils.run_cmd('rsync -rtPv ' + BASE_DIR +
-                     ' --exclude *_sanchez* --exclude *web* pi@192.168.100.15:/home/pi/goes/gk-2a')
+                     ' --exclude *_sanchez* --exclude *web* pi@192.168.100.24:/home/pi/goes/gk-2a')
 
 
 else:

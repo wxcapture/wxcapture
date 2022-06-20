@@ -21,7 +21,7 @@ def long_check(lc_process):
 
     cmd = subprocess.Popen(('ps', '-eo', 'pid,etimes,cmd'), stdout=subprocess.PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
+    # MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
     MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
 
     rows = stdout.decode('utf-8').splitlines()
@@ -155,7 +155,8 @@ def drive_validation():
     MY_LOGGER.debug('stderr:%s', dv_stderr)
     dv_results = dv_stdout.decode('utf-8').splitlines()
     for dv_line in dv_results:
-        if '/home' in dv_line:
+        if '/dev/sda1' in dv_line:
+            MY_LOGGER.debug('used for / - %s', dv_stdout)
             dv_space = dv_line.split()[4].split('%')[0]
     MY_LOGGER.debug('dv_space  = %s used on %s', dv_space, platform.node())
     wxcutils.save_file(OUTPUT_PATH, 'used-' + platform.node() + '.txt', dv_space)

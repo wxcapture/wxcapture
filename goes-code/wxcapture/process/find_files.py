@@ -799,22 +799,21 @@ def process_nws():
 
     MY_LOGGER.debug('---------------------------------------------')
     MY_LOGGER.debug('NWS')
-    raw_dir = BASEDIR + 'nws/'
-    MY_LOGGER.debug('raw_dir = %s', raw_dir)
-    fixed_dir = BASEDIR + 'nwsdata/'
-    MY_LOGGER.debug('fixed_dir = %s', fixed_dir)
+    nws_dir = BASEDIR + 'nws/'
+    MY_LOGGER.debug('nws_dir = %s', nws_dir)
 
     # get list of directories
-    directories = find_directories(fixed_dir)
+    directories = find_directories(nws_dir)
 
     # loop through directories to find files
     for directory in directories:
         MY_LOGGER.debug('directory = %s', directory)
-        for filename in os.listdir(fixed_dir + directory):
+        for filename in os.listdir(nws_dir + directory):
                 MY_LOGGER.debug('filename = %s', filename)
 
                 base_filename, extenstion = os.path.splitext(filename)
-                new_filename = 'nws_' + base_filename
+                # remove the first 17 characters to remove the date time part
+                new_filename = 'nws_' + base_filename[17:]
 
                 # see when last saved
                 stored_timestamp = 0.0
@@ -826,15 +825,16 @@ def process_nws():
                     pass
 
                 # date time for original file
-                latest = os.stat(fixed_dir + directory + '/' + filename).st_mtime
+                latest = os.stat(nws_dir + directory + '/' + filename).st_mtime
 
                 MY_LOGGER.debug('stored_timestamp = %f, latest = %f', stored_timestamp, latest)
 
-                if stored_timestamp != int(latest):
+                # if latest is newer than the stored one
+                if stored_timestamp < int(latest):
                     # new file found which hasn't yet been copied over
                     # copy to output directory
                     MY_LOGGER.debug('new_filename = %s', new_filename)
-                    wxcutils.copy_file(fixed_dir + directory + '/' + filename,
+                    wxcutils.copy_file(nws_dir + directory + '/' + filename,
                                        os.path.join(OUTPUT_PATH, new_filename + extenstion))
 
                     # create thumbnail

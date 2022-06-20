@@ -81,7 +81,7 @@ def do_backup_all():
     errors.append({'type': 'GK-2A', 'errors': do_rsync('caWv', '', 'pi@192.168.100.7:/home/pi/gk-2a/xrit-rx/received/LRIT/', '/mnt/f/Satellites/gk-2a/LRIT/')})
 
     MY_LOGGER.debug('NWS')
-    errors.append({'type': 'NWS', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/nwsdata/', '/mnt/f/Satellites/nwsdata/')})
+    errors.append({'type': 'NWS', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/nws/', '/mnt/f/Satellites/nws/')})
 
     MY_LOGGER.debug('GOES 13')
     errors.append({'type': 'GOES 13', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/goes13/', '/mnt/f/Satellites/goes13/')})
@@ -236,8 +236,8 @@ def do_backup_new():
         MY_LOGGER.debug('date = %s', date_dir)
         errors.append({'type': 'NWS - ' + date_dir,
                        'errors': do_rsync('caWv', '',
-                                          'pi@192.168.100.24:/home/pi/goes/nwsdata/' + date_dir + '/',
-                                          '/mnt/f/Satellites/nwsdata/' + date_dir + '/')})
+                                          'pi@192.168.100.24:/home/pi/goes/nws/' + date_dir + '/',
+                                          '/mnt/f/Satellites/nws/' + date_dir + '/')})
 
     MY_LOGGER.debug('GOES 13')
     # get all dates between the ranges

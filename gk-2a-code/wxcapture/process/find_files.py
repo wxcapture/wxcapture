@@ -212,12 +212,12 @@ def animate(a_directory, a_filename, a_extenstion, a_frames, a_suffix):
 
     wxcutils.run_cmd('ffmpeg -y -safe 0 -f concat -i ' + WORKING_PATH +
                      'framelist.txt -c:v libx264 -pix_fmt yuv420p -vf scale=800:800 ' + \
-                      OUTPUT_PATH + 'FD-' + a_suffix + '-' + str(a_frames) + '.mp4')
+                      OUTPUT_PATH + 'FD-' + a_suffix + '.mp4')
 
     # create file with date time info
     date_time = 'Last generated at ' + get_local_date_time() + ' ' + \
         LOCAL_TIME_ZONE + ' [' + get_utc_date_time() + ' UTC].'
-    wxcutils.save_file(OUTPUT_PATH, 'FD-' + a_suffix + '-' + str(a_frames) + '.txt', date_time)
+    wxcutils.save_file(OUTPUT_PATH, 'FD-' + a_suffix + '.txt', date_time)
 
 
 def create_branded(satellite):
@@ -406,7 +406,7 @@ if number_processes('find_files.py') == 1:
         MY_LOGGER.debug('extenstion = %s', extenstion)
 
         # date time for original file
-        latest = os. path. getmtime(os.path.join(location, latest_file))
+        latest = int(os. path. getmtime(os.path.join(location, latest_file)))
         MY_LOGGER.debug('latest = %d', latest)
         latest_local = wxcutils.epoch_to_local(latest, '%a %d %b %H:%M')
         MY_LOGGER.debug('latest_local = %s', latest_local)

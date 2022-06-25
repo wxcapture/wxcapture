@@ -544,9 +544,11 @@ CAPTURES_PAGE = 'captures.html'
 try:
     # see if args passed
     try:
-        REBUILD = sys.argv[1]
+        REBUILD = sys.argv[1].lower()
     except:
         REBUILD = ''
+    MY_LOGGER.debug('REBUILD = %s', REBUILD)
+
     # get local time zone
     LOCAL_TIME_ZONE = subprocess.check_output("date").decode('utf-8').split(' ')[-2]
 

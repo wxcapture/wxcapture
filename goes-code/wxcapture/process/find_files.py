@@ -14,6 +14,35 @@ import cv2
 import wxcutils
 
 
+def kill_old_process(pa_text, pa_age):
+    """kill old processes over an threshold age"""
+
+    MY_LOGGER.debug('pa_text = %s', pa_text)
+    pa_pid = pa_text.split()[1]
+    MY_LOGGER.debug('pa_pid = %s', pa_pid)
+
+    pa_time = 0
+    try:
+        cmd = subprocess.Popen(('ps', '-p', pa_pid, '-o', 'etimes'),
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = cmd.communicate()
+        MY_LOGGER.debug('output = %s', stdout.decode('utf-8'))
+        pa_time = stdout.decode('utf-8').splitlines()[1]
+        MY_LOGGER.debug('pa_time = %s', pa_time)
+    except:
+        # note this unlikely unless process has completed very recently
+        MY_LOGGER.debug('%s is NOT running???', pa_text)
+
+    if int(pa_time) > int(pa_age):
+        # kill process
+        MY_LOGGER.debug('Killing process as running too long - %s', pa_text)
+        wxcutils.run_cmd('kill ' + str(pa_pid))
+        return True
+
+    MY_LOGGER.debug('Process is young enough - %s', pa_text)
+    return False
+
+
 def number_processes(process_name):
     """see how many processes are running"""
     try:
@@ -28,7 +57,11 @@ def number_processes(process_name):
                 # ignore grep or cron lines
                 process_count += 0
             else:
-                process_count += 1
+                # get age and kill if too old (20 minutes)
+                if kill_old_process(line, 1200):
+                    process_count += 0
+                else:
+                    process_count += 1
         MY_LOGGER.debug('%d process(es) are running', process_count)
         return process_count
     except:

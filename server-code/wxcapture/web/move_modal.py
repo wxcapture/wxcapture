@@ -17,6 +17,78 @@ import wxcutils
 import fix_pass_pages_lib
 
 
+def kill_old_process(pa_text, pa_age):
+    """kill old processes over an threshold age"""
+
+    MY_LOGGER.debug('pa_text = %s', pa_text)
+    pa_pid = pa_text.split()[1]
+    MY_LOGGER.debug('pa_pid = %s', pa_pid)
+
+    pa_time = 0
+    try:
+        cmd = subprocess.Popen(('ps', '-p', pa_pid, '-o', 'etimes'),
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = cmd.communicate()
+        MY_LOGGER.debug('output = %s', stdout.decode('utf-8'))
+        pa_time = stdout.decode('utf-8').splitlines()[1]
+        MY_LOGGER.debug('pa_time = %s', pa_time)
+    except:
+        # note this unlikely unless process has completed very recently
+        MY_LOGGER.debug('%s is NOT running???', pa_text)
+
+    if int(pa_time) > int(pa_age):
+        # kill process
+        MY_LOGGER.debug('Killing process as running too long - %s', pa_text)
+        wxcutils.run_cmd('kill ' + str(pa_pid))
+        return True
+
+    MY_LOGGER.debug('Process is young enough - %s', pa_text)
+    return False
+
+
+def number_processes(process_name):
+    """see how many processes are running"""
+    try:
+        cmd = subprocess.Popen(('ps', '-ef'), stdout=subprocess.PIPE)
+        output = subprocess.check_output(('grep', process_name), stdin=cmd.stdout)
+        cmd.wait()
+        MY_LOGGER.debug('output = %s', output.decode('utf-8'))
+        process_count = 0
+        lines = output.decode('utf-8').splitlines()
+        for line in lines:
+            MY_LOGGER.debug('--')
+            if 'grep' in line:
+                process_count += 0
+                MY_LOGGER.debug('ignoring grep %s', line)
+            elif '/bin/sh' in line:
+                process_count += 0
+                MY_LOGGER.debug('ignoring /bin/sh %s', line)
+            elif '/bin/bash' in line:
+                process_count += 0
+                MY_LOGGER.debug('ignoring /bin/bash %s', line)
+            elif 'sudo' in line:
+                process_count += 0
+                MY_LOGGER.debug('ignoring sudo %s', line)
+            else:
+                # get age and kill if too old (20 minutes)
+                if kill_old_process(line, 1200):
+                    process_count += 0
+                    MY_LOGGER.debug('killed %s', line)
+                else:
+                    process_count += 1
+                    MY_LOGGER.debug('counting %s', line)
+            MY_LOGGER.debug('--')
+        MY_LOGGER.debug('%d process(es) are running', process_count)
+        return process_count
+    except:
+        # note this should not be possible!
+        MY_LOGGER.critical('Exception handler: %s %s %s',
+                           sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+        MY_LOGGER.debug('%s is NOT running', process_name)
+    MY_LOGGER.debug('%s is NOT running', process_name)
+    return 0
+
+
 def mk_dir(directory):
     """only create if it does not already exist"""
     MY_LOGGER.debug('Make? %s', directory)
@@ -542,50 +614,54 @@ TARGET = CONFIG_INFO['web doc root location']
 CAPTURES_PAGE = 'captures.html'
 
 try:
-    # see if args passed
-    try:
-        REBUILD = sys.argv[1].lower()
-    except:
-        REBUILD = ''
-    MY_LOGGER.debug('REBUILD = %s', REBUILD)
+    # check if move_modal is already running, if so exit this code
+    if number_processes('move_modal.py') == 1:
+        # see if args passed
+        try:
+            REBUILD = sys.argv[1].lower()
+        except:
+            REBUILD = ''
+        MY_LOGGER.debug('REBUILD = %s', REBUILD)
 
-    # get local time zone
-    LOCAL_TIME_ZONE = subprocess.check_output("date").decode('utf-8').split(' ')[-2]
+        # get local time zone
+        LOCAL_TIME_ZONE = subprocess.check_output("date").decode('utf-8').split(' ')[-2]
 
-    # load config
-    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+        # load config
+        CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
 
-    # load satellites
-    SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')
+        # load satellites
+        SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'satellites.json')
 
-    SAT_DATA = []
-    for key, value in SATELLITE_INFO.items():
-        for sat in SATELLITE_INFO[key]:
-            SAT_DATA.append({'code': sat['name'].replace(' ', '_').replace('(', '').replace(')', ''), 'name': sat['name']})
+        SAT_DATA = []
+        for key, value in SATELLITE_INFO.items():
+            for sat in SATELLITE_INFO[key]:
+                SAT_DATA.append({'code': sat['name'].replace(' ', '_').replace('(', '').replace(')', ''), 'name': sat['name']})
 
-    MY_LOGGER.debug('Starting file moving')
-    FILES_MOVED = move_output_files()
-    MY_LOGGER.debug('Finished file moving')
+        MY_LOGGER.debug('Starting file moving')
+        FILES_MOVED = move_output_files()
+        MY_LOGGER.debug('Finished file moving')
 
-    if FILES_MOVED:
-        wxcutils.run_cmd('touch ' + TARGET + 'polar.txt')
+        if FILES_MOVED:
+            wxcutils.run_cmd('touch ' + TARGET + 'polar.txt')
 
-    if FILES_MOVED or REBUILD == 'rebuild':
-        MY_LOGGER.debug('Build json passes file')
-        ALL_PASSES = []
-        build_pass_json()
-        MY_LOGGER.debug('Finished json passes file')
+        if FILES_MOVED or REBUILD == 'rebuild':
+            MY_LOGGER.debug('Build json passes file')
+            ALL_PASSES = []
+            build_pass_json()
+            MY_LOGGER.debug('Finished json passes file')
 
-        MY_LOGGER.debug('Starting capture page building')
-        build_capture_pages()
-        MY_LOGGER.debug('Finished capture page building')
-    elif int(time.strftime('%H')) == 1 and int(time.strftime('%M')) in (0, 1) or REBUILD == 'rebuild':
-        MY_LOGGER.debug('Starting capture page building - overnight run')
-        build_capture_pages()
-        MY_LOGGER.debug('Finished capture page building - overnight run')
+            MY_LOGGER.debug('Starting capture page building')
+            build_capture_pages()
+            MY_LOGGER.debug('Finished capture page building')
+        elif int(time.strftime('%H')) == 1 and int(time.strftime('%M')) in (0, 1) or REBUILD == 'rebuild':
+            MY_LOGGER.debug('Starting capture page building - overnight run')
+            build_capture_pages()
+            MY_LOGGER.debug('Finished capture page building - overnight run')
+        else:
+            MY_LOGGER.debug('No further work required.')
     else:
-        MY_LOGGER.debug('No further work required.')
-
+        MY_LOGGER.debug('Another instance of move_modal.py is already running')
+        MY_LOGGER.debug('Skip running this instance to allow the existing one to complete')
 except:
     MY_LOGGER.critical('Global exception handler: %s %s %s',
                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])

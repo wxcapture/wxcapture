@@ -161,6 +161,141 @@
          ]
       },
       {
+         "Filename":"goes_18_fd_fc-tn.jpg",
+         "Textlines":[
+            "Latest GOES 18 weather satellite full colour image for the Pacific and Americas",
+            "Visible light image of the Pacific / Americas from GOES 18",
+            "Amazing weather satellite image from GOES 18 over the Pacific and Americas",
+            "Blue marble viewed from space - incredible beauty in this image"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#Pacific",
+            "#Americas"
+         ]
+      },
+      {
+         "Filename":"goes_18_m1_fc-tn.jpg",
+         "Textlines":[
+            "Latest GOES 18 weather satellite full colour detail image (normally California)",
+            "Full colour satellite image (often California)",
+            "Amazing weather satellite image (normally California)",
+            "Close look at the US from space, mainly California or for interesting weather elsewhere"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#California",
+            "#USA"
+         ]
+      },
+      {
+         "Filename":"goes18-m1-ch07-144-800x800.mp4",
+         "Textlines":[
+            "Latest GOES 18 weather satellite infrared detail 3 day video (normally California)",
+            "Infrared satellite video, often California, last 3 days",
+            "Amazing weather satellite 3 day video (normally California)",
+            "Close look at the US from space, mainly California or for interesting weather elsewhere for the last 3 days"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#California",
+            "#USA"
+         ]
+      },
+      {
+         "Filename":"goes18-m1-fc-144-800x800.mp4",
+         "Textlines":[
+            "Latest GOES 18 weather satellite 3 day video (normally California) skipping darkness",
+            "Colour satellite video, often California, last 3 days missing the nights",
+            "Amazing weather satellite 3 day (no night) video (normally California)",
+            "Close look at an area of the US from space, mainly California or for interesting weather elsewhere for the last 3 days"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#California",
+            "#USA"
+         ]
+      },
+      {
+         "Filename":"goes_18_m1_ch07-tn.jpg",
+         "Textlines":[
+            "Latest GOES 18 weather satellite infra red image (normally California)",
+            "Infra red satellite image (often California)",
+            "Amazing weather satellite image (normally California)",
+            "Close look at the US from space in infrared, mainly California or for interesting weather elsewhere"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#California",
+            "#USA"
+         ]
+      },
+      {
+         "Filename":"goes_18_m2_fc-tn.jpg",
+         "Textlines":[
+            "Latest GOES 18 weather satellite full colour detail image (normally Alaska)",
+            "Full colour satellite image (often Alaska)",
+            "Amazing weather satellite image (normally Alaska)",
+            "Close look at the US from space, mainly Alaska or for interesting weather elsewhere"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#Alaska",
+            "#USA"
+         ]
+      },
+      {
+         "Filename":"goes18-m2-ch07-144-800x800.mp4",
+         "Textlines":[
+            "Latest GOES 18 weather satellite infrared detail 3 day video (normally Alaska)",
+            "Infrared satellite video, often Alaska, last 3 days",
+            "Amazing weather satellite 3 day video (normally Alaska)",
+            "Close look at the US from space, mainly Alaska or for interesting weather elsewhere for the last 3 days"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#Alaska",
+            "#USA"
+         ]
+      },
+      {
+         "Filename":"goes18-m2-fc-144-800x800.mp4",
+         "Textlines":[
+            "Latest GOES 18 weather satellite 3 day video (normally Alaska) skipping darkness",
+            "Colour satellite video, often Alaska, last 3 days missing the nights",
+            "Amazing weather satellite 3 day (no night) video (normally Alaska)",
+            "Close look at an area of the US from space, mainly Alaska or for interesting weather elsewhere for the last 3 days"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#Alaska",
+            "#USA"
+         ]
+      },
+      {
+         "Filename":"goes_18_m2_ch07-tn.jpg",
+         "Textlines":[
+            "Latest GOES 18 weather satellite infra red image (normally Alaska)",
+            "Infra red satellite image (often Alaska)",
+            "Amazing weather satellite image (normally Alaska)",
+            "Close look at the US from space in infrared, mainly Alaska or for interesting weather elsewhere"
+         ],
+         "hashtags":[
+            "#GOES18",
+            "#GOES",
+            "#Alaska",
+            "#USA"
+         ]
+      },
+      {
          "Filename":"goes_16_fd_ch13_enhanced-tn.jpg",
          "Textlines":[
             "Latest GOES 16 weather satellite enhanced IR image - Americas / Atlantic",

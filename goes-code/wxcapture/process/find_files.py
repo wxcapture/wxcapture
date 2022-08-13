@@ -173,11 +173,13 @@ def do_sanchez(ds_src, ds_dest, ds_channel):
     MY_LOGGER.debug('Sanchez processing %s %s', ds_src, ds_dest)
     if ds_channel == 'fc':
         MY_LOGGER.debug('Doing full colour sanchez')
-        cmd = '/home/pi/sanchezFC/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f'
+        cmd = '/home/pi/sanchezFC/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f -D ' + CONFIG_PATH + \
+              'Satellites-IR.json'
     else:
         MY_LOGGER.debug('Doing IR sanchez')
         cmd = '/home/pi/sanchez/Sanchez reproject -u ' + CONFIG_PATH + 'world.2004' + str(datetime.now().month).zfill(2) + \
-              '.3x5400x2700.jpg -s ' + ds_src + ' -o ' + ds_dest + ' -La -r 4 -f'
+              '.3x5400x2700.jpg -s ' + ds_src + ' -o ' + ds_dest + ' -La -r 4 -f  -D ' + CONFIG_PATH + \
+              'Satellites-IR.json'
     MY_LOGGER.debug(cmd)
     wxcutils.run_cmd(cmd)
     MY_LOGGER.debug('Sanchez processing completed')
@@ -554,10 +556,11 @@ def process_goes(sat_num):
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
 
-                # generate sanchezFC image if GOES17 and fd and fc/ch13 image
-                if sat_num == '17' and type_directory == 'fd' and channel_directory in ['fc', 'ch13']:
+                # generate sanchezFC image if GOES 17 / 18  and fd and fc/ch13 image
+                if sat_num in ('17', '18') and type_directory == 'fd' and channel_directory in ['fc', 'ch13']:
                     sanchez_dir = SANCHEZ_PATH + 'goes' + sat_num + '/' + type_directory + '/' + channel_directory + '/'
                     # create directory (if needed)
+                    mk_dir(sanchez_dir)
                     mk_dir(sanchez_dir + latest_directory)
                     san_file_dir = sanchez_dir + latest_directory
 
@@ -566,7 +569,7 @@ def process_goes(sat_num):
                                san_file_dir + '/' + latest_file.replace('.jpg', '-sanchez.jpg'),
                                channel_directory)
 
-                    web_file = create_branded('goes', '17', 'fd', channel_directory + 'sanchez', san_file_dir, latest_file.replace('.jpg', '-sanchez'), '.jpg', im_date, im_time)
+                    web_file = create_branded('goes', sat_num, 'fd', channel_directory + 'sanchez', san_file_dir, latest_file.replace('.jpg', '-sanchez'), '.jpg', im_date, im_time)
 
                     # copy to output directory
                     MY_LOGGER.debug('new_filename = %s', new_filename)
@@ -579,10 +582,10 @@ def process_goes(sat_num):
                     # create file with date time info
                     wxcutils.save_file(OUTPUT_PATH, new_filename + '-sanchez' + '.txt', get_last_generated_text(new_filename))
 
-                    # if file is a GOES17 / fd / ch13, then do a stitch of all available sats
-                    # GOES 16 / 17 / Himawari 8 / GK-2A
+                    # if file is a GOES17 (or 18) / fd / ch13, then do a stitch of all available sats
+                    # GOES 16 / 17 / 18 / Himawari 8 / GK-2A
                     # at the current UTC time
-                    if sat_num == '17' and type_directory == 'fd' and channel_directory == 'ch13':
+                    if sat_num in ('17', '18') and type_directory == 'fd' and channel_directory == 'ch13':
                         # create directory (if needed)
                         combined_dir = SANCHEZ_PATH + 'combined' + '/'
                         combined_file_dir = combined_dir + 'fd/ir/' + latest_directory
@@ -800,15 +803,16 @@ def process_himawari(sat_num):
                 MY_LOGGER.debug('sanchez_dir = %s', sanchez_dir)
 
                 # create directory (if needed)
+                mk_dir(sanchez_dir)
                 mk_dir(sanchez_dir + latest_directory)
                 san_file_dir = sanchez_dir + latest_directory
 
                 # create sanchez image
                 do_sanchez(os.path.join(latest_dir, latest_file),
-                            san_file_dir + '/' + latest_file.replace('.jpg', '-sanchez.jpg'),
+                            san_file_dir + '/' + latest_file.replace(extenstion, '-sanchez' + extenstion),
                             image_type)
                 
-                web_file = create_branded('himawari', sat_num, type_directory, image_type + 'sanchez', san_file_dir, latest_file.replace('.jpg', '-sanchez'), '.jpg', im_date, im_time)
+                web_file = create_branded('himawari', sat_num, type_directory, image_type + 'sanchez', san_file_dir, latest_file.replace(extenstion, '-sanchez'), extenstion, im_date, im_time)
 
                 # copy to output directory
                 MY_LOGGER.debug('new_filename = %s', new_filename)
@@ -883,11 +887,11 @@ def process_nws():
     MY_LOGGER.debug('---------------------------------------------')
 
 
-def create_animation(ca_satellite, ca_directory, ca_file_match, ca_frames, ca_duration, ca_resolution, ca_selection, ca_min_size):
+def create_animation(ca_satellite, ca_directory, ca_file_match, ca_frames, ca_duration, ca_resolution, ca_selection, ca_min_size, ca_end_frame):
     """create animation from images - type / channel / date format directories"""
 
-    MY_LOGGER.debug('create_animation satellite = %s, directory = %s, file_match = %s, frames = %s, duration = %s, resolution = %s',
-                    ca_satellite, ca_directory, ca_file_match, ca_frames, ca_duration, ca_resolution)
+    MY_LOGGER.debug('create_animation satellite = %s, directory = %s, file_match = %s, frames = %s, duration = %s, resolution = %s, selection = %s, min_size = %s, end_frame = %s',
+                    ca_satellite, ca_directory, ca_file_match, ca_frames, ca_duration, ca_resolution, ca_selection, ca_min_size, ca_end_frame)
 
     # filename
     ca_filename = ca_directory.replace('/', '-') + '-' + str(ca_frames) + '-' + ca_resolution.replace(':', 'x')
@@ -922,7 +926,8 @@ def create_animation(ca_satellite, ca_directory, ca_file_match, ca_frames, ca_du
                 else:
                     if ca_frame_counter == 0:
                         # this is the last frame to render, to also add end frame
-                        ca_text = ca_entry + ca_duration_text + ca_end_frame
+                        if ca_end_frame == 'Y':
+                            ca_text = ca_entry + ca_duration_text + ca_end_frame
                     else:
                         ca_text = ca_entry + ca_duration_text + ca_text
                     ca_frame_counter += 1
@@ -973,7 +978,7 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 # try:
 
 # check if find_files is already running, if so exit this code
-if number_processes('find_files.py') == 1:
+if number_processes(MODULE + '.py') == 1:
     # get local time zone
     LOCAL_TIME_ZONE = subprocess.check_output("date"). \
         decode('utf-8').split(' ')[-2]
@@ -1001,6 +1006,9 @@ if number_processes('find_files.py') == 1:
     # process Himawari 8 files
     process_himawari('8')
 
+    # process GOES 18 files
+    process_goes('18')
+
     # process GOES 17 files
     # do this one last of the image files so we've got the other
     # image files already loaded
@@ -1015,96 +1023,27 @@ if number_processes('find_files.py') == 1:
     # based on the value of the tens of minutes for the current time
     # this is to minimise the load on the server and the runtime for this code
 
+    VIDEOS = wxcutils.load_json(CONFIG_PATH, 'videos.json')
+    MY_LOGGER.debug('Number of videos = %d', len(VIDEOS))
+    MY_LOGGER.debug('Number of hours = %d', math.ceil(len(VIDEOS) / 6))
+
     MIN_SECTION = math.floor(int(time.strftime('%M')) / 10)
     MY_LOGGER.debug('MIN_SECTION = %s', MIN_SECTION)
-    HOUR_SECTION = int(time.strftime('%H')) % 3
+    HOUR_SECTION = int(time.strftime('%H')) % (math.ceil(len(VIDEOS) / 6))
     MY_LOGGER.debug('HOUR_SECTION = %s', HOUR_SECTION)
+    VIDEO_NUM = MIN_SECTION + (HOUR_SECTION * 6)
+    MY_LOGGER.debug('VIDEO_NUM = %s', VIDEO_NUM)
 
-    if HOUR_SECTION == 0:
-        if MIN_SECTION == 0:
-            # GOES 16 - ch 13 enhanced - 1 frame per hour
+    COUNTER = 0
+    for video in VIDEOS:
+        if COUNTER == VIDEO_NUM:
             MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES16', 'web/goes16/fd/ch13_enhanced', '*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
+            MY_LOGGER.debug('Found video to create - %s - %s - %d frames per hour', video['sat'], video['description'], video['frames'])
 
-        if MIN_SECTION == 1:
-            # GOES 17 - FD visible Projected - 2 frames per hour
+            create_animation(video['sat'], video['location'], video['file match'] , 24 * 3 * video['frames'],
+                             video['duration'], video['resolution'], video['selection'], video['min_size'], video['end frame'])
             MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES17', 'web/goes17/fd/fcsanchez', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 2:
-            # GOES 17 - M1 ch 7 IR shortwave - 2 frames per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES17', 'web/goes17/m1/ch07', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 3:
-            # GOES 17 - M2 ch 7 IR shortwave - 2 frames per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES17', 'web/goes17/m2/ch07', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 4:
-            # Himawari 8 - FD IR - 1 frame per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('HIMAWARI8', 'web/himawari8/fd/IR', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 5:
-            # combined images - 1 frame per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('COMBINED', 'web/combined/fd/ir', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-    elif HOUR_SECTION == 1:
-        if MIN_SECTION == 0:
-            # GOES 17 - FD visible - 2 frames per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES17', 'web/goes17/fd/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 1:
-            # GOES 17 - ch13 visible Projected - 2 frames per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES17', 'web/goes17/fd/ch13sanchez', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 2:
-            # GOES 17 - M1 fc - 2 frames per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES17', 'web/goes17/m1/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'LIGHT', 400 * 1024)
-
-        if MIN_SECTION == 3:
-            # GOES 17 - M2 fc - 2 frames per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES17', 'web/goes17/m2/fc', '*', 24 * 2 * 3, 0.15, '800:800', 'LIGHT', 400 * 1024)
-
-        if MIN_SECTION == 4:
-            # GOES 13 - Full Colour - 2 frame per hour
-            create_animation('GOES13', 'web/goes13/fd/FC', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 5:
-            # GOES 16 - ch 13 enhanced - 1 frame per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES16', 'web/goes16/fd/ch13', '*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
-    else:
-        if MIN_SECTION == 0:
-            # GOES 13 - #3 Water Vapour - 2 frame per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('GOES13', 'web/goes13/fd/3', '*', 24 * 2 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 1:
-            # Himawari 8 - FD IR sanchez projected - 1 frame per hour
-            MY_LOGGER.debug('+=' * 40)
-            create_animation('HIMAWARI8', 'web/himawari8/fd/IRsanchez', '*FD_IR*', 24 * 1 * 3, 0.15, '800:800', 'ALL', 0)
-
-        if MIN_SECTION == 2:
-            # nothing
-            MY_LOGGER.debug('+=' * 40)
-
-        if MIN_SECTION == 3:
-            # nothing
-            MY_LOGGER.debug('+=' * 40)
-
-        if MIN_SECTION == 4:
-            # nothing
-            MY_LOGGER.debug('+=' * 40)
-
-        if MIN_SECTION == 5:
-            # nothing
-            MY_LOGGER.debug('+=' * 40)
+        COUNTER += 1
 
     # save latest times data
     wxcutils.save_json(OUTPUT_PATH, 'goes_info.json', LATESTTIMESTAMPS)

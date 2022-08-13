@@ -126,9 +126,10 @@ def is_running(process_name):
     return False
 
 
-def is_processing(process_name, minutes):
+def is_processing(process_name, minutes, sat):
     """see if images are being created in last defined number of minutes"""
-    cmd = Popen(['find', FILE_BASE + 'goes17', '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
+    MY_LOGGER.debug('Validating processing against %s', sat)
+    cmd = Popen(['find', FILE_BASE + sat, '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
     MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
     MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
@@ -206,10 +207,14 @@ for key, value in NETCONFIG.items():
 wxcutils.save_json(OUTPUT_PATH, 'network.json', NETCONFIG)
 
 # test if goesproc is running or processing
-if not is_running('goesproc') or not is_processing('goesproc', 10):
+if not is_running('goesproc') or not is_processing('goesproc', 10, 'goes18'):
     # need to kick off the code
     MY_LOGGER.debug('Kicking it off')
-    wxcutils.run_cmd('goesproc -c /usr/share/goestools/goesproc-goesr.conf -m packet ' +
+    # original version
+    # wxcutils.run_cmd('goesproc -c /usr/share/goestools/goesproc-goesr.conf -m packet ' +
+    #                  '--subscribe tcp://203.86.195.49:5004 --out /home/pi/goes &')
+    # updated version
+    wxcutils.run_cmd('goesproc -c /usr/share/goestools/NEWgoesproc-goesr.conf -m packet ' +
                      '--subscribe tcp://203.86.195.49:5004 --out /home/pi/goes &')
     if is_running('goesproc'):
         MY_LOGGER.debug('goesproc is now running')
@@ -239,6 +244,8 @@ for sc in SATCONFIG:
         # do the validation
         sc['Last Status'], sc['Status Change'], sc['Current Age'] = validate_sat(sc)
         MY_LOGGER.debug('sc = %s', sc)
+    else:
+        MY_LOGGER.debug('Inactive - skipping')
 # save results
 wxcutils.save_json(CONFIG_PATH, 'last-received.json', SATCONFIG)
 wxcutils.save_json(OUTPUT_PATH, 'last-received.json', SATCONFIG)

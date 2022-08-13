@@ -135,6 +135,41 @@ THRESHOLD = 25
 MY_LOGGER.debug('THRESHOLD = %d', THRESHOLD)
 
 # do each webhook
+# GOES 18
+IMAGE = 'goes_18_fd_fc-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    webhook(IMAGE, 'GOES 18', 'Full colour')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+IMAGE = 'goes_18_m1_fc-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+        webhook(IMAGE, 'GOES 18', 'Full colour Meso Area 1')
+    else:
+        MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
+        IMAGE = 'goes_18_m1_ch07-tn.jpg'
+        if is_light(IMAGE, THRESHOLD):
+            MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+            webhook(IMAGE, 'GOES 18', 'Infra red Meso 1 (normally California)')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
+IMAGE = 'goes_18_m2_fc-tn.jpg'
+if get_image_age(IMAGE) < 3600:
+    if is_light(IMAGE, THRESHOLD):
+        MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+        webhook(IMAGE, 'GOES 18', 'Full colour Meso Area 2')
+    else:
+        MY_LOGGER.debug('%s is dark, use IR image instead?', IMAGE)
+        IMAGE = 'goes_18_m2_ch07-tn.jpg'
+        if is_light(IMAGE, THRESHOLD):
+            MY_LOGGER.debug('%s is not dark, firing webhook', IMAGE)
+            webhook(IMAGE, 'GOES 18', 'Infra red Meso 2 (normally Alaska)')
+else:
+    MY_LOGGER.debug('Image %s is too old', IMAGE)
+
 # GOES 17
 IMAGE = 'goes_17_fd_fc-tn.jpg'
 if get_image_age(IMAGE) < 3600:
@@ -245,7 +280,7 @@ else:
 # Combined
 IMAGE = 'combined-tn.jpg'
 if get_image_age(IMAGE) < 3600:
-    webhook(IMAGE, 'GOES 13 / GOES 16 / GOES 17 / Himawari 8 / GK-2A', 'Infra red')
+    webhook(IMAGE, 'GOES 13 / GOES 16 / GOES 17 / GOES 18 / Himawari 8 / GK-2A', 'Infra red')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 

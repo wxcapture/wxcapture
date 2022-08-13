@@ -9,7 +9,17 @@
          "Alternate Filename":""
       },
       {
+         "Main Filename":"goes18-fd-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
          "Main Filename":"goes_17_fd_fc-tn.jpg",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes_18_fd_fc-tn.jpg",
          "Main check light":"No",
          "Alternate Filename":""
       },
@@ -34,6 +44,11 @@
          "Alternate Filename":""
       },
       {
+         "Main Filename":"goes18-m1-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
          "Main Filename":"goes13-FC-tn.jpg",
          "Main check light":"Yes",
          "Alternate Filename":"goes13-4-tn.jpg"
@@ -49,7 +64,17 @@
          "Alternate Filename":"goes_17_m1_ch07-tn.jpg"
       },
       {
+         "Main Filename":"goes_18_m1_fc-tn.jpg",
+         "Main check light":"Yes",
+         "Alternate Filename":"goes_17_m1_ch07-tn.jpg"
+      },
+      {
          "Main Filename":"goes17-m2-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes18-m2-fc-144-800x800.mp4",
          "Main check light":"No",
          "Alternate Filename":""
       },
@@ -69,7 +94,17 @@
          "Alternate Filename":"goes_17_m2_ch07-tn.jpg"
       },
       {
+         "Main Filename":"goes_18_m2_fc-tn.jpg",
+         "Main check light":"Yes",
+         "Alternate Filename":"goes_17_m2_ch07-tn.jpg"
+      },
+      {
          "Main Filename":"sanchez-goes17-fd-ch13-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"sanchez-goes18-fd-ch13-144-800x800.mp4",
          "Main check light":"No",
          "Alternate Filename":""
       },
@@ -94,12 +129,22 @@
          "Alternate Filename":""
       },
       {
+         "Main Filename":"sanchez-goes18-fd-fc-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
          "Main Filename":"goes_15_fd_IR-tn.jpg",
          "Main check light":"No",
          "Alternate Filename":""
       },
       {
          "Main Filename":"goes17-m1-ch07-144-800x800.mp4",
+         "Main check light":"No",
+         "Alternate Filename":""
+      },
+      {
+         "Main Filename":"goes18-m1-ch07-144-800x800.mp4",
          "Main check light":"No",
          "Alternate Filename":""
       },

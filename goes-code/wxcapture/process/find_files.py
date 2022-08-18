@@ -174,7 +174,7 @@ def do_sanchez(ds_src, ds_dest, ds_channel):
     if ds_channel == 'fc':
         MY_LOGGER.debug('Doing full colour sanchez')
         cmd = '/home/pi/sanchezFC/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f -D ' + CONFIG_PATH + \
-              'Satellites-IR.json'
+              'Satellites-FC.json'
     else:
         MY_LOGGER.debug('Doing IR sanchez')
         cmd = '/home/pi/sanchez/Sanchez reproject -u ' + CONFIG_PATH + 'world.2004' + str(datetime.now().month).zfill(2) + \

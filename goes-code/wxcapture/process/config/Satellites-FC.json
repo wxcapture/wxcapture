@@ -1,0 +1,16 @@
+﻿[
+  {
+    "DisplayName": "GOES-17",
+    "FilenamePrefix": "GOES17_FD_FC_(?!enhanced)",
+    "FilenameParser": "Goesproc",
+    "Longitude": -137.2,
+    "Brightness": 0.95
+  },
+  {
+    "DisplayName": "GOES-18",
+    "FilenamePrefix": "GOES18_FD_FC_(?!enhanced)",
+    "FilenameParser": "Goesproc",
+    "Longitude": -137.2,
+    "Brightness": 0.95
+  }
+]

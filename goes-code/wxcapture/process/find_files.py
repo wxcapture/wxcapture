@@ -173,7 +173,7 @@ def do_sanchez(ds_src, ds_dest, ds_channel):
     MY_LOGGER.debug('Sanchez processing %s %s', ds_src, ds_dest)
     if ds_channel == 'fc':
         MY_LOGGER.debug('Doing full colour sanchez')
-        cmd = '/home/pi/sanchezFC/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f -D ' + CONFIG_PATH + \
+        cmd = '/home/pi/sanchez/Sanchez reproject -s ' + ds_src + ' -o ' + ds_dest + ' -ULa -r 4 -f -D ' + CONFIG_PATH + \
               'Satellites-FC.json'
     else:
         MY_LOGGER.debug('Doing IR sanchez')
@@ -556,7 +556,7 @@ def process_goes(sat_num):
                 # update latest
                 LATESTTIMESTAMPS[new_filename + extenstion] = int(latest)
 
-                # generate sanchezFC image if GOES 17 / 18  and fd and fc/ch13 image
+                # generate sanchez FC image if GOES 17 / 18  and fd and fc/ch13 image
                 if sat_num in ('17', '18') and type_directory == 'fd' and channel_directory in ['fc', 'ch13']:
                     sanchez_dir = SANCHEZ_PATH + 'goes' + sat_num + '/' + type_directory + '/' + channel_directory + '/'
                     # create directory (if needed)

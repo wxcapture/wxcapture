@@ -281,7 +281,7 @@ try:
     MY_LOGGER.debug('Demodulate .wav to QPSK')
     SYMBOL_RATE = ' -r ' + str(PASS_INFO['meteor symbol rate'])
     MODE = ' -m ' + PASS_INFO['meteor mode']
-    wxcutils.run_cmd('echo yes | /usr/bin/meteor_demod -B ' + SYMBOL_RATE + ' ' + MODE + ' -o ' +
+    wxcutils.run_cmd('echo yes | /usr/local/bin/meteor_demod -B ' + SYMBOL_RATE + ' ' + MODE + ' -o ' +
                      WORKING_PATH + FILENAME_BASE + '.qpsk ' + AUDIO_PATH + FILENAME_BASE + '.wav')
     MY_LOGGER.debug('-' * 30)
 

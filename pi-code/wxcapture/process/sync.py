@@ -46,8 +46,8 @@ def process_file(pf_file_name):
         pf_stdout = pf_stdout.decode('utf-8')
         pf_stderr = pf_stderr.decode('utf-8')
         MY_LOGGER.debug('stdout:%s', pf_stdout)
-        if pf_stderr == '':
-            MY_LOGGER.debug('rsync successful')
+        if pf_stderr == '' or 'setlocale: LC_ALL: cannot change locale' in pf_stderr:
+            MY_LOGGER.debug('rsync successful - %s', pf_stderr)
             return True
         MY_LOGGER.debug('rsync error = %s', pf_stderr)
         return False

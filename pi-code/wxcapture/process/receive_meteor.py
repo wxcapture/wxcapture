@@ -11,15 +11,105 @@ create images plus pass web page"""
 
 
 # import libraries
-import os
-from os import path
-import sys
+import calendar
 import glob
-import time
+import os
+import random
 import subprocess
+import sys
+import time
+from datetime import datetime
+from os import path
+
 import cv2
+import numpy as np
+from PIL import Image, ImageOps
+
 import wxcutils
 import wxcutils_pi
+
+
+def fix_image(fi_source, fi_destination, fi_image_fix):
+    """remove noise from image"""
+
+    def load_image(li_filename):
+        """load an image file"""
+        li_image = Image.open(li_filename)
+        li_image_height = li_image.size[1]
+        li_image_width = li_image.size[0]
+        MY_LOGGER.debug('Loaded image %s height = %d width = %d type = %s',
+                             li_filename, li_image_height, li_image_width, li_image.format)
+        return li_image, li_image_height, li_image_width
+
+
+    def save_image(si_filename):
+        """save an image file"""
+        MY_LOGGER.debug('Saving %s', si_filename)
+        image.save(si_filename)
+        MY_LOGGER.debug('Saved %s', si_filename)
+
+    def new_value(nv_val1, nv_val2):
+        """randomized combined value"""
+        nv = ((nv_val1 + nv_val2) / 2) + random.randint(-5, 5)
+        if nv < 0:
+            nv = 0
+        elif nv > 255:
+            nv = 255
+        return int(nv)
+
+    image_height = 0
+    image_width = 0
+    image = Image.new('RGB', (1, 1), (0, 0, 0))
+
+    MY_LOGGER.debug('Load image start')
+    image, image_height, image_width = load_image(fi_source)
+    MY_LOGGER.debug('Load image end')
+
+    if fi_image_fix == 'Y':
+        MY_LOGGER.debug('Image line removal start')
+        y_iterator = 0
+        try_count_max = 5
+        while y_iterator < image_height:
+            if y_iterator%500 == 0:
+                MY_LOGGER.debug('line = %d', y_iterator)
+            x_iterator = 0
+            while x_iterator < image_width:
+                red, green, blue = image.getpixel((x_iterator, y_iterator))
+                # MY_LOGGER.debug('Pixel %d,%d = R%d G%d B%d', x_iterator, y_iterator, red, green, blue)
+                # see if black is faulty
+                if red == 0 and green == 0 and blue == 0:
+                    # MY_LOGGER.debug('bad black')
+                    pass
+                # see if cyan is faulty
+                elif red == 0 and green != 0 and blue != 0:
+                    # MY_LOGGER.debug('bad cyan')
+                    image.putpixel((x_iterator, y_iterator), (new_value(green, blue), green, blue))
+                # see if magenta is faulty
+                elif red != 0 and green == 0 and blue != 0:
+                    # MY_LOGGER.debug('bad magenta')
+                    image.putpixel((x_iterator, y_iterator), (red, new_value(red, blue), blue))
+                # see if yellow is faulty
+                elif red != 0 and green != 0 and blue == 0:
+                    # MY_LOGGER.debug('bad yellow')
+                    image.putpixel((x_iterator, y_iterator), (red, green, new_value(red, green)))
+                elif red != 0 and green == 0 and blue == 0:
+                    # MY_LOGGER.debug('good red')
+                    image.putpixel((x_iterator, y_iterator), (red, new_value(red, red), new_value(red, red)))
+                elif red == 0 and green != 0 and blue == 0:
+                    # MY_LOGGER.debug('good green')
+                    image.putpixel((x_iterator, y_iterator), (green, new_value(green, green), new_value(green, green)))
+                elif red == 0 and green == 0 and blue != 0:
+                    # MY_LOGGER.debug('good blue')
+                    image.putpixel((x_iterator, y_iterator), (blue, new_value(blue, blue), new_value(blue, blue)))
+
+                x_iterator += 1
+            y_iterator += 1
+
+        MY_LOGGER.debug('Image line removal finished')
+
+    MY_LOGGER.debug('Save image start')
+    save_image(fi_destination)
+    MY_LOGGER.debug('Save image end')
 
 
 def brand_image(bi_filename,
@@ -321,6 +411,11 @@ try:
             else:
                 MY_LOGGER.debug('A -cc.bmp file was created, continuing generating images')
 
+                # fix image to remove noice
+                fix_image(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp',
+                          WORKING_PATH + FILENAME_BASE + '-fixed.bmp',
+                          'Y')
+
                 # create full size .jpg of each .bmp
                 MY_LOGGER.debug('create full size .jpg of each .bmp')
                 # main
@@ -330,6 +425,9 @@ try:
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
                                  ' ' + WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp > ' +
                                  WORKING_PATH + FILENAME_BASE + '-cc.jpg')
+                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                                 ' ' + WORKING_PATH + FILENAME_BASE + '-fixed.bmp > ' +
+                                 WORKING_PATH + FILENAME_BASE + '-fixed.jpg')
                 # channels
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
                                  ' ' + WORKING_PATH + FILENAME_BASE + '_0.bmp > ' + WORKING_PATH +
@@ -345,6 +443,7 @@ try:
                 MY_LOGGER.debug('Generate stretched version of the colour corrected .jpg')
                 # main
                 wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
+                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-fixed.jpg')
                 # channels
                 wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
                 wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
@@ -354,6 +453,8 @@ try:
                 MY_LOGGER.debug('move to image directory')
                 wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '-cc-rectified.jpg',
                                    IMAGE_PATH, FILENAME_BASE + '-cc-rectified.jpg')
+                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '-fixed-rectified.jpg',
+                                   IMAGE_PATH, FILENAME_BASE + '-fixed-rectified.jpg')
                 wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_0-rectified.jpg',
                                    IMAGE_PATH, FILENAME_BASE + '_0-rectified.jpg')
                 wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_1-rectified.jpg',
@@ -372,6 +473,12 @@ try:
                                  ' | cjpeg -opti -progr -qual ' +
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
                                  IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg\"')
+                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                                 '-fixed-rectified.jpg\" | pnmscale -xysize ' +
+                                 IMAGE_OPTIONS['thumbnail size'] +
+                                 ' | cjpeg -opti -progr -qual ' +
+                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                                 IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg\"')
                 # channels
                 wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
                                  '_0-rectified.jpg\" | pnmscale -xysize ' +
@@ -436,6 +543,12 @@ try:
             MY_LOGGER.debug('Good file size for main image -> non-bad quality')
             CREATE_PAGE = True
 
+        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '-fixed-rectified.jpg')
+        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+            MY_LOGGER.debug('Good file size for main fixed image -> non-bad quality')
+            CREATE_PAGE = True
+
         FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_0-rectified.jpg')
         MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
         if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
@@ -498,6 +611,15 @@ try:
             html.write('<h2>Colour Corrected Image</h2>')
 
             html.write('<p>Click on the image to get the full size image.</p>')
+
+            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified.jpg'):
+                MY_LOGGER.debug('Adding fixed image')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-fixed-rectified.jpg'))
+                html.write('<h3>Processed, Noise Removed Image</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-fixed-rectified.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-fixed-rectified-tn.jpg' + '\"></a>')
 
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg'):
                 MY_LOGGER.debug('Adding processed image')
@@ -588,6 +710,15 @@ try:
                     'Processed full colour',
                     IMAGE_OPTIONS['Branding'])
 
+        brand_image(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Processed full colour',
+                    IMAGE_OPTIONS['Branding'])
+        brand_image(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg',
+                    SATELLITE, MAX_ELEVATION,
+                    'Processed full colour',
+                    IMAGE_OPTIONS['Branding'])
+
         # migrate files to destinations
         MY_LOGGER.debug('migrate files to destinations')
         migrate_files()
@@ -605,7 +736,8 @@ try:
             # change filename to select which image to webhook
             # normal -  '-cc-rectified-tn.jpg'
             # processes - '-processed-rectified-tn.jpg'
-            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg'
+            # fixed - '-fixed-rectified-tn.jpg'
+            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg'
             # only proceed if the image exists
             if path.exists(TWEET_IMAGE):
                 try:
@@ -631,10 +763,11 @@ try:
             # change filename to select which image to webhook
             # normal -  '-cc-rectified-tn.jpg'
             # processes - '-processed-rectified-tn.jpg'
-            DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg'
+            # fixed - '-fixed-rectified-tn.jpg'
+            DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg'
             DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + \
                 FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + \
-                '-processed-rectified-tn.jpg'
+                '-fixed-rectified-tn.jpg'
             MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
             # need to sleep a few minutes to enable the images to get to the web server
             # otherwise the image used by the webhook API will not be accessible when the

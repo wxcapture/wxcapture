@@ -207,7 +207,7 @@ for key, value in NETCONFIG.items():
 wxcutils.save_json(OUTPUT_PATH, 'network.json', NETCONFIG)
 
 # test if goesproc is running or processing
-if not is_running('goesproc') or not is_processing('goesproc', 10, 'goes18'):
+if not is_running('goesproc') or not is_processing('goesproc', 10, 'goes17'):
     # need to kick off the code
     MY_LOGGER.debug('Kicking it off')
     # original version

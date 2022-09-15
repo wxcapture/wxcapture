@@ -226,6 +226,7 @@ def create_branded(satellite):
     def add_kiwiweather():
         """add kiwiweather"""
         # Kiwiweather.com
+        MY_LOGGER.debug('adding branding')
         nonlocal image
         image = cv2.putText(image, 'Kiwi', (20, 80),
                             cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
@@ -239,6 +240,7 @@ def create_branded(satellite):
     def add_logo(x_offset):
         """add logo"""
         # logo
+        MY_LOGGER.debug('adding logo')
         y_offset = 0
         nonlocal image
         image[y_offset:y_offset+logo.shape[0], x_offset:x_offset+logo.shape[1]] = logo
@@ -254,8 +256,7 @@ def create_branded(satellite):
         day = bits[4][6:8]
         hour = bits[5][:2]
         min = bits[5][2:4]
-        # MY_LOGGER.debug('year = %s, month = %s, day = %s,
-        #                 hour = %s min = %s', year, month, day, hour, min)
+        MY_LOGGER.debug('year = %s, month = %s, day = %s, hour = %s min = %s', year, month, day, hour, min)
         nonlocal image
         image = cv2.putText(image, hour + ':' + min + ' UTC', (20, y_offset),
                             cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 2, cv2.LINE_AA)
@@ -287,6 +288,8 @@ def create_branded(satellite):
             MY_LOGGER.debug('creating raw branded')
             # load raw image
             image = cv2.imread(file['dir'] + '/' + file['file'] + file['ext'])
+            if image is None:
+                MY_LOGGER.debug('image loaded is None - %s', file['dir'] + '/' + file['file'] + file['ext'])
             add_kiwiweather()
             add_logo(2000)
             add_date(2100)

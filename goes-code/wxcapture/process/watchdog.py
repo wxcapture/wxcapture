@@ -126,17 +126,21 @@ def is_running(process_name):
     return False
 
 
-def is_processing(process_name, minutes, sat):
+def is_processing(process_name, minutes, sats):
     """see if images are being created in last defined number of minutes"""
-    MY_LOGGER.debug('Validating processing against %s', sat)
-    cmd = Popen(['find', FILE_BASE + sat, '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
-    stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
-    MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
 
-    if len(stdout.decode('utf-8')) > 0:
-        MY_LOGGER.debug('%s is processing images', process_name)
-        return True
+    for ip_sat in sats:
+        MY_LOGGER.debug('Validating processing against %s', ip_sat)
+        cmd = Popen(['find', FILE_BASE + ip_sat, '-cmin', str(-1 * minutes)], stdout=PIPE, stderr=PIPE)
+        stdout, stderr = cmd.communicate()
+        MY_LOGGER.debug('stdout:%s', stdout.decode('utf-8'))
+        MY_LOGGER.debug('stderr:%s', stderr.decode('utf-8'))
+
+        if len(stdout.decode('utf-8')) > 0:
+            MY_LOGGER.debug('%s is processing images for %s', process_name, ip_sat)
+            return True
+        else:
+            MY_LOGGER.debug('%s is NOT processing images for %s', process_name, ip_sat)
     MY_LOGGER.debug('%s is NOT processing images', process_name)
 
     # need to kill off any existing goesproc processes
@@ -195,6 +199,8 @@ FILE_BASE = '/home/pi/goes/'
 MY_LOGGER.debug('FILE_BASE = %s', FILE_BASE)
 
 # test for network connectivity
+MY_LOGGER.debug('=' * 20)
+MY_LOGGER.debug('test for network connectivity...')
 for key, value in NETCONFIG.items():
     if key == 'addresses':
         for nc in NETCONFIG[key]:
@@ -207,7 +213,10 @@ for key, value in NETCONFIG.items():
 wxcutils.save_json(OUTPUT_PATH, 'network.json', NETCONFIG)
 
 # test if goesproc is running or processing
-if not is_running('goesproc') or not is_processing('goesproc', 10, 'goes17'):
+# either GOES 16 or 17 or 18 need to be processing
+MY_LOGGER.debug('=' * 20)
+MY_LOGGER.debug('check if goesproc needs to be restarted...')
+if not is_running('goesproc') or not is_processing('goesproc', 10, ['goes16', 'goes17', 'goes18']):
     # need to kick off the code
     MY_LOGGER.debug('Kicking it off')
     # original version
@@ -222,10 +231,13 @@ if not is_running('goesproc') or not is_processing('goesproc', 10, 'goes17'):
         MY_LOGGER.critical('goesproc is NOT running and could not be restarted')
 
 # log drive space free to file
+MY_LOGGER.debug('=' * 20)
+MY_LOGGER.debug('drive space validation...')
 drive_validation()
 
 # test if tweet.py is running, if not kick it off
 MY_LOGGER.debug('=' * 20)
+MY_LOGGER.debug('see if tweet.py is running...')
 if not is_running('tweet.py'):
     # need to kick off the code
     MY_LOGGER.debug('tweet.py not running - kicking it off')
@@ -234,6 +246,8 @@ else:
     MY_LOGGER.debug('tweet.py is running')
 
 # test if images received for all sats
+MY_LOGGER.debug('=' * 20)
+MY_LOGGER.debug('test if images are being received by all sats...')
 SATCONFIG = wxcutils.load_json(CONFIG_PATH, 'last-received.json')
 # iterate through satellites
 for sc in SATCONFIG:
@@ -246,11 +260,16 @@ for sc in SATCONFIG:
         MY_LOGGER.debug('sc = %s', sc)
     else:
         MY_LOGGER.debug('Inactive - skipping')
+
 # save results
+MY_LOGGER.debug('=' * 20)
+MY_LOGGER.debug('save out results...')
 wxcutils.save_json(CONFIG_PATH, 'last-received.json', SATCONFIG)
 wxcutils.save_json(OUTPUT_PATH, 'last-received.json', SATCONFIG)
 
 # find overly long running processes to kill them
+MY_LOGGER.debug('=' * 20)
+MY_LOGGER.debug('kill overly long running processes...')
 PSCONFIG = wxcutils.load_json(CONFIG_PATH, 'running.json')
 for process in PSCONFIG:
     long_check(process)

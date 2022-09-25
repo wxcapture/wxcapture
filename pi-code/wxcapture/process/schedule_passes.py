@@ -165,9 +165,6 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     MY_LOGGER.debug('orbit = %s', orbit)
 
     MY_LOGGER.debug('Sat type = %s', sat['type'])
-    elevation_type = 'Min Elevation-' + str(sat['type'])
-    min_elevation = int(CONFIG_INFO[elevation_type])
-    MY_LOGGER.debug('min_elevation = %s', str(min_elevation))
 
     # start to parse the predict output
     visible_start = ''
@@ -299,6 +296,10 @@ def get_predict(sat_data, sat, time_stamp, end_time_stamp, when, capture):
     capture_reason = 'Not defined'
     if capture == 'no':
         capture_reason = 'Not configured for capture'
+
+    elevation_type = 'Min Elevation-' + str(sat['type'] + '-' + max_elevation_direction_desc)
+    min_elevation = int(CONFIG_INFO[elevation_type])
+    MY_LOGGER.debug('min_elevation = %s for direction = %s', str(min_elevation), max_elevation_direction_desc)
 
     # only append if elevation high enough and in the current local day
     if (max_elevation >= min_elevation) and (start_epoch < end_time_stamp):

@@ -411,6 +411,14 @@ try:
             else:
                 MY_LOGGER.debug('A -cc.bmp file was created, continuing generating images')
 
+                # northbound pass, need to rotate image 180 degrees
+                if PASS_INFO['direction'] == 'Northbound':
+                    MY_LOGGER.debug('Northbound pass - must rotate image')
+                    wxcutils.run_cmd('convert ' + WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp' +
+                                     ' -rotate 180 ' + WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp')
+                else:
+                    MY_LOGGER.debug('Southbound pass - no rotation required')
+
                 # fix image to remove noice
                 fix_image(WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp',
                           WORKING_PATH + FILENAME_BASE + '-fixed.bmp',

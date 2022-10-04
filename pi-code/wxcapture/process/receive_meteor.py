@@ -436,26 +436,26 @@ try:
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
                                  ' ' + WORKING_PATH + FILENAME_BASE + '-fixed.bmp > ' +
                                  WORKING_PATH + FILENAME_BASE + '-fixed.jpg')
-                # channels
-                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE + '_0.bmp > ' + WORKING_PATH +
-                                 FILENAME_BASE + '_0.jpg')
-                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
-                                 FILENAME_BASE + '_1.jpg')
-                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
-                                 FILENAME_BASE + '_2.jpg')
+                # # channels
+                # wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                #                  ' ' + WORKING_PATH + FILENAME_BASE + '_0.bmp > ' + WORKING_PATH +
+                #                  FILENAME_BASE + '_0.jpg')
+                # wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                #                  ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
+                #                  FILENAME_BASE + '_1.jpg')
+                # wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
+                #                  ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
+                #                  FILENAME_BASE + '_2.jpg')
 
                 # Generate stretched version of the colour corrected .jpg
                 MY_LOGGER.debug('Generate stretched version of the colour corrected .jpg')
                 # main
                 wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
                 wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-fixed.jpg')
-                # channels
-                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
-                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
-                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
+                # # channels
+                # wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
+                # wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
+                # wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
 
                 # move to image directory
                 MY_LOGGER.debug('move to image directory')
@@ -463,12 +463,12 @@ try:
                                    IMAGE_PATH, FILENAME_BASE + '-cc-rectified.jpg')
                 wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '-fixed-rectified.jpg',
                                    IMAGE_PATH, FILENAME_BASE + '-fixed-rectified.jpg')
-                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_0-rectified.jpg',
-                                   IMAGE_PATH, FILENAME_BASE + '_0-rectified.jpg')
-                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_1-rectified.jpg',
-                                   IMAGE_PATH, FILENAME_BASE + '_1-rectified.jpg')
-                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_2-rectified.jpg',
-                                   IMAGE_PATH, FILENAME_BASE + '_2-rectified.jpg')
+                # wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_0-rectified.jpg',
+                #                    IMAGE_PATH, FILENAME_BASE + '_0-rectified.jpg')
+                # wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_1-rectified.jpg',
+                #                    IMAGE_PATH, FILENAME_BASE + '_1-rectified.jpg')
+                # wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_2-rectified.jpg',
+                #                    IMAGE_PATH, FILENAME_BASE + '_2-rectified.jpg')
 
                 MY_LOGGER.debug('-' * 30)
 
@@ -487,25 +487,25 @@ try:
                                  ' | cjpeg -opti -progr -qual ' +
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
                                  IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg\"')
-                # channels
-                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                                 '_0-rectified.jpg\" | pnmscale -xysize ' +
-                                 IMAGE_OPTIONS['thumbnail size'] +
-                                 ' | cjpeg -opti -progr -qual ' +
-                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                                 IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg\"')
-                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                                 '_1-rectified.jpg\" | pnmscale -xysize ' +
-                                 IMAGE_OPTIONS['thumbnail size'] +
-                                 ' | cjpeg -opti -progr -qual ' +
-                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                                 IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg\"')
-                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                                 '_2-rectified.jpg\" | pnmscale -xysize ' +
-                                 IMAGE_OPTIONS['thumbnail size'] +
-                                 ' | cjpeg -opti -progr -qual ' +
-                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                                 IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
+                # # channels
+                # wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                #                  '_0-rectified.jpg\" | pnmscale -xysize ' +
+                #                  IMAGE_OPTIONS['thumbnail size'] +
+                #                  ' | cjpeg -opti -progr -qual ' +
+                #                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                #                  IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg\"')
+                # wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                #                  '_1-rectified.jpg\" | pnmscale -xysize ' +
+                #                  IMAGE_OPTIONS['thumbnail size'] +
+                #                  ' | cjpeg -opti -progr -qual ' +
+                #                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                #                  IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg\"')
+                # wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
+                #                  '_2-rectified.jpg\" | pnmscale -xysize ' +
+                #                  IMAGE_OPTIONS['thumbnail size'] +
+                #                  ' | cjpeg -opti -progr -qual ' +
+                #                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                #                  IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
 
                 # create a processed image
                 wxcutils_pi.clahe_process(WORKING_PATH, FILENAME_BASE + '-cc.bmp.bmp',
@@ -529,9 +529,9 @@ try:
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.qpsk')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.jpg')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
-    wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
-    wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
-    wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
+    # wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
+    # wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
+    # wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.dec')
 
     # delete audio file?
@@ -557,23 +557,23 @@ try:
             MY_LOGGER.debug('Good file size for main fixed image -> non-bad quality')
             CREATE_PAGE = True
 
-        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_0-rectified.jpg')
-        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
-        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
-            MY_LOGGER.debug('Good file size for channel 0 image -> non-bad quality')
-            CREATE_PAGE = True
+        # FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_0-rectified.jpg')
+        # MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        # if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+        #     MY_LOGGER.debug('Good file size for channel 0 image -> non-bad quality')
+        #     CREATE_PAGE = True
 
-        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_1-rectified.jpg')
-        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
-        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
-            MY_LOGGER.debug('Good file size for channel 1 image -> non-bad quality')
-            CREATE_PAGE = True
+        # FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_1-rectified.jpg')
+        # MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        # if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+        #     MY_LOGGER.debug('Good file size for channel 1 image -> non-bad quality')
+        #     CREATE_PAGE = True
 
-        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_2-rectified.jpg')
-        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
-        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
-            MY_LOGGER.debug('Good file size for channel 2 image -> non-bad quality')
-            CREATE_PAGE = True
+        # FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_2-rectified.jpg')
+        # MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
+        # if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
+        #     MY_LOGGER.debug('Good file size for channel 2 image -> non-bad quality')
+        #     CREATE_PAGE = True
 
     except Exception as err:
         MY_LOGGER.debug('Unexpected error validating norm image file size: %s %s %s',
@@ -638,67 +638,67 @@ try:
                            '-processed-rectified.jpg' + '\"><img src=\"images/' +
                            FILENAME_BASE + '-processed-rectified-tn.jpg' + '\"></a>')
 
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'):
-                MY_LOGGER.debug('Adding image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'))
-                html.write('<h3>Original Colour Image</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-cc-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
+            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'):
+            #     MY_LOGGER.debug('Adding image')
+            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'))
+            #     html.write('<h3>Original Colour Image</h3>')
+            #     html.write('<a href=\"images/' + FILENAME_BASE +
+            #                '-cc-rectified.jpg' + '\"><img src=\"images/' +
+            #                FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
 
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'):
-                MY_LOGGER.debug('Adding channel 0 image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'))
-                html.write('<h3>Channel 0 Image</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '_0-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '_0-rectified-tn.jpg' + '\"></a>')
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'):
-                MY_LOGGER.debug('Adding channel 1 image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'))
-                html.write('<h3>Channel 1 Image</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '_1-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '_1-rectified-tn.jpg' + '\"></a>')
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'):
-                MY_LOGGER.debug('Adding channel 2 image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'))
-                html.write('<h3>Channel 2 Image</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '_2-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '_2-rectified-tn.jpg' + '\"></a>')
+            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'):
+            #     MY_LOGGER.debug('Adding channel 0 image')
+            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'))
+            #     html.write('<h3>Channel 0 Image</h3>')
+            #     html.write('<a href=\"images/' + FILENAME_BASE +
+            #                '_0-rectified.jpg' + '\"><img src=\"images/' +
+            #                FILENAME_BASE + '_0-rectified-tn.jpg' + '\"></a>')
+            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'):
+            #     MY_LOGGER.debug('Adding channel 1 image')
+            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'))
+            #     html.write('<h3>Channel 1 Image</h3>')
+            #     html.write('<a href=\"images/' + FILENAME_BASE +
+            #                '_1-rectified.jpg' + '\"><img src=\"images/' +
+            #                FILENAME_BASE + '_1-rectified-tn.jpg' + '\"></a>')
+            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'):
+            #     MY_LOGGER.debug('Adding channel 2 image')
+            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'))
+            #     html.write('<h3>Channel 2 Image</h3>')
+            #     html.write('<a href=\"images/' + FILENAME_BASE +
+            #                '_2-rectified.jpg' + '\"><img src=\"images/' +
+            #                FILENAME_BASE + '_2-rectified-tn.jpg' + '\"></a>')
             html.write('</body></html>')
 
         html.close()
 
     if CREATE_PAGE:
-        # add branding to pages
-        brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Channel 0',
-                    IMAGE_OPTIONS['Branding'])
-        brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Channel 0',
-                    IMAGE_OPTIONS['Branding'])
+        # # add branding to pages
+        # brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg',
+        #             SATELLITE, MAX_ELEVATION,
+        #             'Channel 0',
+        #             IMAGE_OPTIONS['Branding'])
+        # brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg',
+        #             SATELLITE, MAX_ELEVATION,
+        #             'Channel 0',
+        #             IMAGE_OPTIONS['Branding'])
 
-        brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Channel 1',
-                    IMAGE_OPTIONS['Branding'])
-        brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Channel 1',
-                    IMAGE_OPTIONS['Branding'])
+        # brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg',
+        #             SATELLITE, MAX_ELEVATION,
+        #             'Channel 1',
+        #             IMAGE_OPTIONS['Branding'])
+        # brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg',
+        #             SATELLITE, MAX_ELEVATION,
+        #             'Channel 1',
+        #             IMAGE_OPTIONS['Branding'])
 
-        brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Channel 2',
-                    IMAGE_OPTIONS['Branding'])
-        brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Channel 2',
-                    IMAGE_OPTIONS['Branding'])
+        # brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg',
+        #             SATELLITE, MAX_ELEVATION,
+        #             'Channel 2',
+        #             IMAGE_OPTIONS['Branding'])
+        # brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg',
+        #             SATELLITE, MAX_ELEVATION,
+        #             'Channel 2',
+        #             IMAGE_OPTIONS['Branding'])
 
         brand_image(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,

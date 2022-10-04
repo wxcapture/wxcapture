@@ -180,7 +180,7 @@ def process_nws():
     MY_LOGGER.debug('---------------------------------------------')
     MY_LOGGER.debug('NWS')
 
-    fixed_dir = BASEDIR + 'nwsdata/'
+    fixed_dir = BASEDIR + 'nws/'
     MY_LOGGER.debug('fixed_dir = %s', fixed_dir)
 
     for date_directory in find_directories(fixed_dir):

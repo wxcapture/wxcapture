@@ -76,16 +76,25 @@ def validate_file(vf_si):
     else:
         vf_change = 'N'
 
-    vf_html = '<tr>' + vf_html + \
-        '<td align=\"center\">' + vf_change + '</td>' + \
-        '<td>' + vf_si['Display Name'] + '</td>' + \
-        '<td align=\"center\">' + vf_si['Max Age'] + '</td>' + \
-        '<td align=\"center\">' + vf_age_text + '</td>' + \
-        '<td align=\"center\">' + vf_margin_text + '</td></tr>' + NEWLINE
+    # don't report if file age is over 2 weeks
+    if file_age > 20160:
+        MY_LOGGER.debug('Too old to report - over 2 weeks!')
+        vf_status = 'N'
+        vf_text = ''
+        vf_html = ''
+        vf_data = ''
 
-    vf_data = vf_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + \
-        vf_si['Max Age'] + ',' + vf_age_text + ',' + vf_margin_text + ',' + \
-        vf_change + ',' + vf_status + '\r\n'
+    else:
+        vf_html = '<tr>' + vf_html + \
+            '<td align=\"center\">' + vf_change + '</td>' + \
+            '<td>' + vf_si['Display Name'] + '</td>' + \
+            '<td align=\"center\">' + vf_si['Max Age'] + '</td>' + \
+            '<td align=\"center\">' + vf_age_text + '</td>' + \
+            '<td align=\"center\">' + vf_margin_text + '</td></tr>' + NEWLINE
+
+        vf_data = vf_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + \
+            vf_si['Max Age'] + ',' + vf_age_text + ',' + vf_margin_text + ',' + \
+            vf_change + ',' + vf_status + '\r\n'
 
     return vf_status, vf_text, vf_html, vf_data
 
@@ -367,7 +376,8 @@ ALERT_INFO = get_local_date_time() + ' ' +  LOCAL_TIME_ZONE + \
         ' [' + get_utc_date_time() + ' UTC].'
 MY_LOGGER.debug('ALERT_INFO = %s', ALERT_INFO)
 
-# iterate through satellites on this server
+# iterate through satellites on this server (webserver)
+# see when we last got an image from the satellite
 MY_LOGGER.debug('-' * 20)
 MY_LOGGER.debug('Iterate through satellites on this server')
 for si in SATELLITE_INFO:
@@ -382,6 +392,7 @@ for si in SATELLITE_INFO:
             EMAIL_REQUIRED = True
             MY_LOGGER.debug('Status change detected - old = %s, new = %s',
                             si['Last Status'], status)
+            MY_LOGGER.debug('Email required + status change')
             si['Last Status'] = status
             si['Status Change'] = ALERT_INFO
         EMAIL_TEXT += text
@@ -392,12 +403,16 @@ for si in SATELLITE_INFO:
 
 MY_LOGGER.debug('-' * 20)
 
-# iterate through satellites on data server
+# iterate through satellites on the data server (web)
+# see when we last got an image from the satellite
+# ignore any where where there is n/a or over
+# 20,160 min (2 weeks)
 MY_LOGGER.debug('-' * 20)
 MY_LOGGER.debug('Iterate through satellites on data server')
 EMAIL_TEXT1 = ''
 EMAIL_HTML1 = ''
 for sd in SATELLITE_DATA:
+    MY_LOGGER.debug('-' * 5)
     if sd['Active'] == 'yes':
         MY_LOGGER.debug('Satellite = %s', sd['Display Name'])
         if sd['Last Status'] == 'OK':
@@ -406,20 +421,39 @@ for sd in SATELLITE_DATA:
         else:
             msg = ' has exceeded the receiving threshold ('
             sat_status = '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
+
+        MY_LOGGER.debug('Current age is %s', sd['Current Age'])
         if sd['Current Age'] != 'n/a':
             margin = str(int(sd['Max Age']) - int(sd['Current Age']))
+            if int(margin) < 0 and int(margin) > -20160:
+                EMAIL_REQUIRED = True
+                MY_LOGGER.debug('Email required')
         else:
             margin = 'n/a'
-        EMAIL_TEXT1 += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
-                sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
-                ' min - safety margin ' + margin + ' min' + \
-                NEWLINE
-        EMAIL_HTML1 += sat_status + \
-            '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
-            '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
-            '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
-            '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
-            '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
+
+        MY_LOGGER.debug('Status change = %s', sd['Status Change'])
+        if sd['Status Change'] == 'Y':
+            STATUS_CHANGE_DETECTED = True
+            EMAIL_REQUIRED = True
+            MY_LOGGER.debug('Email required + status change')
+
+        if sd['Current Age'] == 'n/a':
+            MY_LOGGER.debug('Not reporting as current age is %s', sd['Current Age'])
+        elif int(sd['Current Age']) > 20160:
+            MY_LOGGER.debug('Not reporting as current age is %s - over 2 weeks', sd['Current Age']) 
+        else:
+
+            EMAIL_TEXT1 += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
+                    sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
+                    ' min - safety margin ' + margin + ' min' + \
+                    NEWLINE
+
+            EMAIL_HTML1 += sat_status + \
+                '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
+                '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
+                '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
+                '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
+                '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
     else:
         MY_LOGGER.debug('Skipping satellite = %s as inactive', sd['Display Name'])
 
@@ -433,6 +467,7 @@ MY_LOGGER.debug('current SERVER_INFO = %s', SERVER_INFO)
 drive_validation()
 
 # iterate through servers
+# checking for remaining free space
 MY_LOGGER.debug('-' * 20)
 MY_LOGGER.debug('Iterate through servers')
 for si in SERVER_INFO:
@@ -445,6 +480,7 @@ for si in SERVER_INFO:
         if status != si['Last Status']:
             STATUS_CHANGE_DETECTED = True
             EMAIL_REQUIRED = True
+            MY_LOGGER.debug('Email required + status change')
             MY_LOGGER.debug('Status change detected - old = %s, new = %s',
                             si['Last Status'], status)
             si['Last Status'] = status
@@ -514,6 +550,7 @@ MY_LOGGER.debug('txt = %s', EMAIL_TEXT3)
 wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
 
 # validate satellite status
+# do we have satellite lock? 
 MY_LOGGER.debug('-' * 20)
 LATESTSATSTATUS = wxcutils.load_json(WEB_PATH + 'gk-2a/', 'satellite-receivers.json')
 PREVIOUSSATSTATUS = wxcutils.load_json(CONFIG_PATH, 'satellite-receivers.json')
@@ -539,6 +576,7 @@ for si1 in LATESTSATSTATUS:
             if si1['ok'] != si2['ok']:
                 EMAIL_REQUIRED = True
                 CHANGE = 'Y'
+                MY_LOGGER.debug('Email required + status change')
             EMAIL_HTML4 += '<td align = \"center\">' + CHANGE + '</td>'
 
             EMAIL_TEXT4 += si1['label'] + ' - ' + si1['ok'] + ' - ' + \
@@ -558,6 +596,7 @@ MY_LOGGER.debug('txt = %s', EMAIL_TEXT4)
 wxcutils.save_json(CONFIG_PATH, 'satellite-receivers.json', LATESTSATSTATUS)
 
 # validate ping connectivity
+# to all the servers / pi
 MY_LOGGER.debug('-**' * 20)
 PINGS = wxcutils.load_json(CONFIG_PATH, 'pings.json')
 MY_LOGGER.debug('Testing Pings')
@@ -598,6 +637,7 @@ for key, value in PINGS.items():
                 if new_status != ping['status']:
                     EMAIL_REQUIRED = True
                     CHANGE = 'Y'
+                    MY_LOGGER.debug('Email required + status change')
                 EMAIL_HTML5 += '<td align = \"center\">' + CHANGE + '</td>'
                 ping['status'] = new_status
 
@@ -622,6 +662,7 @@ wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
 
 
 # website test
+# find the time taken to load the index page
 MY_LOGGER.debug('-' * 20)
 MY_LOGGER.debug('website test')
 WEBSITE = wxcutils.load_json(CONFIG_PATH, 'website.json')
@@ -647,6 +688,7 @@ except Exception as exc:
 
 if NEW_STATUS != WEBSITE['status']:
     EMAIL_REQUIRED = True
+    MY_LOGGER.debug('Email required + status change')
 WEBSITE['status'] = NEW_STATUS
 
 wxcutils.save_json(CONFIG_PATH, 'website.json', WEBSITE)

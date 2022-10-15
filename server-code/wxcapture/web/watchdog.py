@@ -612,8 +612,6 @@ EMAIL_HTML = ''
 NEWLINE = os.linesep + os.linesep
 EMAIL_SUBJECT, EMAIL_REQUIRED = get_email_info()
 
-EMAIL_SUBJECT = 'TEST - ' + EMAIL_SUBJECT
-
 # load satellite info
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog.json')
 SATELLITE_DATA = wxcutils.load_json(WEB_PATH + 'goes/', 'last-received.json')

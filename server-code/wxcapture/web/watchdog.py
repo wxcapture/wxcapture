@@ -108,7 +108,6 @@ def validate_file(vf_si):
     vf_status = 'good'
     vf_text = ''
     vf_html = ''
-    vf_data = ''
 
     # see when last modified
     last_modified = os.path.getmtime(WEB_PATH + vf_si['Location'] + '/' + vf_si['Test Image'])
@@ -150,11 +149,15 @@ def validate_file(vf_si):
         '<td align=\"center\">' + vf_age_text + '</td>' + \
         '<td align=\"center\">' + vf_margin_text + '</td></tr>' + NEWLINE
 
-    vf_data = vf_si['Display Name'] + ',' + str(CURRENT_TIME) + ',' + ALERT_INFO + ',' + \
-        vf_si['Max Age'] + ',' + vf_age_text + ',' + vf_margin_text + ',' + \
-        vf_change + ',' + vf_status + '\r\n'
+    # check if too old
+    if int(vf_margin_text) >= MAX_AGE:
+        MY_LOGGER.debug('max age reached, don''t report')
+        vf_text = ''
+        vf_html = ''
+    else:
+        MY_LOGGER.debug('less than max age, so report')
 
-    return vf_status, vf_text, vf_html, vf_data
+    return vf_status, vf_text, vf_html
 
 
 def check_webserver_images():
@@ -171,7 +174,7 @@ def check_webserver_images():
         if si['Active'] == 'yes':
             MY_LOGGER.debug('Active - Validation processing')
             # do the validation
-            status, text, html, data = validate_file(si)
+            status, text, html = validate_file(si)
             if status != si['Last Status']:
                 response_email_required = True
                 MY_LOGGER.debug('Status change detected - old = %s, new = %s',
@@ -220,18 +223,29 @@ def check_data_server_images():
             else:
                 margin = 'n/a'
             MY_LOGGER.debug('Margin = %a', margin)
-            response_text += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
-                sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
-                ' min - safety margin ' + margin + ' min' + \
-                NEWLINE
-            response_html += sat_status + \
-                '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
-                '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
-                '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
-                '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
-                '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
+
+            # check if too old
+            MY_LOGGER.debug('margin = %s', margin)
+            if margin == 'n/a':
+                MY_LOGGER.debug('no images on server, don''t report')
+            elif int(margin) <= (-1 * MAX_AGE):
+                MY_LOGGER.debug('max age reached, don''t report')
+            else:
+                MY_LOGGER.debug('less than max age, so report')
+                response_text += sd['Last Status'] + ' ' + sd['Display Name'] + msg + \
+                    sd['Max Age'] + ' min) with age of ' + sd['Current Age'] + \
+                    ' min - safety margin ' + margin + ' min' + \
+                    NEWLINE
+                response_html += sat_status + \
+                    '<td align=\"center\">' + sd['Status Change'] + '</td>' +\
+                    '<td align=\"center\">' + sd['Display Name'] + '</td>' +\
+                    '<td align=\"center\">' + sd['Max Age'] + '</td>' +\
+                    '<td align=\"center\">' + sd['Current Age'] + '</td>' +\
+                    '<td align=\"center\">' + margin + '</td></tr>' + NEWLINE
+
         else:
             MY_LOGGER.debug('Skipping satellite = %s as inactive', sd['Display Name'])
+
     MY_LOGGER.debug('-' * 10)
 
     # add in HTML header / footer
@@ -385,18 +399,16 @@ def check_network():
 
                     if nc['status'] == 'OK':
                         response_text += 'OK - network connectivity is good' + ' - '
-                        response_html += '<td>Good connectivity</td><td>' + \
-                            wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                        response_html += '<td>Good connectivity</td></tr>' + NEWLINE
                     else:
                         response_text = 'Error - network connecitivity issue - ' + nc['status'] + ''
-                        response_html += '<td>' + nc['status'] + '</td><td>' + \
-                            wxcutils.epoch_to_local(nc['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                        response_html += '<td>' + nc['status'] + '</td></tr>' + NEWLINE
     MY_LOGGER.debug('-' * 10)
 
     # add in HTML header / footer
-    response_html = '<h3>Network</h3>' + \
+    response_html = '<h3>Network Connectivity</h3>' + \
         '<table border="1">' + \
-        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Information</th><th>Date</th></tr>' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Information</th></tr>' + \
         response_html + NEWLINE + \
         '</table>' + NEWLINE
 
@@ -434,24 +446,23 @@ def check_sat_status():
 
                 response_text += si1['label'] + ' - ' + si1['ok'] + ' - ' + \
                     str(si1['skipped_symbols']) + ' - ' + \
-                    str(si1['reed_solomon_errors']) + ' - ' + str(si1['viterbi_errors']) + \
-                    ' - ' + wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + ' - '
+                    str(si1['reed_solomon_errors']) + ' - ' + str(si1['viterbi_errors']) + NEWLINE
                 response_html += '<td>' +  si1['label'] + '</td><td>' + si1['ok'] + '</td><td align=\"center\">' + \
                     str(si1['skipped_symbols']) + \
                     '</td><td align=\"center\">' + str(si1['reed_solomon_errors']) + '</td><td align=\"center\">' + \
-                    str(si1['viterbi_errors']) + '</td><td>' + \
-                    wxcutils.epoch_to_local(si1['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                    str(si1['viterbi_errors']) + '</td></tr>' + NEWLINE
     MY_LOGGER.debug('-' * 10)
 
     # add in HTML header / footer
-    response_html = '<h3>Network</h3>' + \
+    response_html = '<h3>Satellite Lock</h3>' + \
         '<table border="1">' + \
-        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Lock?</th><th>Skipped Symbols</th><th>Reed Solomon Errors</th><th>Viterbi Errors</th><th>Date</th></tr>' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Lock?</th><th>Skipped Symbols</th><th>Reed Solomon Errors</th><th>Viterbi Errors</th></tr>' + \
         response_html + NEWLINE + \
         '</table>' + NEWLINE
 
     MY_LOGGER.debug('=' * 30)
     return response_text, response_html, response_email_required
+
 
 def check_ip(address, attempts):
     """Check if IP address responds to pings"""
@@ -486,6 +497,7 @@ def check_pings():
         if key == 'addresses':
             for ping in PINGS[key]:
                 MY_LOGGER.debug('-' * 10)
+
                 if ping['Active'] == 'yes':
                     MY_LOGGER.debug('Testing - %s', ping['description'])
                     new_status = 'ERROR'
@@ -507,32 +519,34 @@ def check_pings():
 
                     # get the previous state
                     MY_LOGGER.debug('Previous status = %s', ping['status'])
-                    CHANGE = 'N'
+                    change = 'N'
                     if new_status != ping['status']:
                         response_email_required = True
-                        CHANGE = 'Y'
-                    response_html += '<td align = \"center\">' + CHANGE + '</td>'
+                        change = 'Y'
+                        ping['when'] = int(CURRENT_TIME)
+                    response_html += '<td align = \"center\">' + change + '</td>'
                     ping['status'] = new_status
 
                     response_text += ping['description'] + ' - '
                     response_html += '<td>' + ping['description'] + '</td>'
 
+                    margin = int((CURRENT_TIME - ping['when']) / 60)
+                    MY_LOGGER.debug('margin = %d', margin)
+
                     if new_status == 'OK':
                         response_text += 'OK - network connectivity is good' + NEWLINE
-                        response_html += '<td>Good connectivity</td><td>' + \
-                            wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                        response_html += '<td>Good connectivity</td></tr>' + NEWLINE
                     else:
                         response_text = 'Error - network connecitivity issue  is bad' + NEWLINE
-                        response_html += '<td>Bad connectivity</td><td>' + \
-                            wxcutils.epoch_to_local(ping['when'], '%m/%d/%Y %H:%M') + '</td></tr>' + NEWLINE
+                        response_html += '<td>Bad connectivity</td></tr>' + NEWLINE
                 else:
                     MY_LOGGER.debug('Skipping - %s (%s) - inactive', ping['description'], ping['ip'])
     MY_LOGGER.debug('-' * 10)
 
     # add in HTML header / footer
-    response_html = '<h3>Satellite Lock</h3>' + \
+    response_html = '<h3>Local Network Connectivity</h3>' + \
         '<table border="1">' + \
-        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Information</th><th>Date</th></tr>' + \
+        '<tr><th>Status</th><th>Status Change?</th><th>Connection</th><th>Information</th></tr>' + \
         response_html + NEWLINE + \
         '</table>' + NEWLINE
 
@@ -598,6 +612,8 @@ EMAIL_HTML = ''
 NEWLINE = os.linesep + os.linesep
 EMAIL_SUBJECT, EMAIL_REQUIRED = get_email_info()
 
+EMAIL_SUBJECT = 'TEST - ' + EMAIL_SUBJECT
+
 # load satellite info
 SATELLITE_INFO = wxcutils.load_json(CONFIG_PATH, 'config-watchdog.json')
 SATELLITE_DATA = wxcutils.load_json(WEB_PATH + 'goes/', 'last-received.json')
@@ -616,9 +632,17 @@ MY_LOGGER.debug('PREVIOUSTNETWORK = %s', PREVIOUSTNETWORK)
 # load satellite status
 LATESTSATSTATUS = wxcutils.load_json(WEB_PATH + 'gk-2a/', 'satellite-receivers.json')
 PREVIOUSSATSTATUS = wxcutils.load_json(CONFIG_PATH, 'satellite-receivers.json')
+MY_LOGGER.debug('LATESTSATSTATUS = %s', LATESTSATSTATUS)
+MY_LOGGER.debug('PREVIOUSSATSTATUS = %s', PREVIOUSSATSTATUS)
 
 # load pings
 PINGS = wxcutils.load_json(CONFIG_PATH, 'pings.json')
+MY_LOGGER.debug('PINGS = %s', PINGS)
+
+# max age we care about seeing updates for in minutes (1 week)
+MAX_AGE = 60 * 24 * 7
+MY_LOGGER.debug('MAX_AGE = %d', MAX_AGE)
+
 
 # do the different checks...
 MY_LOGGER.debug('Kicking off the different checks...')
@@ -644,15 +668,6 @@ EMAIL_HTML += RESULT_HTML
 if RESULT_EMAIL_REQUIRED:
     EMAIL_REQUIRED = True
 
-# validate network connectivity
-RESULT_TEXT, RESULT_HTML, RESULT_EMAIL_REQUIRED = check_network()
-EMAIL_TEXT += RESULT_TEXT
-EMAIL_HTML += RESULT_HTML
-if RESULT_EMAIL_REQUIRED:
-    EMAIL_REQUIRED = True
-# save latest
-wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
-
 # validate satellite status
 RESULT_TEXT, RESULT_HTML, RESULT_EMAIL_REQUIRED = check_sat_status()
 EMAIL_TEXT += RESULT_TEXT
@@ -662,7 +677,16 @@ if RESULT_EMAIL_REQUIRED:
 # save latest
 wxcutils.save_json(CONFIG_PATH, 'satellite-receivers.json', LATESTSATSTATUS)
 
-# validate ping connectivity
+# validate network connectivity
+RESULT_TEXT, RESULT_HTML, RESULT_EMAIL_REQUIRED = check_network()
+EMAIL_TEXT += RESULT_TEXT
+EMAIL_HTML += RESULT_HTML
+if RESULT_EMAIL_REQUIRED:
+    EMAIL_REQUIRED = True
+# save latest
+wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
+
+# # validate ping connectivity
 RESULT_TEXT, RESULT_HTML, RESULT_EMAIL_REQUIRED = check_pings()
 EMAIL_TEXT += RESULT_TEXT
 EMAIL_HTML += RESULT_HTML
@@ -670,7 +694,6 @@ if RESULT_EMAIL_REQUIRED:
     EMAIL_REQUIRED = True
 # save latest
 wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
-
 
 # send the email, if required
 MY_LOGGER.debug('=' * 30)

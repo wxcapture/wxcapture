@@ -554,6 +554,41 @@ def check_pings():
     return response_text, response_html, response_email_required
 
 
+def check_website():
+    """validate website loading time"""
+
+    MY_LOGGER.debug('=' * 30)
+    MY_LOGGER.debug('validate website loading time')
+    response_text = ''
+    response_html = ''
+    response_email_required = False
+
+    MY_LOGGER.debug('-' * 10)
+    web_start_time = time.time()
+    try:
+        with urlopen("https://kiwiweather.com") as response:
+            body = response.read()
+        duration = round(time.time() - web_start_time, 2)
+        response_text = str(duration) + ' seconds index page load'
+        response_html = response_text
+        MY_LOGGER.debug(response_text)
+    except Exception as e:
+        response_text = 'Exception during index page load - ' + str(e)
+        response_html = response_text
+        MY_LOGGER.debug(response_text)
+        response_email_required = True
+    # count > 1 seconds as requiring attention
+    if duration >= 1:
+        response_email_required = True
+    MY_LOGGER.debug('-' * 10)
+
+    # add in HTML header / footer
+    response_html = '<h3>Website response - ' + response_html + '</h3>' + NEWLINE
+
+    MY_LOGGER.debug('=' * 30)
+    return response_text, response_html, response_email_required
+
+
 # setup paths to directories
 HOME = '/home/mike'
 APP_PATH = HOME + '/wxcapture/'
@@ -684,7 +719,7 @@ if RESULT_EMAIL_REQUIRED:
 # save latest
 wxcutils.save_json(CONFIG_PATH, 'network.json', LATESTNETWORK)
 
-# # validate ping connectivity
+# validate ping connectivity
 RESULT_TEXT, RESULT_HTML, RESULT_EMAIL_REQUIRED = check_pings()
 EMAIL_TEXT += RESULT_TEXT
 EMAIL_HTML += RESULT_HTML
@@ -692,6 +727,13 @@ if RESULT_EMAIL_REQUIRED:
     EMAIL_REQUIRED = True
 # save latest
 wxcutils.save_json(CONFIG_PATH, 'pings.json', PINGS)
+
+# website test
+RESULT_TEXT, RESULT_HTML, RESULT_EMAIL_REQUIRED = check_website()
+EMAIL_TEXT += RESULT_TEXT
+EMAIL_HTML += RESULT_HTML
+if RESULT_EMAIL_REQUIRED:
+    EMAIL_REQUIRED = True
 
 # send the email, if required
 MY_LOGGER.debug('=' * 30)

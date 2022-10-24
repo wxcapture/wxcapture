@@ -28,22 +28,35 @@ def backup_tle():
 def refresh_tle(filename):
     """refresh TLE"""
     MY_LOGGER.debug('refresh TLE - %s', filename)
+
+    # get list of sats we are interested in
+    sats = []
+    MY_LOGGER.debug('Finding satellites we need to process')
     for key, value in SATELLITE_INFO.items():
-        MY_LOGGER.debug('%s %s', key, value)
+        MY_LOGGER.debug('key = %s, value = %s', key, value)
         for line in SATELLITE_INFO[key]:
-            with urlopen('https://www.celestrak.com/NORAD/elements/' +
-                         filename + '.txt') as file_in:
-                while True:
-                    line1 = file_in.readline()
-                    line2 = file_in.readline()
-                    line3 = file_in.readline()
-                    # MY_LOGGER.debug(line1, line2, line3)
-                    if not line2:
-                        break
-                    if line['name'] == line1.decode('utf-8').strip():
-                        TLE_INFO.append({"line_1":line1.decode('utf-8'),
-                                         "line_2":line2.decode('utf-8'),
-                                         "line_3":line3.decode('utf-8')})
+            # MY_LOGGER.debug('name = %s', line['name'])
+            sats.append(line['name'])
+    MY_LOGGER.debug('sats = %s', sats)
+
+    MY_LOGGER.debug('getting %s.txt from celestrak', filename)
+    with urlopen('https://www.celestrak.com/NORAD/elements/' +
+                    filename + '.txt') as file_in:
+        while True:
+            read_data1 = file_in.readline().decode('utf-8')
+            read_data2 = file_in.readline().decode('utf-8')
+            read_data3 = file_in.readline().decode('utf-8')
+            if read_data1:
+                if read_data1.rstrip() in sats:
+                    MY_LOGGER.debug('>>%s<<', read_data1.rstrip())
+                    TLE_INFO.append({"line_1":read_data1,
+                                     "line_2":read_data2,
+                                     "line_3":read_data3})
+            else:
+                break
+
+    MY_LOGGER.debug('New tle file = %s', TLE_INFO)
+
 
 def write_file():
     """write TLE"""

@@ -68,7 +68,6 @@ def fix_image(fi_source, fi_destination, fi_image_fix):
     if fi_image_fix == 'Y':
         MY_LOGGER.debug('Image line removal start')
         y_iterator = 0
-        try_count_max = 5
         while y_iterator < image_height:
             if y_iterator%500 == 0:
                 MY_LOGGER.debug('line = %d', y_iterator)
@@ -244,6 +243,92 @@ def migrate_files():
     MY_LOGGER.debug('Completed migrating files')
 
 
+def webhook(w_enhancement):
+    """webhook an image"""
+
+    MY_LOGGER.debug('Webhooking pass for %s', w_enhancement)
+    # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
+    FILENAME_BITS = FILENAME_BASE.split('-')
+    # change filename to select which image to webhook
+    # fixed - '-fixed-rectified-tn.jpg'
+    DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + w_enhancement + '-tn.jpg'
+    DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + \
+        FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + \
+        '-' + w_enhancement + '-tn.jpg'
+    MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
+    # need to sleep a few minutes to enable the images to get to the web server
+    # otherwise the image used by the webhook API will not be accessible when the
+    # API is called
+    MY_LOGGER.debug('Wait up to 10 minutes to allow the images to get to the web server')
+    MAX_TIME = 10*60
+    SLEEP_INTERVAL = 15
+    TIMER = 0
+    while TIMER <= MAX_TIME and not wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+        MY_LOGGER.debug('Current sleep time = %d', TIMER)
+        MY_LOGGER.debug('Sleeping %d seconds', SLEEP_INTERVAL)
+        time.sleep(SLEEP_INTERVAL)
+        TIMER += SLEEP_INTERVAL
+    MY_LOGGER.debug('Sleep complete...')
+
+    # logging if the file exists on the webserver
+    if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+        MY_LOGGER.debug('url exists on webserver')
+    else:
+        MY_LOGGER.debug('url does NOT exist on webserver')
+    if TIMER >= MAX_TIME:
+        MY_LOGGER.debug('max time delay exceeded whilst waiting for image to arrive')
+
+    # get the description
+    for search, desc in IMAGE_OPTIONS['enhancements'].items():
+        if search == w_enhancement:
+            image_desc = desc
+
+    # only proceed if the image exists on webserver
+    if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+        try:
+            wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
+                                    DISCORD_IMAGE_URL,
+                                    SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
+                                    IMAGE_OPTIONS['discord colour'],
+                                    MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                    '', '', image_desc)
+        except:
+            MY_LOGGER.critical('Discord exception handler: %s %s %s',
+                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+    else:
+        MY_LOGGER.debug('The image, %s, does not exist so skipping webhooking it.')
+
+
+def tweet(t_enhancement):
+    """tweet the image"""
+
+    LOCATION_HASHTAGS = '#' + \
+        CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
+
+    # get the description
+    for search, desc in IMAGE_OPTIONS['enhancements'].items():
+        if search == t_enhancement:
+            image_desc = desc
+
+    TWEET_TEXT = 'Latest ' + image_desc + ' weather satellite pass over ' + CONFIG_INFO['Location'] + \
+        ' from ' + SATELLITE + ' on ' + PASS_INFO['start_date_local'] + \
+        ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
+    # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
+    TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + t_enhancement + '-tn.jpg'
+    # only proceed if the image exists
+    if path.exists(TWEET_IMAGE):
+        try:
+            wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json',
+                                         TWEET_TEXT, TWEET_IMAGE)
+        except:
+            MY_LOGGER.critical('Tweet exception handler: %s %s %s',
+                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+        MY_LOGGER.debug('Tweeted!')
+    else:
+        MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.',
+                        TWEET_IMAGE)
+
+
 # setup paths to directories
 HOME = os.environ['HOME']
 APP_PATH = HOME + '/wxcapture/'
@@ -252,6 +337,7 @@ LOG_PATH = CODE_PATH + 'logs/'
 OUTPUT_PATH = APP_PATH + 'output/'
 IMAGE_PATH = OUTPUT_PATH + 'images/'
 WORKING_PATH = CODE_PATH + 'working/'
+MD_WORKING_PATH = WORKING_PATH + 'mdtemp/'
 CONFIG_PATH = CODE_PATH + 'config/'
 AUDIO_PATH = APP_PATH + 'audio/'
 
@@ -354,7 +440,7 @@ try:
                          str(WX_SDR) + BIAS_T + ' -M raw -f ' + str(PASS_INFO['frequency']) +
                          'M -s 130k ' + GAIN_COMMAND +
                          ' -p 0 | sox -t raw -r 130k -c 2 -b 16 -e s - -t wav \"' +
-                         AUDIO_PATH + FILENAME_BASE + '.wav\" rate 96k')
+                         AUDIO_PATH + FILENAME_BASE + '.wav\" rate 128k')
         if os.path.isfile(AUDIO_PATH + FILENAME_BASE + '.wav'):
             MY_LOGGER.debug('Audio file created')
         else:
@@ -428,47 +514,19 @@ try:
                 MY_LOGGER.debug('create full size .jpg of each .bmp')
                 # main
                 wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE + '.bmp > ' + WORKING_PATH +
-                                 FILENAME_BASE + '.jpg')
-                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE + '-cc.bmp.bmp > ' +
-                                 WORKING_PATH + FILENAME_BASE + '-cc.jpg')
-                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
                                  ' ' + WORKING_PATH + FILENAME_BASE + '-fixed.bmp > ' +
                                  WORKING_PATH + FILENAME_BASE + '-fixed.jpg')
-                # # channels
-                # wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                #                  ' ' + WORKING_PATH + FILENAME_BASE + '_0.bmp > ' + WORKING_PATH +
-                #                  FILENAME_BASE + '_0.jpg')
-                # wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                #                  ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
-                #                  FILENAME_BASE + '_1.jpg')
-                # wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                #                  ' ' + WORKING_PATH + FILENAME_BASE + '_1.bmp > ' + WORKING_PATH +
-                #                  FILENAME_BASE + '_2.jpg')
 
                 # Generate stretched version of the colour corrected .jpg
                 MY_LOGGER.debug('Generate stretched version of the colour corrected .jpg')
                 # main
-                wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
+                # wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
                 wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '-fixed.jpg')
-                # # channels
-                # wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
-                # wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
-                # wxcutils.run_cmd('rectify-jpg ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
 
                 # move to image directory
                 MY_LOGGER.debug('move to image directory')
-                wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '-cc-rectified.jpg',
-                                   IMAGE_PATH, FILENAME_BASE + '-cc-rectified.jpg')
                 wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '-fixed-rectified.jpg',
                                    IMAGE_PATH, FILENAME_BASE + '-fixed-rectified.jpg')
-                # wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_0-rectified.jpg',
-                #                    IMAGE_PATH, FILENAME_BASE + '_0-rectified.jpg')
-                # wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_1-rectified.jpg',
-                #                    IMAGE_PATH, FILENAME_BASE + '_1-rectified.jpg')
-                # wxcutils.move_file(WORKING_PATH, FILENAME_BASE + '_2-rectified.jpg',
-                #                    IMAGE_PATH, FILENAME_BASE + '_2-rectified.jpg')
 
                 MY_LOGGER.debug('-' * 30)
 
@@ -476,50 +534,89 @@ try:
                 # main
                 MY_LOGGER.debug('create thumbnails')
                 wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                                 '-cc-rectified.jpg\" | pnmscale -xysize ' +
-                                 IMAGE_OPTIONS['thumbnail size'] +
-                                 ' | cjpeg -opti -progr -qual ' +
-                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                                 IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg\"')
-                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
                                  '-fixed-rectified.jpg\" | pnmscale -xysize ' +
                                  IMAGE_OPTIONS['thumbnail size'] +
                                  ' | cjpeg -opti -progr -qual ' +
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
                                  IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg\"')
-                # # channels
-                # wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                #                  '_0-rectified.jpg\" | pnmscale -xysize ' +
-                #                  IMAGE_OPTIONS['thumbnail size'] +
-                #                  ' | cjpeg -opti -progr -qual ' +
-                #                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                #                  IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg\"')
-                # wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                #                  '_1-rectified.jpg\" | pnmscale -xysize ' +
-                #                  IMAGE_OPTIONS['thumbnail size'] +
-                #                  ' | cjpeg -opti -progr -qual ' +
-                #                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                #                  IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg\"')
-                # wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                #                  '_2-rectified.jpg\" | pnmscale -xysize ' +
-                #                  IMAGE_OPTIONS['thumbnail size'] +
-                #                  ' | cjpeg -opti -progr -qual ' +
-                #                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                #                  IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg\"')
 
-                # create a processed image
-                wxcutils_pi.clahe_process(WORKING_PATH, FILENAME_BASE + '-cc.bmp.bmp',
-                                          WORKING_PATH, FILENAME_BASE + '-processed.bmp')
-                wxcutils.run_cmd('cjpeg -opti -progr -qual ' + IMAGE_OPTIONS['main image quality'] +
-                                 ' ' + WORKING_PATH + FILENAME_BASE +  '-processed.bmp > ' +
-                                 IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
-                wxcutils.run_cmd('rectify-jpg ' + IMAGE_PATH + FILENAME_BASE + '-processed.jpg')
-                wxcutils.run_cmd('djpeg \"' + IMAGE_PATH + FILENAME_BASE +
-                                 '-processed-rectified.jpg\" | pnmscale -xysize ' +
-                                 IMAGE_OPTIONS['thumbnail size'] +
-                                 ' | cjpeg -opti -progr -qual ' +
-                                 IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
-                                 IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg\"')
+                # remove any created images older than 6 hours
+                MY_LOGGER.debug('remove any created images older than 6 hours')
+                file_list = os.listdir(MD_WORKING_PATH)
+                epoch_seconds_now = time.time()
+                max_age = 6 * 60 * 60
+                for filename in file_list:
+                    if epoch_seconds_now - os.path.getmtime(MD_WORKING_PATH + filename) >= max_age:
+                        # delete the file
+                        wxcutils.run_cmd('rm ' + MD_WORKING_PATH + filename)
+
+                # create images with meteor_demod using qspk file
+                MY_LOGGER.debug('create images with meteor_demod using qspk file')
+                MY_LOGGER.debug('*' * 40)
+                MY_LOGGER.debug('*' * 40)
+                DATE_STRING_DMY = wxcutils.epoch_to_utc(START_EPOCH, '%d-%m-%Y')
+                MY_LOGGER.debug('DATE_STRING_DMY = %s', DATE_STRING_DMY)
+                DATE_STRING_YMD = wxcutils.epoch_to_utc(START_EPOCH, '%Y-%m-%-d')
+                MY_LOGGER.debug('DATE_STRING_YMD = %s', DATE_STRING_YMD)
+
+                wxcutils.run_cmd('meteordemod -i ' + WORKING_PATH + FILENAME_BASE + '.qpsk -t ' +
+                                 OUTPUT_PATH + FILENAME_BASE + 'weather.tle -f jpg -d ' +
+                                 DATE_STRING_DMY + ' -o ' + MD_WORKING_PATH)
+
+                # remove the unused .bmp
+                MY_LOGGER.debug('remove the unused .bmp')
+                wxcutils.run_cmd('rm ' + MD_WORKING_PATH + DATE_STRING_YMD + '*.bmp')
+
+                # copy and rename files to the output directory
+                file_list = os.listdir(MD_WORKING_PATH)
+                for filename in file_list:
+                    if filename[:11] == 'equidistant':
+                        base, ext = filename.split('.')
+                        base_bits = base.split('_')
+                        if len(base_bits) == 4:
+                            brand_search = base_bits[0] + '-' + base_bits[1] + '-' + base_bits[2]
+                            new_filename = FILENAME_BASE + '-' + brand_search + '.' + ext
+                        else:
+                            brand_search = base_bits[0] + '-' + base_bits[1]
+                            new_filename = FILENAME_BASE + '-' + brand_search + '.' + ext
+
+                        for search, desc in IMAGE_OPTIONS['enhancements'].items():
+                            if search == brand_search:
+                                branding_desc = desc
+
+                        MY_LOGGER.debug('Old filename = %s, new filename = %s', filename, new_filename)
+
+                        # move file to new location
+                        MY_LOGGER.debug('Move files to working directory')
+                        wxcutils.copy_file(MD_WORKING_PATH + filename, WORKING_PATH + new_filename)
+
+                        # add branding
+                        MY_LOGGER.debug('Add branding to image')
+                        for search, desc in IMAGE_OPTIONS['enhancements'].items():
+                            if search == brand_search:
+                                branding_desc = desc
+                        MY_LOGGER.debug('brand search = %s, description = %s', brand_search, branding_desc)
+
+                        brand_image(WORKING_PATH + new_filename,
+                                    SATELLITE, MAX_ELEVATION,
+                                    branding_desc,
+                                    IMAGE_OPTIONS['Branding'])
+
+                        # generate thumbnail
+                        name, ext = new_filename.split('.')
+                        wxcutils.run_cmd('djpeg \"' + WORKING_PATH + new_filename +
+                                        '\" | pnmscale -xysize ' +
+                                        IMAGE_OPTIONS['thumbnail size'] +
+                                        ' | cjpeg -opti -progr -qual ' +
+                                        IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
+                                        IMAGE_PATH + name + '-tn.jpg\"')
+
+                        # move file to output location
+                        MY_LOGGER.debug('move to output directory')
+                        wxcutils.move_file(WORKING_PATH, new_filename, IMAGE_PATH, new_filename)
+
+                MY_LOGGER.debug('*' * 40)
+                MY_LOGGER.debug('*' * 40)
 
     # delete bmp and qpsk files
     # also intermediate jpg files
@@ -527,11 +624,7 @@ try:
     MY_LOGGER.debug('delete intermediate files')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '*.bmp')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.qpsk')
-    wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.jpg')
-    wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '-cc.jpg')
-    # wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_0.jpg')
-    # wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_1.jpg')
-    # wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '_2.jpg')
+    wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '-fixed.jpg')
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.dec')
 
     # delete audio file?
@@ -545,35 +638,11 @@ try:
     MY_LOGGER.debug('check file size of main image')
     CREATE_PAGE = False
     try:
-        FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '-cc-rectified.jpg')
-        MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
-        if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
-            MY_LOGGER.debug('Good file size for main image -> non-bad quality')
-            CREATE_PAGE = True
-
         FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '-fixed-rectified.jpg')
         MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
         if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
             MY_LOGGER.debug('Good file size for main fixed image -> non-bad quality')
             CREATE_PAGE = True
-
-        # FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_0-rectified.jpg')
-        # MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
-        # if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
-        #     MY_LOGGER.debug('Good file size for channel 0 image -> non-bad quality')
-        #     CREATE_PAGE = True
-
-        # FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_1-rectified.jpg')
-        # MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
-        # if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
-        #     MY_LOGGER.debug('Good file size for channel 1 image -> non-bad quality')
-        #     CREATE_PAGE = True
-
-        # FILE_SIZE = os.path.getsize(IMAGE_PATH + FILENAME_BASE +  '_2-rectified.jpg')
-        # MY_LOGGER.debug('file size = %s', str(FILE_SIZE))
-        # if FILE_SIZE >= int(IMAGE_OPTIONS['image minimum']):
-        #     MY_LOGGER.debug('Good file size for channel 2 image -> non-bad quality')
-        #     CREATE_PAGE = True
 
     except Exception as err:
         MY_LOGGER.debug('Unexpected error validating norm image file size: %s %s %s',
@@ -620,104 +689,81 @@ try:
 
             html.write('<p>Click on the image to get the full size image.</p>')
 
+            MY_LOGGER.debug('FILENAME_BASE = %s', FILENAME_BASE)
+
             if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified.jpg'):
                 MY_LOGGER.debug('Adding fixed image')
                 MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
                                                 '-fixed-rectified.jpg'))
-                html.write('<h3>Processed, Noise Removed Image</h3>')
+                html.write('<h3>Processed Standard Image</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +
                            '-fixed-rectified.jpg' + '\"><img src=\"images/' +
                            FILENAME_BASE + '-fixed-rectified-tn.jpg' + '\"></a>')
 
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg'):
-                MY_LOGGER.debug('Adding processed image')
+                MY_LOGGER.debug('Adding equidistant images')
+
+                MY_LOGGER.debug('Equidistant projection 125')
                 MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-processed-rectified.jpg'))
-                html.write('<h3>Processed Image</h3>')
+                                                '-equidistant-125.jpg'))
+                html.write('<h3>Equidistant projection 125</h3>')
                 html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-processed-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-processed-rectified-tn.jpg' + '\"></a>')
+                           '-equidistant-221.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-equidistant-125-tn.jpg' + '\"></a>')
 
-            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'):
-            #     MY_LOGGER.debug('Adding image')
-            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg'))
-            #     html.write('<h3>Original Colour Image</h3>')
-            #     html.write('<a href=\"images/' + FILENAME_BASE +
-            #                '-cc-rectified.jpg' + '\"><img src=\"images/' +
-            #                FILENAME_BASE + '-cc-rectified-tn.jpg' + '\"></a>')
+                MY_LOGGER.debug('Equidistant projection 221')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-equidistant-221.jpg'))
+                html.write('<h3>Equidistant projection 221</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-equidistant-221.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-equidistant-221-tn.jpg' + '\"></a>')
 
-            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'):
-            #     MY_LOGGER.debug('Adding channel 0 image')
-            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg'))
-            #     html.write('<h3>Channel 0 Image</h3>')
-            #     html.write('<a href=\"images/' + FILENAME_BASE +
-            #                '_0-rectified.jpg' + '\"><img src=\"images/' +
-            #                FILENAME_BASE + '_0-rectified-tn.jpg' + '\"></a>')
-            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'):
-            #     MY_LOGGER.debug('Adding channel 1 image')
-            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg'))
-            #     html.write('<h3>Channel 1 Image</h3>')
-            #     html.write('<a href=\"images/' + FILENAME_BASE +
-            #                '_1-rectified.jpg' + '\"><img src=\"images/' +
-            #                FILENAME_BASE + '_1-rectified-tn.jpg' + '\"></a>')
-            # if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'):
-            #     MY_LOGGER.debug('Adding channel 2 image')
-            #     MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg'))
-            #     html.write('<h3>Channel 2 Image</h3>')
-            #     html.write('<a href=\"images/' + FILENAME_BASE +
-            #                '_2-rectified.jpg' + '\"><img src=\"images/' +
-            #                FILENAME_BASE + '_2-rectified-tn.jpg' + '\"></a>')
+                MY_LOGGER.debug('Equidistant projection infrared')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-equidistant-IR.jpg'))
+                html.write('<h3>Equidistant projection infrared</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-equidistant-IR.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-equidistant-IR-tn.jpg' + '\"></a>')
+
+                MY_LOGGER.debug('Equidistant projection Rain 125')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-equidistant-rain-125.jpg'))
+                html.write('<h3>Equidistant projection Rain 125</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-equidistant-rain-125.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-equidistant-rain-125-tn.jpg' + '\"></a>')
+
+                MY_LOGGER.debug('Equidistant projection Rain 221')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-equidistant-rain-221.jpg'))
+                html.write('<h3>Equidistant projection Rain 221</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-equidistant-rain-221.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-equidistant-rain-221-tn.jpg' + '\"></a>')
+
+                MY_LOGGER.debug('Equidistant projection Rain IR')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-equidistant-rain-IR.jpg'))
+                html.write('<h3>Equidistant projection Rain IR</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-equidistant-rain-IR.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-equidistant-rain-IR-tn.jpg' + '\"></a>')
+
+                MY_LOGGER.debug('Equidistant projection thermal')
+                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
+                                                '-equidistant-thermal.jpg'))
+                html.write('<h3>Equidistant projection thermal</h3>')
+                html.write('<a href=\"images/' + FILENAME_BASE +
+                           '-equidistant-thermal.jpg' + '\"><img src=\"images/' +
+                           FILENAME_BASE + '-equidistant-thermal-tn.jpg' + '\"></a>')
+
             html.write('</body></html>')
 
         html.close()
 
     if CREATE_PAGE:
-        # # add branding to pages
-        # brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified.jpg',
-        #             SATELLITE, MAX_ELEVATION,
-        #             'Channel 0',
-        #             IMAGE_OPTIONS['Branding'])
-        # brand_image(IMAGE_PATH + FILENAME_BASE + '_0-rectified-tn.jpg',
-        #             SATELLITE, MAX_ELEVATION,
-        #             'Channel 0',
-        #             IMAGE_OPTIONS['Branding'])
-
-        # brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified.jpg',
-        #             SATELLITE, MAX_ELEVATION,
-        #             'Channel 1',
-        #             IMAGE_OPTIONS['Branding'])
-        # brand_image(IMAGE_PATH + FILENAME_BASE + '_1-rectified-tn.jpg',
-        #             SATELLITE, MAX_ELEVATION,
-        #             'Channel 1',
-        #             IMAGE_OPTIONS['Branding'])
-
-        # brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified.jpg',
-        #             SATELLITE, MAX_ELEVATION,
-        #             'Channel 2',
-        #             IMAGE_OPTIONS['Branding'])
-        # brand_image(IMAGE_PATH + FILENAME_BASE + '_2-rectified-tn.jpg',
-        #             SATELLITE, MAX_ELEVATION,
-        #             'Channel 2',
-        #             IMAGE_OPTIONS['Branding'])
-
-        brand_image(IMAGE_PATH + FILENAME_BASE + '-cc-rectified.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Full colour',
-                    IMAGE_OPTIONS['Branding'])
-        brand_image(IMAGE_PATH + FILENAME_BASE + '-cc-rectified-tn.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Full colour',
-                    IMAGE_OPTIONS['Branding'])
-
-        brand_image(IMAGE_PATH + FILENAME_BASE + '-processed-rectified.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Processed full colour',
-                    IMAGE_OPTIONS['Branding'])
-        brand_image(IMAGE_PATH + FILENAME_BASE + '-processed-rectified-tn.jpg',
-                    SATELLITE, MAX_ELEVATION,
-                    'Processed full colour',
-                    IMAGE_OPTIONS['Branding'])
-
+        # add branding to pages
         brand_image(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Processed full colour',
@@ -730,89 +776,34 @@ try:
         # migrate files to destinations
         MY_LOGGER.debug('migrate files to destinations')
         migrate_files()
-        
+
         # tweet?
         if IMAGE_OPTIONS['tweet'] == 'yes' and \
             int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
             MY_LOGGER.debug('Tweeting pass')
-            LOCATION_HASHTAGS = '#' + \
-                CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
-            TWEET_TEXT = 'Latest weather satellite pass over ' + CONFIG_INFO['Location'] + \
-                ' from ' + SATELLITE + ' on ' + PASS_INFO['start_date_local'] + \
-                ' (Click on image to see detail) #weather ' + LOCATION_HASHTAGS
-            # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
-            # change filename to select which image to webhook
-            # normal -  '-cc-rectified-tn.jpg'
-            # processes - '-processed-rectified-tn.jpg'
-            # fixed - '-fixed-rectified-tn.jpg'
-            TWEET_IMAGE = IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg'
-            # only proceed if the image exists
-            if path.exists(TWEET_IMAGE):
-                try:
-                    wxcutils_pi.tweet_text_image(CONFIG_PATH, 'config-twitter.json',
-                                                 TWEET_TEXT, TWEET_IMAGE)
-                except:
-                    MY_LOGGER.critical('Tweet exception handler: %s %s %s',
-                                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-                MY_LOGGER.debug('Tweeted!')
-            else:
-                MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.',
-                                TWEET_IMAGE)
+            tweet('fixed-rectified')
+            tweet('equidistant-125')
+            tweet('equidistant-221')
+            tweet('equidistant-IR')
+            tweet('equidistant-rain-125')
+            tweet('equidistant-rain-221')
+            tweet('equidistant-thermal')
+
         else:
             MY_LOGGER.debug('Tweeting not enabled')
- 
+
         # discord webhook?
         if IMAGE_OPTIONS['discord webhooks'] == 'yes' and \
             int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):
 
-            MY_LOGGER.debug('Webhooking pass')
-            # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
-            FILENAME_BITS = FILENAME_BASE.split('-')
-            # change filename to select which image to webhook
-            # normal -  '-cc-rectified-tn.jpg'
-            # processes - '-processed-rectified-tn.jpg'
-            # fixed - '-fixed-rectified-tn.jpg'
-            DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg'
-            DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + \
-                FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + \
-                '-fixed-rectified-tn.jpg'
-            MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
-            # need to sleep a few minutes to enable the images to get to the web server
-            # otherwise the image used by the webhook API will not be accessible when the
-            # API is called
-            MY_LOGGER.debug('Wait up to 10 minutes to allow the images to get to the web server')
-            MAX_TIME = 10*60
-            SLEEP_INTERVAL = 15
-            TIMER = 0
-            while TIMER <= MAX_TIME and not wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
-                MY_LOGGER.debug('Current sleep time = %d', TIMER)
-                MY_LOGGER.debug('Sleeping %d seconds', SLEEP_INTERVAL)
-                time.sleep(SLEEP_INTERVAL)
-                TIMER += SLEEP_INTERVAL
-            MY_LOGGER.debug('Sleep complete...')
+            webhook('fixed-rectified')
+            webhook('equidistant-125')
+            webhook('equidistant-221')
+            webhook('equidistant-IR')
+            webhook('equidistant-rain-125')
+            webhook('equidistant-rain-221')
+            webhook('equidistant-thermal')
 
-            # logging if the file exists on the webserver
-            if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
-                MY_LOGGER.debug('url exists on webserver')
-            else:
-                MY_LOGGER.debug('url does NOT exist on webserver')
-            if TIMER >= MAX_TIME:
-                MY_LOGGER.debug('max time delay exceeded whilst waiting for image to arrive')
-
-            # only proceed if the image exists on webserver
-            if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
-                try:
-                    wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
-                                         DISCORD_IMAGE_URL,
-                                         SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
-                                         IMAGE_OPTIONS['discord colour'],
-                                         MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
-                                         '', '', 'Visible light image')
-                except:
-                    MY_LOGGER.critical('Discord exception handler: %s %s %s',
-                                       sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-            else:
-                MY_LOGGER.debug('The image, %s, does not exist so skipping webhooking it.')
         else:
             MY_LOGGER.debug('Webhooking not enabled')
 

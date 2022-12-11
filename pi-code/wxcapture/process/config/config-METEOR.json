@@ -10,8 +10,18 @@
 	"main image quality": "90",
 	"image minimum": "150000",
 	"tweet": "yes",
-	"tweet min elevation": "20",
-	"discord min elevation": "20",
+	"tweet min elevation": "10",
+	"discord min elevation": "10",
 	"discord webhooks": "yes",
-	"discord colour": "ff0000"
+	"discord colour": "ff0000",
+	"enhancements": {
+		"equidistant-125": "Equidistant projection 125 (visible + IR)",
+		"equidistant-221": "Equidistant projection 221 (visible)",
+		"equidistant-IR": "Equidistant projection infrared",
+		"equidistant-rain-125": "Equidistant projection Rain 125 (visible + IR)",
+		"equidistant-rain-221": "Equidistant projection Rain 221 (visible)",
+		"equidistant-rain-IR": "Equidistant projection IR",
+		"equidistant-thermal": "Equidistant projection thermal",
+		"fixed-rectified": "Visible light"
+	}
 }

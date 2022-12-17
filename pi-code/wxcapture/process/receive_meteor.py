@@ -8,6 +8,7 @@ create images plus pass web page"""
 # key code used for processing
 # https://github.com/dbdexter-dev/meteor_demod
 # https://github.com/artlav/meteor_decoder
+# https://github.com/Digitelektro/MeteorDemod
 
 
 # import libraries
@@ -259,8 +260,8 @@ def webhook(w_enhancement):
     # need to sleep a few minutes to enable the images to get to the web server
     # otherwise the image used by the webhook API will not be accessible when the
     # API is called
-    MY_LOGGER.debug('Wait up to 10 minutes to allow the images to get to the web server')
-    MAX_TIME = 10*60
+    MY_LOGGER.debug('Wait up to 15 minutes to allow the images to get to the web server')
+    MAX_TIME = 15 * 60
     SLEEP_INTERVAL = 15
     TIMER = 0
     while TIMER <= MAX_TIME and not wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):

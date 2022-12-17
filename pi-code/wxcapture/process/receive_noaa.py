@@ -933,12 +933,6 @@ try:
     # send to Discord webhooks, if configured
     if IMAGE_OPTIONS['discord webhooks'] == 'yes' and int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']) and KEEP_PAGE:
 
-        # need to sleep a few minutes to enable the images to get to the web server
-        # otherwise the image used by the webhook API will not be accessible when the
-        # API is called
-        MY_LOGGER.debug('Sleeping 3 minutes to allow the images to get to the web server')
-        time.sleep(180)
-        MY_LOGGER.debug('Sleep complete...')
         MY_LOGGER.debug('try the webhook API')
 
         DISCORD_GROUPS = IMAGE_OPTIONS['discord groups']
@@ -966,6 +960,21 @@ try:
                 filename_bits = FILENAME_BASE.split('-')
                 discord_image_url = CONFIG_INFO['website'] + '/' + filename_bits[0] + '/' + filename_bits[1] + '/' + filename_bits[2] + '/images/' +  FILENAME_BASE + '-' + enhancement_filename + '-tn.jpg'
                 MY_LOGGER.debug('discord_image_url = %s', discord_image_url)
+
+                # need to sleep a few minutes to enable the images to get to the web server
+                # otherwise the image used by the webhook API will not be accessible when the
+                # API is called, should only be required for the first image
+                MY_LOGGER.debug('Wait up to 15 minutes to allow the images to get to the web server')
+                MAX_TIME = 15 * 60
+                SLEEP_INTERVAL = 15
+                TIMER = 0
+                while TIMER <= MAX_TIME and not wxcutils.web_server_file_exists(discord_image_url):
+                    MY_LOGGER.debug('Current sleep time = %d', TIMER)
+                    MY_LOGGER.debug('Sleeping %d seconds', SLEEP_INTERVAL)
+                    time.sleep(SLEEP_INTERVAL)
+                    TIMER += SLEEP_INTERVAL
+                MY_LOGGER.debug('Sleep complete...')
+
                 MY_LOGGER.debug('PASS_INFO[start_date_local] = %s', PASS_INFO['start_date_local'])
                 try:
                     wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',

@@ -583,7 +583,7 @@ def process_goes(sat_num):
                     wxcutils.save_file(OUTPUT_PATH, new_filename + '-sanchez' + '.txt', get_last_generated_text(new_filename))
 
                     # if file is a GOES17 (or 18) / fd / ch13, then do a stitch of all available sats
-                    # GOES 16 / 17 / 18 / Himawari 8 / GK-2A
+                    # GOES 16 / 17 / 18 / Himawari 9 / GK-2A
                     # at the current UTC time
                     if sat_num in ('17', '18') and type_directory == 'fd' and channel_directory == 'ch13':
                         # create directory (if needed)
@@ -780,7 +780,7 @@ def process_himawari(sat_num):
             im_date = day + '-' + month + '-' + year
             im_time = hour + ':' + min + ' UTC'
 
-            web_file = create_branded('himawari', '8', type_directory, bits[2], latest_dir, filename, extenstion, im_date, im_time)
+            web_file = create_branded('himawari', '9', type_directory, bits[2], latest_dir, filename, extenstion, im_date, im_time)
 
             # copy to output directory
             MY_LOGGER.debug('new_filename = %s', new_filename)
@@ -799,7 +799,7 @@ def process_himawari(sat_num):
 
             # for IR full disc images, create a projected image
             if image_type == 'IR' and type_directory  == 'fd':
-                sanchez_dir = SANCHEZ_PATH + 'himawari8/' + type_directory + '/' + image_type + '/'
+                sanchez_dir = SANCHEZ_PATH + 'himawari9/' + type_directory + '/' + image_type + '/'
                 MY_LOGGER.debug('sanchez_dir = %s', sanchez_dir)
 
                 # create directory (if needed)
@@ -1003,8 +1003,8 @@ if number_processes(MODULE + '.py') == 1:
     # process GOES 15 files
     process_goes_2('15')
 
-    # process Himawari 8 files
-    process_himawari('8')
+    # process Himawari 9 files
+    process_himawari('9')
 
     # process GOES 18 files
     process_goes('18')

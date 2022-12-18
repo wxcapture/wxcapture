@@ -107,6 +107,9 @@ def do_backup_all():
     MY_LOGGER.debug('Himawari 8')
     errors.append({'type': 'Himawari 8', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/himawari8/', '/mnt/f/Satellites/himawari8/')})
 
+    MY_LOGGER.debug('Himawari 9')
+    errors.append({'type': 'Himawari 9', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/himawari9/', '/mnt/f/Satellites/himawari9/')})
+
     MY_LOGGER.debug('EWS-G1')
     errors.append({'type': 'EWS-G1', 'errors': do_rsync('caWv', '', 'pi@192.168.100.24:/home/pi/goes/EWS-G1/', '/mnt/f/Satellites/ews-g1/')})
 
@@ -488,6 +491,16 @@ def do_backup_new():
                                           'pi@192.168.100.24:/home/pi/goes/himawari8/fd/' + date_dir + '/',
                                           '/mnt/f/Satellites/himawari8/fd/' + date_dir + '/')})
 
+    MY_LOGGER.debug('-+' *  40)
+    MY_LOGGER.debug('Himawari 9')
+    for single_date in daterange(utc_date_last, utc_date_now):
+        date_dir = single_date.strftime("%Y-%m-%d")
+        MY_LOGGER.debug('date = %s', date_dir)
+        errors.append({'type': 'Himawari 9 - ' + dir + ' - ' + date_dir,
+                       'errors': do_rsync('caWv', '',
+                                          'pi@192.168.100.24:/home/pi/goes/himawari9/fd/' + date_dir + '/',
+                                          '/mnt/f/Satellites/himawari9/fd/' + date_dir + '/')})
+
     MY_LOGGER.debug('Himawari 8 web Data')
     directories = ['fd/IR', 'fd/VS', 'fd/WV', 'fd/IRsanchez']
 
@@ -502,6 +515,20 @@ def do_backup_new():
                                               'pi@192.168.100.24:/home/pi/goes/web/himawari8/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/web/himawari8/' + dir + '/' + date_dir + '/')})
 
+    MY_LOGGER.debug('Himawari 9 web Data')
+    directories = ['fd/IR', 'fd/VS', 'fd/WV', 'fd/IRsanchez']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'Himawari 9 web - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.24:/home/pi/goes/web/himawari9/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/web/himawari9/' + dir + '/' + date_dir + '/')})
+
     MY_LOGGER.debug('Himawari 8 Sanchez Data')
     directories = ['fd/IR']
 
@@ -515,6 +542,21 @@ def do_backup_new():
                            'errors': do_rsync('caWv', '',
                                               'pi@192.168.100.24:/home/pi/goes/sanchez/himawari8/' + dir + '/' + date_dir + '/',
                                               '/mnt/f/Satellites/sanchez/himawari8/' + dir + '/' + date_dir + '/')})
+
+    MY_LOGGER.debug('Himawari 9 Sanchez Data')
+    directories = ['fd/IR']
+
+    for dir in directories:
+        MY_LOGGER.debug('Directory = %a', dir)
+        # get all dates between the ranges
+        for single_date in daterange(utc_date_last, utc_date_now):
+            date_dir = single_date.strftime("%Y-%m-%d")
+            MY_LOGGER.debug('date = %s', date_dir)
+            errors.append({'type': 'Himawari 9 Sanchez - ' + dir + ' - ' + date_dir,
+                           'errors': do_rsync('caWv', '',
+                                              'pi@192.168.100.24:/home/pi/goes/sanchez/himawari9/' + dir + '/' + date_dir + '/',
+                                              '/mnt/f/Satellites/sanchez/himawari9/' + dir + '/' + date_dir + '/')})
+
 
     MY_LOGGER.debug('-+' *  40)
     MY_LOGGER.debug('Combined Sanchez Data')

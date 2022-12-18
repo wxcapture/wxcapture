@@ -264,23 +264,23 @@ if get_image_age(IMAGE) < 3600:
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
-# Himawari 8
-IMAGE = 'himawari_8_fd_IR-tn.jpg'
+# Himawari 9
+IMAGE = 'himawari_9_fd_IR-tn.jpg'
 if get_image_age(IMAGE) < 3600:
-    webhook(IMAGE, 'Himawari 8', 'Infra red')
+    webhook(IMAGE, 'Himawari 9', 'Infra red')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
-IMAGE = 'himawari_8_fd_VS-tn.jpg'
+IMAGE = 'himawari_9_fd_VS-tn.jpg'
 if get_image_age(IMAGE) < 3600:
-    webhook(IMAGE, 'Himawari 8', 'Visible band')
+    webhook(IMAGE, 'Himawari 9', 'Visible band')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 
 # Combined
 IMAGE = 'combined-tn.jpg'
 if get_image_age(IMAGE) < 3600:
-    webhook(IMAGE, 'GOES 13 / GOES 16 / GOES 17 / GOES 18 / Himawari 8 / GK-2A', 'Infra red')
+    webhook(IMAGE, 'GOES 13 / GOES 16 / GOES 17 / GOES 18 / Himawari 9 / GK-2A', 'Infra red')
 else:
     MY_LOGGER.debug('Image %s is too old', IMAGE)
 

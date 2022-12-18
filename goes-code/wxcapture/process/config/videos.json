@@ -456,9 +456,9 @@
         "end frame":"N"
     },
     {
-        "sat":"HIMAWARI8",
+        "sat":"HIMAWARI9",
         "description":"FD IR",
-        "location":"web/himawari8/fd/IR",
+        "location":"web/himawari9/fd/IR",
         "file match":"*FD_IR*",
         "frames":1,
         "duration":0.15,
@@ -468,9 +468,9 @@
         "end frame":"N"
     },
     {
-        "sat":"HIMAWARI8",
+        "sat":"HIMAWARI9",
         "description":"FD IR sanchez projected",
-        "location":"web/himawari8/fd/IRsanchez",
+        "location":"web/himawari9/fd/IRsanchez",
         "file match":"*FD_IR*",
         "frames":1,
         "duration":0.15,

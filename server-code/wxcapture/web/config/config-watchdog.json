@@ -72,6 +72,15 @@
 		"Active": "yes"
 	},
 	{
+		"Display Name": "Himawari 9",
+		"Location": "goes",
+		"Test Image": "himawari_9_fd_IR.jpg",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
 		"Display Name": "Electro-L 2",
 		"Location": "goes",
 		"Test Image": "electro-l-2-rgb.jpg",

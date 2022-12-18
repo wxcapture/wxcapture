@@ -431,6 +431,9 @@ process_goes_2('15')
 # process Himawari 8 files
 process_himawari('8')
 
+# process Himawari 9 files
+process_himawari('9')
+
 # process nws files
 process_nws()
 

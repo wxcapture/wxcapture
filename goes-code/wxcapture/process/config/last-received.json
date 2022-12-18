@@ -72,6 +72,15 @@
 		"Active": "yes"
 	},
 	{
+		"Display Name": "Himawari 9",
+		"Location": "himawari9",
+		"Current Age": "",
+		"Max Age": "120",
+		"Last Status": "good",
+		"Status Change": "",
+		"Active": "yes"
+	},
+	{
 		"Display Name": "Electro-L 2",
 		"Location": "electro-l-2",
 		"Current Age": "",

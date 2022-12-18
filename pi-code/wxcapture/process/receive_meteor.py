@@ -51,12 +51,12 @@ def fix_image(fi_source, fi_destination, fi_image_fix):
 
     def new_value(nv_val1, nv_val2):
         """randomized combined value"""
-        nv = ((nv_val1 + nv_val2) / 2) + random.randint(-5, 5)
-        if nv < 0:
-            nv = 0
-        elif nv > 255:
-            nv = 255
-        return int(nv)
+        nv_new_value = ((nv_val1 + nv_val2) / 2) + random.randint(-5, 5)
+        if nv_new_value < 0:
+            nv_new_value = 0
+        elif nv_new_value > 255:
+            nv_new_value = 255
+        return int(nv_new_value)
 
     image_height = 0
     image_width = 0
@@ -248,60 +248,76 @@ def webhook(w_enhancement):
     """webhook an image"""
 
     MY_LOGGER.debug('Webhooking pass for %s', w_enhancement)
+
+    # sleep to minimise rate limit being hit
+    # 20 seconds
+    time.sleep(20)
+
     # Must post the thumbnail as limit of 3MB for upload which full size image exceeds
-    FILENAME_BITS = FILENAME_BASE.split('-')
+    filename_bits = FILENAME_BASE.split('-')
     # change filename to select which image to webhook
     # fixed - '-fixed-rectified-tn.jpg'
     DISCORD_IMAGE = IMAGE_PATH + FILENAME_BASE + '-' + w_enhancement + '-tn.jpg'
-    DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + FILENAME_BITS[0] + '/' + \
-        FILENAME_BITS[1] + '/' + FILENAME_BITS[2] + '/images/' +  FILENAME_BASE + \
-        '-' + w_enhancement + '-tn.jpg'
-    MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
-    # need to sleep a few minutes to enable the images to get to the web server
-    # otherwise the image used by the webhook API will not be accessible when the
-    # API is called
-    MY_LOGGER.debug('Wait up to 15 minutes to allow the images to get to the web server')
-    MAX_TIME = 15 * 60
-    SLEEP_INTERVAL = 15
-    TIMER = 0
-    while TIMER <= MAX_TIME and not wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
-        MY_LOGGER.debug('Current sleep time = %d', TIMER)
-        MY_LOGGER.debug('Sleeping %d seconds', SLEEP_INTERVAL)
-        time.sleep(SLEEP_INTERVAL)
-        TIMER += SLEEP_INTERVAL
-    MY_LOGGER.debug('Sleep complete...')
 
-    # logging if the file exists on the webserver
-    if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
-        MY_LOGGER.debug('url exists on webserver')
+    # see if the file was created this pass
+    if path.exists(DISCORD_IMAGE):
+        MY_LOGGER.debug('File exists on this server - %s', DISCORD_IMAGE)
+
+        DISCORD_IMAGE_URL = CONFIG_INFO['website'] + '/' + filename_bits[0] + '/' + \
+            filename_bits[1] + '/' + filename_bits[2] + '/images/' +  FILENAME_BASE + \
+            '-' + w_enhancement + '-tn.jpg'
+        MY_LOGGER.debug('discord_image_url = %s', DISCORD_IMAGE_URL)
+        # need to sleep a few minutes to enable the images to get to the web server
+        # otherwise the image used by the webhook API will not be accessible when the
+        # API is called
+        MY_LOGGER.debug('Wait up to 15 minutes to allow the images to get to the web server')
+        MAX_TIME = 15 * 60
+        SLEEP_INTERVAL = 15
+        TIMER = 0
+        while TIMER <= MAX_TIME and not wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+            MY_LOGGER.debug('Current sleep time = %d', TIMER)
+            MY_LOGGER.debug('Sleeping %d seconds', SLEEP_INTERVAL)
+            time.sleep(SLEEP_INTERVAL)
+            TIMER += SLEEP_INTERVAL
+        MY_LOGGER.debug('Sleep complete...')
+
+        # logging if the file exists on the webserver
+        if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+            MY_LOGGER.debug('url exists on webserver')
+        else:
+            MY_LOGGER.debug('url does NOT exist on webserver')
+        if TIMER >= MAX_TIME:
+            MY_LOGGER.debug('max time delay exceeded whilst waiting for image to arrive')
+
+        # get the description
+        for search, desc in IMAGE_OPTIONS['enhancements'].items():
+            if search == w_enhancement:
+                image_desc = desc
+
+        # only proceed if the image exists on webserver
+        if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
+            try:
+                wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
+                                        DISCORD_IMAGE_URL,
+                                        SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
+                                        IMAGE_OPTIONS['discord colour'],
+                                        MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                        '', '', image_desc)
+            except:
+                MY_LOGGER.critical('Discord exception handler: %s %s %s',
+                                    sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
+        else:
+            MY_LOGGER.debug('The image, %s, does not exist so skipping webhooking it.')
     else:
-        MY_LOGGER.debug('url does NOT exist on webserver')
-    if TIMER >= MAX_TIME:
-        MY_LOGGER.debug('max time delay exceeded whilst waiting for image to arrive')
-
-    # get the description
-    for search, desc in IMAGE_OPTIONS['enhancements'].items():
-        if search == w_enhancement:
-            image_desc = desc
-
-    # only proceed if the image exists on webserver
-    if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
-        try:
-            wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
-                                    DISCORD_IMAGE_URL,
-                                    SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
-                                    IMAGE_OPTIONS['discord colour'],
-                                    MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
-                                    '', '', image_desc)
-        except:
-            MY_LOGGER.critical('Discord exception handler: %s %s %s',
-                                sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-    else:
-        MY_LOGGER.debug('The image, %s, does not exist so skipping webhooking it.')
+        MY_LOGGER.debug('File doesn\'t exist on this server - %s', DISCORD_IMAGE)
 
 
 def tweet(t_enhancement):
     """tweet the image"""
+
+    # sleep to minimise rate limit being hit
+    # 5 seconds
+    time.sleep(5)
 
     LOCATION_HASHTAGS = '#' + \
         CONFIG_INFO['Location'].replace(', ', ' #').replace(' ', '').replace('#', ' #')
@@ -548,6 +564,8 @@ try:
                 max_age = 6 * 60 * 60
                 for filename in file_list:
                     if epoch_seconds_now - os.path.getmtime(MD_WORKING_PATH + filename) >= max_age:
+                        # copy file to old
+                        wxcutils.copy_file(MD_WORKING_PATH + filename, MD_WORKING_PATH + 'old/' + filename)
                         # delete the file
                         wxcutils.run_cmd('rm ' + MD_WORKING_PATH + filename)
 
@@ -563,10 +581,6 @@ try:
                 wxcutils.run_cmd('meteordemod -i ' + WORKING_PATH + FILENAME_BASE + '.qpsk -t ' +
                                  OUTPUT_PATH + FILENAME_BASE + 'weather.tle -f jpg -d ' +
                                  DATE_STRING_DMY + ' -o ' + MD_WORKING_PATH)
-
-                # remove the unused .bmp
-                MY_LOGGER.debug('remove the unused .bmp')
-                wxcutils.run_cmd('rm ' + MD_WORKING_PATH + DATE_STRING_YMD + '*.bmp')
 
                 # copy and rename files to the output directory
                 file_list = os.listdir(MD_WORKING_PATH)

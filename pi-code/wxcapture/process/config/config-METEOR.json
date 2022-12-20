@@ -17,11 +17,22 @@
 	"enhancements": {
 		"equidistant-125": "Equidistant projection 125 (visible + IR)",
 		"equidistant-221": "Equidistant projection 221 (visible)",
+		"equidistant-68": "Equidistant projection 68 (IR)",
 		"equidistant-IR": "Equidistant projection infrared",
 		"equidistant-rain-125": "Equidistant projection Rain 125 (visible + IR)",
 		"equidistant-rain-221": "Equidistant projection Rain 221 (visible)",
 		"equidistant-rain-IR": "Equidistant projection IR",
 		"equidistant-thermal": "Equidistant projection thermal",
+		"equidistant-125-composite": "Equidistant projection 125 (visible + IR) composite",
+		"equidistant-221-composite": "Equidistant projection 221 (visible) composite",
+		"equidistant-68-composite": "Equidistant projection 68 (IR) composite",
+		"equidistant-68-rain-composite": "Equidistant projection 68 (IR) rain composite",
+		"equidistant-IR-composite": "Equidistant projection infrared composite",
+		"equidistant-rain-125-composite": "Equidistant projection Rain 125 (visible + IR) composite",
+		"equidistant-rain-221-composite": "Equidistant projection Rain 221 (visible) composite",
+		"equidistant-rain-IR-composite": "Equidistant projection IR composite",
+		"equidistant-thermal-composite": "Equidistant projection thermal composite",
 		"fixed-rectified": "Visible light"
+
 	}
 }

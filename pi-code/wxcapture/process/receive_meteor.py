@@ -116,7 +116,8 @@ def brand_image(bi_filename,
                 bi_satellite,
                 bi_max_elevation,
                 bi_processing,
-                bi_branding):
+                bi_branding,
+                bi_composite):
     """add image branding"""
     MY_LOGGER.debug('Adding image branding')
     MY_LOGGER.debug('filename = %s', bi_filename)
@@ -124,6 +125,10 @@ def brand_image(bi_filename,
     MY_LOGGER.debug('max_elevation = %s', bi_max_elevation)
     MY_LOGGER.debug('processing = %s', bi_processing)
     MY_LOGGER.debug('branding = %s', bi_branding)
+    if bi_composite:
+        MY_LOGGER.debug('composite = True')
+    else:
+        MY_LOGGER.debug('composite = False')
 
     try:
         # load the image
@@ -154,8 +159,13 @@ def brand_image(bi_filename,
         # headline
         MY_LOGGER.debug('add headline')
         y_val += y_inc
-        output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degrees ' + PASS_INFO['max_elevation_direction'] + ' pass', (20, y_val),
-                                   cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
+        if bi_composite:
+            output_image = cv2.putText(output_image, bi_satellite + ' - ' + ' composite', (20, y_val),
+                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
+        else:
+            output_image = cv2.putText(output_image, bi_satellite + ' - ' + bi_max_elevation + ' degrees ' + PASS_INFO['max_elevation_direction'] + ' pass', (20, y_val),
+                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
+
         y_val += y_inc
         output_image = cv2.putText(output_image, 'over ' + CONFIG_INFO['Location'], (20, y_val),
                                    cv2.FONT_HERSHEY_SIMPLEX, bi_text_size, (255, 255, 255), 2, cv2.LINE_AA)
@@ -297,12 +307,22 @@ def webhook(w_enhancement):
         # only proceed if the image exists on webserver
         if wxcutils.web_server_file_exists(DISCORD_IMAGE_URL):
             try:
-                wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
-                                        DISCORD_IMAGE_URL,
-                                        SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
-                                        IMAGE_OPTIONS['discord colour'],
-                                        MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
-                                        '', '', image_desc)
+                if 'composite' in branding_desc:
+                    MY_LOGGER.debug('Composite image')
+                    wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
+                                            DISCORD_IMAGE_URL,
+                                            SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
+                                            IMAGE_OPTIONS['discord colour'],
+                                            'Composite', 'Composite', PASS_INFO['start_date_local'],
+                                            '', '', image_desc)
+                else:
+                    MY_LOGGER.debug('Non-composite image')
+                    wxcutils_pi.webhooks(CONFIG_PATH, 'config-discord.json', 'config.json',
+                                            DISCORD_IMAGE_URL,
+                                            SATELLITE, 'Pass over ' + CONFIG_INFO['Location'],
+                                            IMAGE_OPTIONS['discord colour'],
+                                            MAX_ELEVATION, DURATION, PASS_INFO['start_date_local'],
+                                            '', '', image_desc)
             except:
                 MY_LOGGER.critical('Discord exception handler: %s %s %s',
                                     sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
@@ -344,6 +364,21 @@ def tweet(t_enhancement):
     else:
         MY_LOGGER.debug('The image, %s, does not exist so skipping tweeting it.',
                         TWEET_IMAGE)
+
+
+def add_image(ai_title, ai_file, ai_thumb):
+    """add in the HTML for an image if it exists"""
+    MY_LOGGER.debug('Adding title %s for %s image', ai_title, ai_file)
+    if os.path.isfile(IMAGE_PATH + FILENAME_BASE + ai_file):
+        MY_LOGGER.debug('File exists, so adding it...')
+        MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE + ai_file))
+        html.write('<h3>' + ai_title + '</h3>')
+        html.write('<a href=\"images/' + FILENAME_BASE +
+                   ai_file + '\"><img src=\"images/' +
+                   FILENAME_BASE + ai_thumb + '\"></a>')
+    else:
+        MY_LOGGER.debug('File does not exist, so skiping adding it...')
+        
 
 
 # setup paths to directories
@@ -557,6 +592,8 @@ try:
                                  IMAGE_OPTIONS['thumbnail quality'] + ' > \"' +
                                  IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg\"')
 
+                # start of MeteorDemod processing
+
                 # remove any created images older than 6 hours
                 MY_LOGGER.debug('remove any created images older than 6 hours')
                 file_list = os.listdir(MD_WORKING_PATH)
@@ -588,12 +625,21 @@ try:
                     if filename[:11] == 'equidistant':
                         base, ext = filename.split('.')
                         base_bits = base.split('_')
-                        if len(base_bits) == 4:
+                        MY_LOGGER.debug('filename = %s, base = %s, ext = %s, base_bits = %s, len(base_bits) = %d', filename, base, ext, base_bits, len(base_bits))
+                        if len(base_bits) == 5 and base_bits[3] == 'composite':
+                            brand_search = base_bits[0] + '-' + base_bits[2] + '-' + base_bits[3] + '-' + base_bits[4]
+                            new_filename = FILENAME_BASE + '-' + brand_search + '.' + ext
+                        elif len(base_bits) == 4 and base_bits[3] == 'composite':
+                            brand_search = base_bits[0] + '-' + base_bits[2] + '-' + base_bits[3]
+                            new_filename = FILENAME_BASE + '-' + brand_search + '.' + ext
+                        elif len(base_bits) == 4:
                             brand_search = base_bits[0] + '-' + base_bits[1] + '-' + base_bits[2]
                             new_filename = FILENAME_BASE + '-' + brand_search + '.' + ext
-                        else:
+                        elif len(base_bits) == 3:
                             brand_search = base_bits[0] + '-' + base_bits[1]
                             new_filename = FILENAME_BASE + '-' + brand_search + '.' + ext
+                        else:
+                            MY_LOGGER.error('Unandled length %s for %s', len(base_bits), base_bits)
 
                         for search, desc in IMAGE_OPTIONS['enhancements'].items():
                             if search == brand_search:
@@ -612,10 +658,17 @@ try:
                                 branding_desc = desc
                         MY_LOGGER.debug('brand search = %s, description = %s', brand_search, branding_desc)
 
+                        if 'composite' in branding_desc:
+                            MY_LOGGER.debug('Composite image')
+                            contains_composite = True
+                        else:
+                            MY_LOGGER.debug('Non-composite image')
+                            contains_composite = False
+                        
                         brand_image(WORKING_PATH + new_filename,
                                     SATELLITE, MAX_ELEVATION,
                                     branding_desc,
-                                    IMAGE_OPTIONS['Branding'])
+                                    IMAGE_OPTIONS['Branding'], contains_composite)
 
                         # generate thumbnail
                         name, ext = new_filename.split('.')
@@ -706,72 +759,31 @@ try:
 
             MY_LOGGER.debug('FILENAME_BASE = %s', FILENAME_BASE)
 
-            if os.path.isfile(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified.jpg'):
-                MY_LOGGER.debug('Adding fixed image')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-fixed-rectified.jpg'))
-                html.write('<h3>Processed Standard Image</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-fixed-rectified.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-fixed-rectified-tn.jpg' + '\"></a>')
+            add_image('Processed Standard Image', '-fixed-rectified.jpg', '-fixed-rectified-tn.jpg')
 
-                MY_LOGGER.debug('Adding equidistant images')
+            add_image('Equidistant projection 125', '-equidistant-125.jpg', '-equidistant-125-tn.jpg')
+            add_image('Equidistant projection 125 - composite', '-equidistant-125-composite.jpg', '-equidistant-125-composite-tn.jpg')
 
-                MY_LOGGER.debug('Equidistant projection 125')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-equidistant-125.jpg'))
-                html.write('<h3>Equidistant projection 125</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-equidistant-221.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-equidistant-125-tn.jpg' + '\"></a>')
+            add_image('Equidistant projection 221', '-equidistant-221.jpg', '-equidistant-221-tn.jpg')
+            add_image('Equidistant projection 221 - composite', '-equidistant-221-composite.jpg', '-equidistant-221-composite-tn.jpg')
 
-                MY_LOGGER.debug('Equidistant projection 221')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-equidistant-221.jpg'))
-                html.write('<h3>Equidistant projection 221</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-equidistant-221.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-equidistant-221-tn.jpg' + '\"></a>')
+            add_image('Equidistant projection infrared', '-equidistant-IR.jpg', '-equidistant-IR-tn.jpg')
+            add_image('Equidistant projection infrared - composite', '-equidistant-IR-composite.jpg', '-equidistant-IR-composite-tn.jpg')
 
-                MY_LOGGER.debug('Equidistant projection infrared')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-equidistant-IR.jpg'))
-                html.write('<h3>Equidistant projection infrared</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-equidistant-IR.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-equidistant-IR-tn.jpg' + '\"></a>')
+            add_image('Equidistant projection 125 rain', '-equidistant-rain-125.jpg', '-equidistant-rain-125-tn.jpg')
+            add_image('Equidistant projection 125 rain- composite', '-equidistant-rain-125-composite.jpg', '-equidistant-rain-125-composite-tn.jpg')
 
-                MY_LOGGER.debug('Equidistant projection Rain 125')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-equidistant-rain-125.jpg'))
-                html.write('<h3>Equidistant projection Rain 125</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-equidistant-rain-125.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-equidistant-rain-125-tn.jpg' + '\"></a>')
+            add_image('Equidistant projection 221 rain', '-equidistant-rain-221.jpg', '-equidistant-rain-221-tn.jpg')
+            add_image('Equidistant projection 221 rain - composite', '-equidistant-rain-221-composite.jpg', '-equidistant-rain-221-composite-tn.jpg')
 
-                MY_LOGGER.debug('Equidistant projection Rain 221')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-equidistant-rain-221.jpg'))
-                html.write('<h3>Equidistant projection Rain 221</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-equidistant-rain-221.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-equidistant-rain-221-tn.jpg' + '\"></a>')
+            add_image('Equidistant projection infrared rain', '-equidistant-rain-IR.jpg', '-equidistant-rain-IR-tn.jpg')
+            add_image('Equidistant projection infrared rain - composite', '-equidistant-rain-IR-composite.jpg', '-equidistant-rain-IR-composite-tn.jpg')
 
-                MY_LOGGER.debug('Equidistant projection Rain IR')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-equidistant-rain-IR.jpg'))
-                html.write('<h3>Equidistant projection Rain IR</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-equidistant-rain-IR.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-equidistant-rain-IR-tn.jpg' + '\"></a>')
+            add_image('Equidistant projection 68 - composite', '-equidistant-68-composite.jpg', '-equidistant-68-composite-tn.jpg')
+            add_image('Equidistant projection 68 rain - composite', '-equidistant-68-rain-composite.jpg', '-equidistant-68-rain-composite-tn.jpg')
 
-                MY_LOGGER.debug('Equidistant projection thermal')
-                MY_LOGGER.debug(os.path.getsize(IMAGE_PATH + FILENAME_BASE +
-                                                '-equidistant-thermal.jpg'))
-                html.write('<h3>Equidistant projection thermal</h3>')
-                html.write('<a href=\"images/' + FILENAME_BASE +
-                           '-equidistant-thermal.jpg' + '\"><img src=\"images/' +
-                           FILENAME_BASE + '-equidistant-thermal-tn.jpg' + '\"></a>')
+            add_image('Equidistant projection thermal', '-equidistant-thermal.jpg', '-equidistant-thermal-tn.jpg')
+            add_image('Equidistant projection thermal - composite', '-equidistant-thermal-composite.jpg', '-equidistant-thermal-composite-tn.jpg')
 
             html.write('</body></html>')
 
@@ -782,11 +794,11 @@ try:
         brand_image(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Processed full colour',
-                    IMAGE_OPTIONS['Branding'])
+                    IMAGE_OPTIONS['Branding'], False)
         brand_image(IMAGE_PATH + FILENAME_BASE + '-fixed-rectified-tn.jpg',
                     SATELLITE, MAX_ELEVATION,
                     'Processed full colour',
-                    IMAGE_OPTIONS['Branding'])
+                    IMAGE_OPTIONS['Branding'], False)
 
         # migrate files to destinations
         MY_LOGGER.debug('migrate files to destinations')
@@ -797,12 +809,25 @@ try:
             int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['tweet min elevation']):
             MY_LOGGER.debug('Tweeting pass')
             tweet('fixed-rectified')
+
             tweet('equidistant-125')
+            tweet('equidistant-125-composite')
+
             tweet('equidistant-221')
+            tweet('equidistant-221-composite')
+
             tweet('equidistant-IR')
+            tweet('equidistant-IR-composite')
+
             tweet('equidistant-rain-125')
+            tweet('equidistant-rain-125-composite')
+
             tweet('equidistant-rain-221')
+            tweet('equidistant-rain-221-composite')
+
             tweet('equidistant-thermal')
+            tweet('equidistant-thermal-composite')
+
 
         else:
             MY_LOGGER.debug('Tweeting not enabled')
@@ -812,12 +837,24 @@ try:
             int(MAX_ELEVATION) >= int(IMAGE_OPTIONS['discord min elevation']):
 
             webhook('fixed-rectified')
+
             webhook('equidistant-125')
+            webhook('equidistant-125-composite')
+
             webhook('equidistant-221')
+            webhook('equidistant-221-composite')
+
             webhook('equidistant-IR')
+            webhook('equidistant-IR-composite')
+
             webhook('equidistant-rain-125')
+            webhook('equidistant-rain-125-composite')
+
             webhook('equidistant-rain-221')
+            webhook('equidistant-rain-221-composite')
+
             webhook('equidistant-thermal')
+            webhook('equidistant-thermal-composite')
 
         else:
             MY_LOGGER.debug('Webhooking not enabled')

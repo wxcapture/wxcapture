@@ -4,6 +4,7 @@
 
 # import libraries
 import os
+import sys
 import fnmatch
 import logging
 import wxcutils
@@ -205,54 +206,59 @@ def fix_file(ff_path, ff_filename):
     # load config
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
 
-    # create page backup file
-    # only if there isn't an existing .backup file (i.e. our backup of the original)
-    if not os.path.isfile(ff_path + ff_filename + '.backup'):
-        MY_LOGGER.debug('no existing backup, so creating page backup file')
-        wxcutils.copy_file(ff_path + ff_filename, ff_path + ff_filename + '.backup')
-    else:
-        MY_LOGGER.debug('File backup exists, so retaining original backup')
-        # restore the backup and re-fix it
-        wxcutils.copy_file(ff_path + ff_filename + '.backup', ff_path + ff_filename)
+    try:
+        # create page backup file
+        # only if there isn't an existing .backup file (i.e. our backup of the original)
+        if not os.path.isfile(ff_path + ff_filename + '.backup'):
+            MY_LOGGER.debug('no existing backup, so creating page backup file')
+            wxcutils.copy_file(ff_path + ff_filename, ff_path + ff_filename + '.backup')
+        else:
+            MY_LOGGER.debug('File backup exists, so retaining original backup')
+            # restore the backup and re-fix it
+            wxcutils.copy_file(ff_path + ff_filename + '.backup', ff_path + ff_filename)
 
-     # load file
-    MY_LOGGER.debug('load file')
-    ff_page = wxcutils.load_file(ff_path, ff_filename)
+        # load file
+        MY_LOGGER.debug('load file')
+        ff_page = wxcutils.load_file(ff_path, ff_filename)
 
-    # add stylesheets
-    MY_LOGGER.debug('add stylesheets')
-    ff_page = update_page(ff_page, '</head>', '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\"><meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\"><meta name=\"author\" content=\"WxCapture\"><link rel=\"stylesheet\" href=\"/css/styles.css\"><link rel=\"stylesheet\" href=\"/lightbox/css/lightbox.min.css\"></head>')
+        # add stylesheets
+        MY_LOGGER.debug('add stylesheets')
+        ff_page = update_page(ff_page, '</head>', '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"Satellite pass capture page for NOAA / Meteor / International Space Station (ISS) SSTV / Amsat (Amateur Satellites)\"><meta name=\"keywords\" content=\"wxcapture, weather, satellite, NOAA, Meteor, images, ISS, Zarya, SSTV, Amsat, orbit, APT, LRPT, SDR, Mike, KiwiinNZ, Predictions, Auckland, New Zealand, storm, cyclone, hurricane, front, rain, wind, cloud\"><meta name=\"author\" content=\"WxCapture\"><link rel=\"stylesheet\" href=\"/css/styles.css\"><link rel=\"stylesheet\" href=\"/lightbox/css/lightbox.min.css\"></head>')
 
-    # add script code
-    MY_LOGGER.debug('add script code')
-    ff_page = update_page(ff_page, '</body>', '<script src=\"/lightbox/js/lightbox-plus-jquery.min.js\"></script></body>')
+        # add script code
+        MY_LOGGER.debug('add script code')
+        ff_page = update_page(ff_page, '</body>', '<script src=\"/lightbox/js/lightbox-plus-jquery.min.js\"></script></body>')
 
-    # remove table start
-    MY_LOGGER.debug('remove table start')
-    ff_page = update_page(ff_page, '</h2><table><tr><td>', '</h2>')
+        # remove table start
+        MY_LOGGER.debug('remove table start')
+        ff_page = update_page(ff_page, '</h2><table><tr><td>', '</h2>')
 
-    # remove table end
-    MY_LOGGER.debug('remove table end')
-    ff_page = update_page(ff_page, '</td><td></table>', '<br>')
+        # remove table end
+        MY_LOGGER.debug('remove table end')
+        ff_page = update_page(ff_page, '</td><td></table>', '<br>')
 
-    # remove table border
-    MY_LOGGER.debug('remove table border')
-    ff_page = update_page(ff_page, '<table border = 1>', '<table>')
+        # remove table border
+        MY_LOGGER.debug('remove table border')
+        ff_page = update_page(ff_page, '<table border = 1>', '<table>')
 
-    # fix audio link - amsat  only
-    if 'ISS' in ff_filename or 'SSTV' in ff_filename or 'SAUDISAT' in ff_filename or 'FOX' in ff_filename:
-        ff_page = fix_audio(ff_page, ff_path, ff_filename)
+        # fix audio link - amsat  only
+        if 'ISS' in ff_filename or 'SSTV' in ff_filename or 'SAUDISAT' in ff_filename or 'FOX' in ff_filename:
+            ff_page = fix_audio(ff_page, ff_path, ff_filename)
 
-    # update img tags to use lightbox
-    if 'ISS' in ff_filename or 'SSTV' in ff_filename:
-        ff_page = fix_img_iss(ff_page, ff_path, ff_filename)
-    else:
-        ff_page = fix_img(ff_page, ff_path, ff_filename)
+        # update img tags to use lightbox
+        if 'ISS' in ff_filename or 'SSTV' in ff_filename:
+            ff_page = fix_img_iss(ff_page, ff_path, ff_filename)
+        else:
+            ff_page = fix_img(ff_page, ff_path, ff_filename)
 
-    # MY_LOGGER.debug('%s', ff_page)
+        # MY_LOGGER.debug('%s', ff_page)
 
-    # save file
-    wxcutils.save_file(ff_path, ff_filename, ff_page)
+        # save file
+        wxcutils.save_file(ff_path, ff_filename, ff_page)
+    except:
+        MY_LOGGER.error('Encountered error processing file %s', ff_filename)
+        MY_LOGGER.error('Exception during plot creation: %s %s %s',
+                        sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
 
 FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 MY_LOGGER = None

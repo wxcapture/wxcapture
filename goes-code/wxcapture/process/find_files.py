@@ -981,7 +981,8 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 if number_processes(MODULE + '.py') == 1:
     # get local time zone
     LOCAL_TIME_ZONE = subprocess.check_output("date"). \
-        decode('utf-8').split(' ')[-2]
+        decode('utf-8').split(' ')[-1]
+    MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
     BASEDIR = '/home/pi/goes/'
     MY_LOGGER.debug('BASEDIR = %s', BASEDIR)

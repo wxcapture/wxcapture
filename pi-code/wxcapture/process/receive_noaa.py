@@ -749,14 +749,14 @@ try:
                         MY_LOGGER.debug('MY_TIME = %s', str(MY_TIME))
                         MY_LOGGER.debug('MY_SATELLITE = %s', MY_SATELLITE)
 
-                        MY_LOGGER.debug('Prior passes to include - same satellite')
+                        MY_LOGGER.debug('Prior passes to include - any NOAA satellite')
                         FILE_LIST = ''
-                        FILE_SAME_DESC = 'Passes from this morning for the ' + MY_SATELLITE + ' satellite are:<ul>'
+                        FILE_SAME_DESC = 'Passes from this morning for the NOAA satellites are:<ul>'
                         if MY_PASS_MERIDIAN == 'pm':
-                            FILE_SAME_DESC = 'Passes from this evening for the ' + MY_SATELLITE + ' satellite are:<ul>'
+                            FILE_SAME_DESC = 'Passes from this evening for the NOAA satellites are:<ul>'
                         FILE_SAME_COUNT = 0
                         for sat_pass in PASSES:
-                            if sat_pass['sat type'] == 'NOAA' and sat_pass['pass meridian'] == MY_PASS_MERIDIAN and int(sat_pass['time']) <= MY_TIME and sat_pass['satellite'] == MY_SATELLITE:
+                            if sat_pass['sat type'] == 'NOAA' and sat_pass['pass meridian'] == MY_PASS_MERIDIAN and int(sat_pass['time']) <= MY_TIME:
                                 MY_LOGGER.debug('%s %s %s %s %s', sat_pass['satellite'], sat_pass['time'], sat_pass['pass meridian'], sat_pass['start_date_local'], sat_pass['filename_base'])
                                 FILE_NAME = IMAGE_PATH + sat_pass['filename_base'] + '-' + ENHANCEMENTS[key]['filename'] + '-proj-trans.png'
                                 if os.path.isfile(FILE_NAME):
@@ -795,7 +795,7 @@ try:
                                     stdout, stderr = cmd.communicate()
                                     MY_LOGGER.debug('completed adding temperature scale')
                                 else:
-                                    MY_LOGGER.debug('unable to add temperature scale as iamge too small')
+                                    MY_LOGGER.debug('unable to add temperature scale as image too small')
 
                             wxcutils.run_cmd('convert -quality ' +
                                              IMAGE_OPTIONS['main image quality'] + ' ' +

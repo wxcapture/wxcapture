@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""sync meteor and noaa satellite data"""
+"""sync meteor satellite data"""
 
 
 # import libraries
@@ -51,81 +51,6 @@ def convert_to_utc(timestamp_string, mask, timezone):
     ts = str(ts.astimezone(pytz.utc))[0:19]
     MY_LOGGER.debug('UTC timestamp is: {}'.format(ts))
     return ts
-
-
-                        # create_noaa_image(filename_base,
-                        #                 'Coloured IR image highlighting precipitation',
-                        #                 '-e', 'MCIR-precip',
-                        #                 'mcir-precip')
-
-def create_noaa_image(cni_filename_base, cni_desc, cni_para1, cni_para2, cni_file):
-    """create NOAA images"""
-
-    MY_LOGGER.debug('Create NOAA Image')
-    MY_LOGGER.debug('cni_filename_base = %s', cni_filename_base)
-    MY_LOGGER.debug('cni_desc = %s', cni_desc)
-    MY_LOGGER.debug('cni_para1 = %s', cni_para1)
-    MY_LOGGER.debug('cni_para2 = %s', cni_para2)
-    MY_LOGGER.debug('cni_file = %s', cni_file)
-
-    cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
-                    '-m', IMAGE_PATH + cni_filename_base + '-map.png',
-                    cni_para1, cni_para2, AUDIO_PATH +
-                    cni_filename_base + '.wav', IMAGE_PATH +
-                    cni_filename_base + '-' +
-                    cni_file + '.png'],
-                stdout=PIPE, stderr=PIPE)
-    stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('===out')
-    MY_LOGGER.debug(stdout)
-    MY_LOGGER.debug('===')
-    MY_LOGGER.debug('Creating projection')
-    longitude = float(CONFIG_INFO['GPS location NS'].split(' ')[0])
-    if CONFIG_INFO['GPS location NS'].split(' ')[1] == 'S':
-        longitude *= -1
-    latitude = float(CONFIG_INFO['GPS location EW'].split(' ')[0])
-    if CONFIG_INFO['GPS location NS'].split(' ')[1] == 'W':
-        latitude *= -1
-    cmd = Popen(['/usr/local/bin/wxproj', '-o', '-' +
-                    IMAGE_OPTIONS['projection N/S type'], '-p',
-                    IMAGE_OPTIONS['projection type'],
-                    '-l', str(longitude), '-m', str(latitude), '-b',
-                    IMAGE_OPTIONS['projection bounding box'], '-s', '1',
-                    IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '.png',
-                    IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '-proj.png'],
-                stdout=PIPE, stderr=PIPE)
-    MY_LOGGER.debug('Projection %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s',
-                    '/usr/local/bin/wxproj',
-                    '-o', '-' + IMAGE_OPTIONS['projection N/S type'], '-p',
-                    IMAGE_OPTIONS['projection type'], '-l', str(longitude),
-                    '-m', str(latitude), '-b',
-                    IMAGE_OPTIONS['projection bounding box'], '-s', '1',
-                    IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '.png',
-                    IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '-proj.png')
-    stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('===out')
-    MY_LOGGER.debug(stdout)
-    MY_LOGGER.debug('===')
-    cmd = Popen(['convert', IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '-proj.png',
-                    '-transparent', '\'rgb(0,0,0)\'',
-                    IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '-proj-trans.png'],
-                stdout=PIPE, stderr=PIPE)
-    MY_LOGGER.debug('Projection transparency %s %s %s %s %s',
-                    'convert', IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '-proj.png',
-                    '-transparent', '\'rgb(0,0,0)\'',
-                    IMAGE_PATH + cni_filename_base + '-' +
-                    cni_file + '-proj-trans.png')
-    stdout, stderr = cmd.communicate()
-    MY_LOGGER.debug('===out')
-    MY_LOGGER.debug(stdout)
-    MY_LOGGER.debug('===')
 
 
 def remote_to_local(dir_name):
@@ -242,40 +167,7 @@ def remote_to_local(dir_name):
                         reprocess_cmd = wxcutils.load_file(OUTPUT_PATH, txt_to_use.replace('./', ''))
                         wxcutils.run_cmd(reprocess_cmd)
                     else:
-                        MY_LOGGER.debug('Processing a NOAA .wav file')
-
-                        # NOAA
-                        # * do processing to create projection files
-                        satellite = 'NOAA ' + entry[5:7]
-                        MY_LOGGER.debug('Satellite = %s', satellite)
-
-                        # create map
-                        # use start time as start + 420 (7 min) to get middle of pass
-                        filename_base = entry.replace('.wav', '')
-                        MY_LOGGER.debug('Creating .map file %s', filename_base + '.map')
-                        start_time = int(float(tle_epoch)) + 420
-                        wxcutils.run_cmd('/usr/local/bin/wxmap -T \"' + satellite + '\" -H '
-                            + OUTPUT_PATH + tle_to_use + ' -l 0 -o -M 1 ' +
-                            str(start_time) + ' ' + IMAGE_PATH + filename_base +
-                            '-map.png')
-
-                        # create the images
-                        create_noaa_image(filename_base,
-                                        'Coloured IR image highlighting precipitation',
-                                        '-e', 'MCIR-precip',
-                                        'mcir-precip')
-                        create_noaa_image(filename_base,
-                                        'Sea surface temperature image',
-                                        '-e', 'sea',
-                                        'sea')
-                        create_noaa_image(filename_base,
-                                        'Air temperature image',
-                                        '-e', 'therm',
-                                        'therm')
-
-
-
-                    # * re-run last locally received noaa
+                        MY_LOGGER.debug('Unknown directory / satellite type')
 
 
 def local_to_remote(dir_name):
@@ -288,13 +180,13 @@ def local_to_remote(dir_name):
     remote_file_listing = sftp.listdir(dir_name + '/Inbound')
     # MY_LOGGER.debug('remote_file_listing = %s', remote_file_listing)
 
-    # list local %composite.jpg (Meteor) or NOAA towards end of NOAA image files
+    # list local %composite.jpg (Meteor)
     local_file_listing = os.listdir(IMAGE_PATH)
     # MY_LOGGER.debug('local_file_listing = %s', local_file_listing)
 
     # copy %composite*.jpg files over if not already on remote
     for local_file in local_file_listing:
-        if dir_name.upper() in local_file and local_file not in remote_file_listing and ((local_file[-13:] == 'composite.jpg' and dir_name == 'Meteor') or (local_file[len(local_file) - 11 : len(local_file) - 7] == 'NOAA' and dir_name == 'NOAA')):
+        if dir_name.upper() in local_file and local_file not in remote_file_listing and local_file[-13:] == 'composite.jpg':
             MY_LOGGER.debug('Need to sync filename = %s', local_file)
             # put file
             sftp.put(IMAGE_PATH + local_file, dir_name + '/Inbound/' + local_file)
@@ -336,12 +228,6 @@ if number_processes('sftp-sync.py') == 1:
     LOCAL_TIME_ZONE = subprocess.check_output("date"). \
         decode('utf-8').split(' ')[-1]
     MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
-
-    # load config
-    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
-
-    # load image options
-    IMAGE_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
 
     # get the sftp configuration information
     SFTP_INFO = wxcutils.load_json(CONFIG_PATH, 'sftp-sync.json')
@@ -387,13 +273,11 @@ if number_processes('sftp-sync.py') == 1:
         sftp.chdir(SFTP_INFO['init_dir'])
 
         # sync remote to local
-        # remote_to_local('Meteor')
-        remote_to_local('NOAA')
+        remote_to_local('Meteor')
 
         # sync local to remote
-        # local_to_remote('Meteor')
-        local_to_remote('NOAA')
-
+        local_to_remote('Meteor')
+        
         # close connection
         MY_LOGGER.debug('Closing client connection sftp')
         sftp.close()

@@ -6,11 +6,14 @@
 import os
 import sys
 import subprocess
-import sys
+from subprocess import Popen, PIPE
 import os
 import socket
 import sys
 import traceback
+import pytz
+from datetime import datetime
+import time
 import paramiko
 import wxcutils
 
@@ -39,6 +42,92 @@ def number_processes(process_name):
     return 0
 
 
+def convert_to_utc(timestamp_string, mask, timezone):
+    """convert to UTC"""
+
+    local_tz = pytz.timezone(timezone)
+    ts = datetime.strptime(timestamp_string, mask)
+    ts = local_tz.localize(ts)
+    ts = str(ts.astimezone(pytz.utc))[0:19]
+    MY_LOGGER.debug('UTC timestamp is: {}'.format(ts))
+    return ts
+
+
+                        # create_noaa_image(filename_base,
+                        #                 'Coloured IR image highlighting precipitation',
+                        #                 '-e', 'MCIR-precip',
+                        #                 'mcir-precip')
+
+def create_noaa_image(cni_filename_base, cni_desc, cni_para1, cni_para2, cni_file):
+    """create NOAA images"""
+
+    MY_LOGGER.debug('Create NOAA Image')
+    MY_LOGGER.debug('cni_filename_base = %s', cni_filename_base)
+    MY_LOGGER.debug('cni_desc = %s', cni_desc)
+    MY_LOGGER.debug('cni_para1 = %s', cni_para1)
+    MY_LOGGER.debug('cni_para2 = %s', cni_para2)
+    MY_LOGGER.debug('cni_file = %s', cni_file)
+
+    cmd = Popen(['/usr/local/bin/wxtoimg', '-E', '-o', '-I', '-A',
+                    '-m', IMAGE_PATH + cni_filename_base + '-map.png',
+                    cni_para1, cni_para2, AUDIO_PATH +
+                    cni_filename_base + '.wav', IMAGE_PATH +
+                    cni_filename_base + '-' +
+                    cni_file + '.png'],
+                stdout=PIPE, stderr=PIPE)
+    stdout, stderr = cmd.communicate()
+    MY_LOGGER.debug('===out')
+    MY_LOGGER.debug(stdout)
+    MY_LOGGER.debug('===')
+    MY_LOGGER.debug('Creating projection')
+    longitude = float(CONFIG_INFO['GPS location NS'].split(' ')[0])
+    if CONFIG_INFO['GPS location NS'].split(' ')[1] == 'S':
+        longitude *= -1
+    latitude = float(CONFIG_INFO['GPS location EW'].split(' ')[0])
+    if CONFIG_INFO['GPS location NS'].split(' ')[1] == 'W':
+        latitude *= -1
+    cmd = Popen(['/usr/local/bin/wxproj', '-o', '-' +
+                    IMAGE_OPTIONS['projection N/S type'], '-p',
+                    IMAGE_OPTIONS['projection type'],
+                    '-l', str(longitude), '-m', str(latitude), '-b',
+                    IMAGE_OPTIONS['projection bounding box'], '-s', '1',
+                    IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '.png',
+                    IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '-proj.png'],
+                stdout=PIPE, stderr=PIPE)
+    MY_LOGGER.debug('Projection %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s',
+                    '/usr/local/bin/wxproj',
+                    '-o', '-' + IMAGE_OPTIONS['projection N/S type'], '-p',
+                    IMAGE_OPTIONS['projection type'], '-l', str(longitude),
+                    '-m', str(latitude), '-b',
+                    IMAGE_OPTIONS['projection bounding box'], '-s', '1',
+                    IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '.png',
+                    IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '-proj.png')
+    stdout, stderr = cmd.communicate()
+    MY_LOGGER.debug('===out')
+    MY_LOGGER.debug(stdout)
+    MY_LOGGER.debug('===')
+    cmd = Popen(['convert', IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '-proj.png',
+                    '-transparent', '\'rgb(0,0,0)\'',
+                    IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '-proj-trans.png'],
+                stdout=PIPE, stderr=PIPE)
+    MY_LOGGER.debug('Projection transparency %s %s %s %s %s',
+                    'convert', IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '-proj.png',
+                    '-transparent', '\'rgb(0,0,0)\'',
+                    IMAGE_PATH + cni_filename_base + '-' +
+                    cni_file + '-proj-trans.png')
+    stdout, stderr = cmd.communicate()
+    MY_LOGGER.debug('===out')
+    MY_LOGGER.debug(stdout)
+    MY_LOGGER.debug('===')
+
+
 def remote_to_local(dir_name):
     """remote to local sync"""
 
@@ -47,7 +136,7 @@ def remote_to_local(dir_name):
     # list files on the remote host
     MY_LOGGER.debug('get file list')
     file_listing = sftp.listdir(dir_name + '/Outbound')
-    MY_LOGGER.debug('file_listing = %s', file_listing)
+    # MY_LOGGER.debug('file_listing = %s', file_listing)
 
     # look for .wav files that:
     # start with the upper case of the directory name
@@ -56,18 +145,137 @@ def remote_to_local(dir_name):
         if entry[-4:] == '.wav' and entry[:len(dir_name)] == dir_name.upper():
             # see if file already exists in AUDIO_PATH
             if not os.path.exists(AUDIO_PATH + entry):
-                MY_LOGGER.debug('File %s does not yet exist - syncing', entry)
-                # get file
-                sftp.get(dir_name + '/Outbound/' + entry, AUDIO_PATH + entry)
+                MY_LOGGER.debug('May need to sync file %s', entry)
 
                 # need to kick off processing images based on .wav file and appropriate tle file
+                # see if we need to sync, based on file aged and if not yet synced
+                # find tle file for the same day
+                # NOAA-18-20221227-235123.wav or METEOR-M-2-20221220-060619.wav
+                if dir_name == 'Meteor':
+                    syd_date_time = entry[11:26]
+                else:
+                    syd_date_time = entry[8:23]
+                MY_LOGGER.debug('AU Syd date / time = %s', syd_date_time)
+                
+                tle_utc = convert_to_utc(syd_date_time, '%Y%m%d-%H%M%S', 'Australia/Sydney')
+                MY_LOGGER.debug('tle_utc = %s', tle_utc)
 
-                # meteor
-                # * run meteordemod
-                # * re-run last locally received
+                # only process if not "too old"
+                time_now_epoch = int(time.time())
+                MY_LOGGER.debug('time_now_epoch = %d', time_now_epoch)
 
-                # NOAA
-                # TBC!!!
+                tle_epoch = wxcutils.utc_to_epoch(tle_utc, '%Y-%m-%d %H:%M:%S')
+                MY_LOGGER.debug('tle_epoch = %s', tle_epoch)
+                MY_LOGGER.debug('tle_epoch = %d', int(float(tle_epoch)))
+                age = time_now_epoch - int(float(tle_epoch))
+                MY_LOGGER.debug('age = %d', age)
+
+                if age > MAX_AGE:
+                    MY_LOGGER.debug('File %s is too old to sync', entry)
+
+                else:
+                    MY_LOGGER.debug('File %s is young enough to sync and does not yet exist - syncing', entry)
+                    # get file
+                    sftp.get(dir_name + '/Outbound/' + entry, AUDIO_PATH + entry)
+
+                    # find nearest time tle
+                    # could match on sat name, but best to get the nearest tle
+                    # could also match on year / month / day, but there are passes just after midnight
+                    # which will be in a later day, but also potentially a later month / year
+                    tle_files = []
+                    local_file_listing = os.listdir(OUTPUT_PATH)
+                    for local_file in local_file_listing:
+                        if local_file[-4:] == '.tle':
+                            tle_files.append(local_file)
+                    tle_files.append(tle_utc.replace(' ', '-').replace(':', '-') + 'FILE-TO-MATCH')
+                    tle_files.sort()
+                    MY_LOGGER.debug('Sorted list = %s', tle_files)
+
+                    # pick the tle just before the one from Sydney, as this will be either the same or the next pass
+                    tle_to_use = 'ERROR'
+                    for tle_file in tle_files:
+                        if 'FILE-TO-MATCH' in tle_file:
+                            break
+                        else:
+                            tle_to_use = tle_file
+                    MY_LOGGER.debug('tle file to use = %s', tle_to_use)
+
+                    # meteor
+                    if dir_name == 'Meteor':
+                        MY_LOGGER.debug('Processing a Meteor .wav file')
+                        # create .s file from the .wav file
+                        filename_base = entry.replace('.wav', '')
+                        MY_LOGGER.debug('Creating .qpsk file %s', filename_base + '.qpsk')
+                        wxcutils.run_cmd('echo yes | /usr/local/bin/meteor_demod -B -r 72000 -m qpsk -o ' +
+                                        WORKING_PATH + filename_base + '.qpsk ' + AUDIO_PATH + entry)
+
+                        # run meteordemod
+                        MY_LOGGER.debug('run meteordemod')
+                        date_dmy = tle_utc[8:10] + '-' + tle_utc[5:7] + '-' + tle_utc[:4]
+                        wxcutils.run_cmd('meteordemod -i ' + WORKING_PATH + filename_base + '.qpsk -t ' +
+                                        OUTPUT_PATH + tle_to_use + ' -f jpg -d ' +
+                                        date_dmy + ' -o ' + MD_WORKING_PATH)
+
+                        # tidy up
+                        MY_LOGGER.debug('remove .qspk file')
+                        wxcutils.run_cmd('rm ' + WORKING_PATH + filename_base + '.qpsk')
+
+                        # * re-run last locally received meteor
+                        # look for Meteor .txt files
+                        txt_files = []
+                        local_file_listing = os.listdir(OUTPUT_PATH)
+                        for local_file in local_file_listing:
+                            if local_file[-4:] == '.txt' and 'METEOR' in local_file:
+                                txt_files.append(local_file)
+                        txt_files.append(tle_utc.replace(' ', '-').replace(':', '-') + 'FILE-TO-MATCH')
+                        txt_files.sort()
+                        MY_LOGGER.debug('Sorted list = %s', txt_files)
+
+                        # pick the txt just before the one from Sydney, as this will be either the same or the next pass
+                        txt_to_use = 'ERROR'
+                        for txt_file in txt_files:
+                            if 'FILE-TO-MATCH' in txt_file:
+                                break
+                            else:
+                                txt_to_use = txt_file
+                        MY_LOGGER.debug('txt file to use = %s', txt_to_use)
+                        reprocess_cmd = wxcutils.load_file(OUTPUT_PATH, txt_to_use.replace('./', ''))
+                        wxcutils.run_cmd(reprocess_cmd)
+                    else:
+                        MY_LOGGER.debug('Processing a NOAA .wav file')
+
+                        # NOAA
+                        # * do processing to create projection files
+                        satellite = 'NOAA ' + entry[5:7]
+                        MY_LOGGER.debug('Satellite = %s', satellite)
+
+                        # create map
+                        # use start time as start + 420 (7 min) to get middle of pass
+                        filename_base = entry.replace('.wav', '')
+                        MY_LOGGER.debug('Creating .map file %s', filename_base + '.map')
+                        start_time = int(float(tle_epoch)) + 420
+                        wxcutils.run_cmd('/usr/local/bin/wxmap -T \"' + satellite + '\" -H '
+                            + OUTPUT_PATH + tle_to_use + ' -l 0 -o -M 1 ' +
+                            str(start_time) + ' ' + IMAGE_PATH + filename_base +
+                            '-map.png')
+
+                        # create the images
+                        create_noaa_image(filename_base,
+                                        'Coloured IR image highlighting precipitation',
+                                        '-e', 'MCIR-precip',
+                                        'mcir-precip')
+                        create_noaa_image(filename_base,
+                                        'Sea surface temperature image',
+                                        '-e', 'sea',
+                                        'sea')
+                        create_noaa_image(filename_base,
+                                        'Air temperature image',
+                                        '-e', 'therm',
+                                        'therm')
+
+
+
+                    # * re-run last locally received noaa
 
 
 def local_to_remote(dir_name):
@@ -78,13 +286,13 @@ def local_to_remote(dir_name):
     # list files on the remote host
     MY_LOGGER.debug('get remote file list')
     remote_file_listing = sftp.listdir(dir_name + '/Inbound')
-    MY_LOGGER.debug('remote_file_listing = %s', remote_file_listing)
+    # MY_LOGGER.debug('remote_file_listing = %s', remote_file_listing)
 
     # list local %composite.jpg (Meteor) or NOAA towards end of NOAA image files
     local_file_listing = os.listdir(IMAGE_PATH)
-    MY_LOGGER.debug('local_file_listing = %s', local_file_listing)
+    # MY_LOGGER.debug('local_file_listing = %s', local_file_listing)
 
-    # copy %composite..jpg files over if not already on remote
+    # copy %composite*.jpg files over if not already on remote
     for local_file in local_file_listing:
         if dir_name.upper() in local_file and local_file not in remote_file_listing and ((local_file[-13:] == 'composite.jpg' and dir_name == 'Meteor') or (local_file[len(local_file) - 11 : len(local_file) - 7] == 'NOAA' and dir_name == 'NOAA')):
             MY_LOGGER.debug('Need to sync filename = %s', local_file)
@@ -100,6 +308,7 @@ LOG_PATH = CODE_PATH + 'logs/'
 OUTPUT_PATH = APP_PATH + 'output/'
 IMAGE_PATH = OUTPUT_PATH + 'images/'
 WORKING_PATH = CODE_PATH + 'working/'
+MD_WORKING_PATH = WORKING_PATH + 'mdtemp/'
 CONFIG_PATH = CODE_PATH + 'config/'
 AUDIO_PATH = APP_PATH + 'audio/'
 
@@ -114,6 +323,7 @@ MY_LOGGER.debug('LOG_PATH = %s', LOG_PATH)
 MY_LOGGER.debug('OUTPUT_PATH = %s', OUTPUT_PATH)
 MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
+MY_LOGGER.debug('MD_WORKING_PATH = %s', MD_WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 # detailed paramiko logging
@@ -127,18 +337,26 @@ if number_processes('sftp-sync.py') == 1:
         decode('utf-8').split(' ')[-1]
     MY_LOGGER.debug('LOCAL_TIME_ZONE = %s', LOCAL_TIME_ZONE)
 
-    # get the configuration information
-    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'sftp-sync.json')
+    # load config
+    CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
+
+    # load image options
+    IMAGE_OPTIONS = wxcutils.load_json(CONFIG_PATH, 'config-NOAA.json')
+
+    # get the sftp configuration information
+    SFTP_INFO = wxcutils.load_json(CONFIG_PATH, 'sftp-sync.json')
 
     MY_LOGGER.debug('SFTP Server Info')
-    hostname = CONFIG_INFO['sftp site']
+    hostname = SFTP_INFO['sftp site']
     MY_LOGGER.debug('sftp site = %s', hostname)
-    Port = int(CONFIG_INFO['port'])
+    Port = int(SFTP_INFO['port'])
     MY_LOGGER.debug('port = %s', Port)
-    username = CONFIG_INFO['username']
+    username = SFTP_INFO['username']
     MY_LOGGER.debug('username = %s', username)
-    password = CONFIG_INFO['password']
+    password = SFTP_INFO['password']
     MY_LOGGER.debug('password = -not logged-')
+    MAX_AGE = SFTP_INFO['max_age'] * 60 * 60
+    MY_LOGGER.debug('MAX_AGE = %s (seconds)', MAX_AGE)
 
     MY_LOGGER.debug('host keys')
     hostkeytype = None
@@ -166,20 +384,20 @@ if number_processes('sftp-sync.py') == 1:
 
         # change directory on remote host
         MY_LOGGER.debug('change directory')
-        sftp.chdir(CONFIG_INFO['init_dir'])
+        sftp.chdir(SFTP_INFO['init_dir'])
 
         # sync remote to local
-        remote_to_local('Meteor')
+        # remote_to_local('Meteor')
         remote_to_local('NOAA')
 
         # sync local to remote
-        local_to_remote('Meteor')
+        # local_to_remote('Meteor')
         local_to_remote('NOAA')
 
         # close connection
         MY_LOGGER.debug('Closing client connection sftp')
         sftp.close()
-        MY_LOGGER.debug('Closing client connection t')
+        MY_LOGGER.debug('Closing client connection transport')
         transport.close()
 
     except Exception as e:

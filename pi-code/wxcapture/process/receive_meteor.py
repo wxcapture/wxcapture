@@ -404,6 +404,7 @@ MY_LOGGER.debug('LOG_PATH = %s', LOG_PATH)
 MY_LOGGER.debug('OUTPUT_PATH = %s', OUTPUT_PATH)
 MY_LOGGER.debug('IMAGE_PATH = %s', IMAGE_PATH)
 MY_LOGGER.debug('WORKING_PATH = %s', WORKING_PATH)
+MY_LOGGER.debug('MD_WORKING_PATH = %s', MD_WORKING_PATH)
 MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 MY_LOGGER.debug('AUDIO_PATH = %s', AUDIO_PATH)
 
@@ -601,8 +602,6 @@ try:
                 max_age = 6 * 60 * 60
                 for filename in file_list:
                     if epoch_seconds_now - os.path.getmtime(MD_WORKING_PATH + filename) >= max_age:
-                        # copy file to old
-                        wxcutils.copy_file(MD_WORKING_PATH + filename, MD_WORKING_PATH + 'old/' + filename)
                         # delete the file
                         wxcutils.run_cmd('rm ' + MD_WORKING_PATH + filename)
 

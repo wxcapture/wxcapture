@@ -3,5 +3,6 @@
 	"port": "",
 	"username": "",
 	"password": "",
-	"init_dir": ""
+	"init_dir": "",
+	"max_age": 4
 }

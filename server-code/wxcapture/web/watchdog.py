@@ -381,15 +381,16 @@ def check_network():
                         response_html += '<tr><td style=\"background-color:#FF0000\" align=\"center\">ERROR</td>'
 
                     # get the previous state
+                    PREVIOUS = 'n/a'
                     for key2, value2 in PREVIOUSTNETWORK.items():
                         if key2 == 'addresses':
                             for nc2 in PREVIOUSTNETWORK[key]:
                                 if nc['description'] == nc2['description']:
-                                    PREVIOUS = nc2
+                                    PREVIOUS = nc2['status']
                                     MY_LOGGER.debug('Previous = %s', PREVIOUS)
 
                     CHANGE = 'N'
-                    if nc['status'] != PREVIOUS['status']:
+                    if nc['status'] != PREVIOUS:
                         response_email_required = True
                         CHANGE = 'Y'
                     response_html += '<td align = \"center\">' + CHANGE + '</td>'

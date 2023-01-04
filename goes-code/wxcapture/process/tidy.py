@@ -393,9 +393,6 @@ MY_LOGGER.debug('CONFIG_PATH = %s', CONFIG_PATH)
 
 
 # try:
-# get local time zone
-LOCAL_TIME_ZONE = subprocess.check_output("date"). \
-    decode('utf-8').split(' ')[-2]
 
 BASEDIR = '/home/pi/goes/'
 MY_LOGGER.debug('BASEDIR = %s', BASEDIR)
@@ -417,16 +414,16 @@ process_goes2('13')
 process_goes2('14')
 
 # process GOES 15 files
-process_goes2('15gvar')
+process_goes_2('15')
 
-# process GOES 17 files
-process_goes('17')
+# process GOES 15 files
+process_goes2('15gvar')
 
 # process GOES 16 files
 process_goes('16')
 
-# process GOES 15 files
-process_goes_2('15')
+# process GOES 17 files
+process_goes('17')
 
 # process Himawari 8 files
 process_himawari('8')

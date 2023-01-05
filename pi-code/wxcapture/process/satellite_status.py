@@ -155,9 +155,9 @@ try:
     CONFIG_INFO = wxcutils.load_json(CONFIG_PATH, 'config.json')
 
     # grap the status web pages
-    METEOR_STATUS_PAGE = get_page('http://happysat.nl/Meteor/html/Meteor_Status.html')
-    NOAA_STATUS_PAGE = get_page('https://www.ospo.noaa.gov/Operations/POES/status.html')
-    ISS_STATUS_PAGE = get_page('http://ariss-sstv.blogspot.com/')
+    METEOR_STATUS_PAGE = get_page('https://github.com/happysat/Meteor-M-N2-and-N2-2-Satellite-Operational-Status/blob/main/README.md')
+    # NOAA_STATUS_PAGE = get_page('https://www.ospo.noaa.gov/Operations/POES/status.html')
+    # ISS_STATUS_PAGE = get_page('http://ariss-sstv.blogspot.com/')
 
     # output as html
     MY_LOGGER.debug('Build webpage')

@@ -300,7 +300,7 @@ try:
 
         # footer
         html.write('<footer class=\"main-footer\">')
-        html.write('<p id=\"footer-text\">Satellite Status last updated at <span class=\"time\">' +
+        html.write('<p id=\"footer-text\">Config Status last updated at <span class=\"time\">' +
                    time.strftime('%H:%M (' +
                                  subprocess.check_output("date").
                                  decode('utf-8').split(' ')[-2] +

@@ -241,7 +241,7 @@ def migrate_files():
     files_to_copy.append({'source path': OUTPUT_PATH,
                           'source file': FILENAME_BASE + 'weather.tle',
                           'destination path': '', 'copied': 'no'})
-    if CONFIG_INFO['save .wav files'] == 'yes':
+    if CONFIG_INFO['save Meteor .wav files'] == 'yes':
         files_to_copy.append({'source path': AUDIO_PATH,
                               'source file': FILENAME_BASE + '.wav',
                               'destination path': 'audio/', 'copied': 'no'})
@@ -695,7 +695,7 @@ try:
     wxcutils.run_cmd('rm ' + WORKING_PATH + FILENAME_BASE + '.dec')
 
     # delete audio file?
-    if CONFIG_INFO['save .wav files'] == 'no':
+    if CONFIG_INFO['save Meteor .wav files'] == 'no':
         MY_LOGGER.debug('Deleting .wav audio file')
         wxcutils.run_cmd('rm ' + AUDIO_PATH + FILENAME_BASE + '.wav')
 

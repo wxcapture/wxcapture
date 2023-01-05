@@ -21,25 +21,49 @@
 				"description": "Longitude, e.g. 174.7500 E.",
 				"hidden": "no"
 			},
-			"Min Elevation-NOAA": {
+			"Min Elevation-NOAA-East": {
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
 				"hidden": "no"
 			},
-			"Min Elevation-METEOR": {
+			"Min Elevation-METEOR-East": {
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
 				"hidden": "no"
 			},
-			"Min Elevation-SSTV": {
+			"Min Elevation-SSTV-East": {
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
 				"hidden": "no"
 			},
-			"Min Elevation-AMSAT": {
+			"Min Elevation-AMSAT-East": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Min Elevation-NOAA-West": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Min Elevation-METEOR-West": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Min Elevation-SSTV-West": {
+				"required": "yes",
+				"valid values": "-number-",
+				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
+				"hidden": "no"
+			},
+			"Min Elevation-AMSAT-West": {
 				"required": "yes",
 				"valid values": "-number-",
 				"description": "The minimum maximum pass elevation to record a pass, e.g. 15.",
@@ -81,10 +105,16 @@
 				"description": "Link base directory [note that changing this will require updating the static html pages too], e.g. /.",
 				"hidden": "no"
 			},
-			"save .wav files": {
+			"save NOAA .wav files": {
 				"required": "yes",
 				"valid values": "yes|no",
-				"description": "Save .wav files after pass - no will delete them.",
+				"description": "Save NOAA .wav files after pass - no will delete them.",
+				"hidden": "no"
+			},
+			"save Meteor .wav files": {
+				"required": "yes",
+				"valid values": "yes|no",
+				"description": "Save Meteor .wav files after pass - no will delete them.",
 				"hidden": "no"
 			},
 			"email receive output": {

@@ -1007,13 +1007,13 @@ if number_processes(MODULE + '.py') == 1:
     # process Himawari 9 files
     process_himawari('9')
 
-    # process GOES 18 files
-    process_goes('18')
-
     # process GOES 17 files
+    process_goes('17')
+
+    # process GOES 18 files
     # do this one last of the image files so we've got the other
     # image files already loaded
-    process_goes('17')
+    process_goes('18')
 
     # process nws files
     process_nws()

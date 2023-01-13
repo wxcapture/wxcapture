@@ -865,7 +865,7 @@ try:
     wxcutils.save_json(OUTPUT_PATH, FILENAME_BASE + '.json', PASS_INFO)
 
     # delete audio file?
-    if CONFIG_INFO['save Meteor .wav files'] == 'no':
+    if CONFIG_INFO['save NOAA .wav files'] == 'no':
         MY_LOGGER.debug('Deleting .wav audio file')
         wxcutils.run_cmd('rm ' + AUDIO_PATH + FILENAME_BASE + '.wav')
 

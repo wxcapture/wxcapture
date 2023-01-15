@@ -547,6 +547,9 @@ def process_goes(sat_num):
                                    os.path.join(OUTPUT_PATH,
                                                 new_filename + extenstion))
 
+                # add metadata to main image
+                wxcutils.run_cmd('exiftool -description="' + get_last_generated_text(new_filename) + '" ' + os.path.join(OUTPUT_PATH, new_filename + extenstion))
+
                 # create thumbnail
                 create_thumbnail(new_filename, extenstion)
 
@@ -575,6 +578,9 @@ def process_goes(sat_num):
                     MY_LOGGER.debug('new_filename = %s', new_filename)
                     wxcutils.copy_file(web_file,
                                        os.path.join(OUTPUT_PATH, new_filename + '-sanchez' + extenstion))
+
+                    # add metadata to main image
+                    wxcutils.run_cmd('exiftool -description="' + get_last_generated_text(new_filename) + '" ' + os.path.join(OUTPUT_PATH, new_filename + '-sanchez' + extenstion))
 
                     # create thumbnail
                     create_thumbnail(new_filename + '-sanchez', extenstion)
@@ -607,6 +613,8 @@ def process_goes(sat_num):
                         wxcutils.copy_file(web_file,
                                            os.path.join(OUTPUT_PATH,
                                                         'combined.jpg'))
+                        # add metadata to main image
+                        wxcutils.run_cmd('exiftool -description="' + get_last_generated_text(new_filename) + '" ' + os.path.join(OUTPUT_PATH, 'combined.jpg'))
 
                         # create thumbnail
                         create_thumbnail('combined', '.jpg')
@@ -704,6 +712,9 @@ def process_goes_2(sat_num):
                                        os.path.join(OUTPUT_PATH,
                                                     new_filename + extenstion))
 
+                    # add metadata to main image
+                    wxcutils.run_cmd('exiftool -description="' + get_last_generated_text(new_filename) + '" ' + os.path.join(OUTPUT_PATH, new_filename + extenstion))
+
                     # create thumbnail
                     create_thumbnail(new_filename, extenstion)
 
@@ -788,6 +799,9 @@ def process_himawari(sat_num):
                                 os.path.join(OUTPUT_PATH,
                                             new_filename + extenstion))
 
+            # add metadata to main image
+            wxcutils.run_cmd('exiftool -description="' + get_last_generated_text(new_filename) + '" ' + os.path.join(OUTPUT_PATH, new_filename + extenstion))
+
             # create thumbnail
             create_thumbnail(new_filename, extenstion)
 
@@ -818,6 +832,9 @@ def process_himawari(sat_num):
                 MY_LOGGER.debug('new_filename = %s', new_filename)
                 wxcutils.copy_file(web_file,
                                    os.path.join(OUTPUT_PATH, new_filename + '-sanchez' + extenstion))
+
+                # add metadata to main image
+                wxcutils.run_cmd('exiftool -description="' + get_last_generated_text(new_filename) + '" ' + os.path.join(OUTPUT_PATH, new_filename + '-sanchez' + extenstion))
 
                 # create thumbnail
                 create_thumbnail(new_filename + '-sanchez', extenstion)
